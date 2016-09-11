@@ -1,0 +1,9 @@
+structure error, make_eint(get_int:int):eint;
+
+d-predicate ll(int, eint);
+
+axiom all i:int ll(i, error);
+
+axiom all i,j:int ll(i, make_eint(j)) eqv <=(i, j);
+
+all x,y:int all z:eint (<=(x, y) and ll(y, z)) impl ll(x, z);

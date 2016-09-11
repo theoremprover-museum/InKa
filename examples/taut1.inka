@@ -1,0 +1,7 @@
+axiom P or Q;
+
+axiom not P or Q;
+ 
+axiom P or not Q;
+
+not (not P or not Q)

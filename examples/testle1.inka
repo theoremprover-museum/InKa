@@ -1,0 +1,12 @@
+structure nil, cons(car:nat, cdr:list):list;
+
+d-predicate le(list,list);
+
+axiom all x:list not le(x, nil);
+
+axiom all x:nat all y:list le(nil, cons(x, y));
+
+axiom all x,y:nat all u,v:list le(cons(x, u), cons(y, v)) eqv le(u, v);
+
+
+all x:nat all u,v:list le(cons(x, v), u) eqv le(v, cdr(u)); 

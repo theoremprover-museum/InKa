@@ -1,0 +1,17 @@
+structure nil, cons(car:nat, cdr:list):list;
+
+function rev.app(x:list, y:list):list =
+if x = nil then y
+otherwise rev.app(cdr(x), cons(car(x), y));
+
+function rev(x:list):list = rev.app(x, nil);
+
+function app(x,y:list):list =
+if x = nil then y
+otherwise cons(car(x), app(cdr(x), y));
+
+all x:list all y,z:list rev.app(rev.app(x, y),z) = rev.app(y, app(x, z));
+
+all x:list app(x, nil) = x;
+
+all x:list rev(rev(x)) = x;

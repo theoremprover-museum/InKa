@@ -1,0 +1,55 @@
+
+structure TR, BRANCHES:tag;
+
+unspec structure tree;
+
+unspec structure label;
+
+structure nil, cons(car:tree, cdr:treelist):treelist;
+
+structure lnil, lcons(car:labellist, lcdr:labellist):labellist;
+
+structure empty, push(top:tree, pop:stack):stack;
+
+d-function top_n(nat, stack):treelist;
+
+d-function pop_n(nat, stack):stack;
+
+d-function red_trees(label, nat, stack):stack;
+
+d-function mk_tree(label, treelist):tree;
+
+d-function list(tree):stack;
+
+d-function mk-list(tree):treelist;
+
+d-function app(treelist, treelist):treelist;
+
+d-function app(labellist, labellist):labellist;
+
+d-function frontier(tag, tree):labellist;
+
+function leaves(x:treelist):labellist =
+ if x = nil then lnil
+ if x of cons then app(frontier(TR, car(x)), leaves(cdr(x)));
+
+function from_bottom(s:stack):treelist =
+ if s = empty then nil
+ if s of push then app(from_bottom(pop(s)), mk-list(top(s)));
+
+axiom all lhs:label all size:nat all st:stack
+  red_trees(lhs, size, st) = push(mk_tree(lhs,top_n(size, st)), pop_n(size, st));
+
+axiom all x:tree all y:stack from_bottom(push(x, y)) = app(from_bottom(y), mk-list(x));
+
+axiom all x,y:treelist leaves(app(x, y)) = app(leaves(x), leaves(y));
+
+axiom all x:tree leaves(mk-list(x)) = frontier(TR, x);
+
+axiom all x:label all y:treelist frontier(TR, mk_tree(x, y)) = leaves(y);
+
+axiom all n:nat all s:stack app(from_bottom(pop_n(n, s)), top_n(n, s))  = from_bottom(s);
+
+
+all lhs:label all size:nat all st:stack
+  leaves(from_bottom(red_trees(lhs, size, st))) = leaves(from_bottom(st));

@@ -1,0 +1,54 @@
+structure nil, cons(car:int, cdr:list):list;
+
+function merge(x,y:list):list =
+ if x = nil then y
+ otherwise {if y = nil then x
+            if y of cons then {if <=(car(x), car(y)) then cons(car(x), merge(cdr(x), y))
+                               otherwise cons(car(y), merge(x, cdr(y))) }} ;
+
+function split1(x:list):list =
+ if x = nil then nil
+ if x of cons and cdr(x) = nil then nil
+ otherwise cons(car(cdr(x)), split1(cdr(cdr(x))));
+
+function split2(x:list):list =
+ if x = nil then nil
+ if x of cons and cdr(x) = nil then x
+ otherwise cons(car(x), split2(cdr(cdr(x))));
+
+function merge_sort(x:list):list =
+ if x = nil then nil
+ if x of cons and cdr(x) = nil then x
+ otherwise merge(merge_sort(split1(x)), merge_sort(split2(x)));
+
+predicate le(x:int, y:list) =
+ if y = nil then true
+ if y of cons then <=(x, car(y)) and le(x, cdr(y));
+
+predicate ordered(x:list) =
+ if x = nil then true
+ if x of cons then le(car(x), cdr(x)) and ordered(cdr(x));
+
+all x:int all y,z:list le(x, merge(y, z)) impl le(x,y) and le(x, z);
+
+all x:int all y,z:list le(x,y) and le(x, z) impl le(x, merge(y, z));
+
+all x,y:int all z:list (<=(x, y) and le(y, z)) impl le(x, z);
+
+all x,y:list (ordered(x) and ordered(y)) impl ordered(merge(x,y));
+
+all x,y:list ordered(merge(x,y)) impl (ordered(x) and ordered(y));
+
+all x:list ordered(merge_sort(x));
+
+function delete(x:int, y:list):list =
+if y = nil then nil
+if y of cons and car(y) = x then cdr(y)
+otherwise cons(car(y), delete(x, cdr(y)));
+
+predicate member(x:int, y:list) =
+if y = nil then false
+if y of cons and car(y) = x then true
+otherwise member(x, cdr(y));
+
+all x:list all n:int ordered(x) impl (ex y:list ordered(y) and x = delete(n, y) and member(n, y));

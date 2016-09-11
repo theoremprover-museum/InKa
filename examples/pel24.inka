@@ -1,0 +1,21 @@
+unspec structure dummy;
+
+d-predicate ps(dummy);
+
+d-predicate p(dummy);
+
+d-predicate q(dummy);
+
+d-predicate r(dummy);
+
+axiom all x:dummy not ps(x) or not q(x);
+
+axiom all x:dummy not p(x) or Q(x) or r(x);
+
+axiom ex x,y:dummy p(x) or q(y);
+
+axiom all x:dummy q(x) or ps(x);
+
+axiom all x:dummy not r(x) or ps(x);
+
+ex x:dummy p(x) and r(x);

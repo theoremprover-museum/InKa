@@ -1,0 +1,21 @@
+axiom all x f(x e) = x
+
+axiom all x f(x x ) = e
+
+axiom all x,y f(g(x) y) = g(f(x y))
+
+axiom all x,y,z f(f(x y) z) = f(x f(y z))
+
+axiom all x,y f(x y) = f(y x)
+
+all x,y,z y = f(g(f(y x)) f(g(f(x z)) z))
+
+
+
+
+
+
+
+
+
+OK

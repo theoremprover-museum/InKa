@@ -1,0 +1,49 @@
+Return-Path: sengler@serv-400.dfki.uni-sb.de 
+Delivery-Date: Tue, 23 Apr 1996 16:01:41 +0200
+Return-Path: sengler@serv-400.dfki.uni-sb.de
+Organization: DFKI Saarbruecken GmbH, D 66123 Saarbruecken
+Received: from ws-401.dfki.uni-sb.de (ws-401 [134.96.184.22]) by serv-400.dfki.uni-sb.de (8.7.5/8.7.3) with ESMTP id QAA01242 for <hutter>; Tue, 23 Apr 1996 16:01:40 +0200 (MET DST)
+From: Claus Sengler <Claus.Sengler@dfki.uni-sb.de>
+Received: from localhost (sengler@localhost) by ws-401.dfki.uni-sb.de (8.7.5/8.7.3) with ESMTP id QAA06701 for <hutter>; Tue, 23 Apr 1996 16:01:35 +0200 (MET DST)
+Message-Id: <199604231401.QAA06701@ws-401.dfki.uni-sb.de>
+X-Mailer: exmh version 1.6.5 12/11/95
+To: hutter@dfki.uni-sb.de
+Subject: wfo.subsumed....
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Date: Tue, 23 Apr 1996 16:01:35 +0200
+
+unspec structure el;
+
+free structure nil, cons(car:el, cdr:list):list;
+
+d-predicate <(el, el);
+
+predicate member(e:el, l:list) =
+if l = nil then false
+otherwise {
+if car(l) = e then true
+otherwise member(e, cdr(l))
+};
+
+predicate sorted(l:list) =
+if l = nil then true
+otherwise {
+if cdr(l) = nil then true
+otherwise {
+if not <(car(l), car(cdr(l))) then false
+otherwise sorted(cdr(l))
+}};
+
+axiom all e:el not <(e, e);
+axiom all e1, e2, e3:el 
+(<(e1, e2) and <(e2, e3)) -> <(e1, e3);
+axiom all e1, e2:el <(e1, e2) or e1 = e2 or <(e2, e1);
+
+
+all l1,l2:list (sorted(l1) and sorted(l2) and (all e:el (member(e, l1) <-> 
+member(e, l2))))
+-> l1 = l2;
+
+
+

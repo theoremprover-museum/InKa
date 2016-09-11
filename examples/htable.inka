@@ -1,0 +1,69 @@
+unspec structure sset;
+
+unspec structure elem;
+
+d-function trans_empty:sset;
+
+d-function trans_adds(sset, elem):sset;
+
+d-function trans_subs(sset, elem):sset;
+
+d-predicate in(elem, sset);
+
+axiom all se1, se2:sset se1 = se2 <-> (all ele:elem in(ele,se1) <-> in(ele,se2));
+
+axiom all ele:elem  not in(ele, trans_empty);
+
+axiom all ele2, ele1:elem all se:sset in(ele1,trans_adds(se,ele2)) <-> (ele1 = ele2 or in(ele1,se));
+
+axiom all ele2, ele1:elem all se:sset in(ele1,trans_subs(se,ele2)) <-> (not ele1 = ele2 and in(ele1,se));
+
+
+
+%neg. theorem th_1; 
+ex ele:elem ex se:sset trans_adds(se,ele) = se and not in(ele,se);
+
+%neg. theorem th_2; 
+ex ele:elem ex se:set trans_subs(se,ele) = se and in(ele,se);
+
+%neg. theorem th_3; 
+%-(all se (set(se) -> (all ele (elem(ele) -> (trans_adds(trans_adds(se,ele),ele) = trans_adds(se,ele)))))).
+
+%neg. theorem th_4; 
+%-(all se (set(se) -> (all ele1 (elem(ele1) -> (all ele2 (elem(ele2) -> (((-(in(ele1,trans_subs(se,ele2))) & in(ele1,se)) -> ele1 = ele2)))))))).
+
+%neg. theorem th_5; 
+%-(all se (set(se) -> (all ele1 (elem(ele1) -> (all ele2 (elem(ele2) -> (((in(ele1,trans_adds(se,ele2)) & -(in(ele1,se))) -> ele1 = ele2)))))))).
+
+%neg. theorem th_6; 
+%-(all se (set(se) -> (all ele (elem(ele) -> (in(ele,trans_adds(se,ele))))))).
+
+%neg. theorem th_7; 
+%-(all ele2 (elem(ele2) -> (all ele1 (elem(ele1) -> (all se (set(se) -> ((-(in(ele1,trans_adds(se,ele2))) -> (-(ele1 = ele2) & -(in(ele1,se))))))))))).
+
+%neg. theorem th_8; 
+%-(all ele2 (elem(ele2) -> (all ele1 (elem(ele1) -> (all se (set(se) -> (((in(ele1,trans_adds(se,ele2)) & -(ele1 = ele2)) -> in(ele1,se))))))))).
+
+%neg. theorem th_9; 
+%-(all se (set(se) -> (all ele (elem(ele) -> (-(in(ele,trans_subs(se,ele)))))))).
+
+%neg. theorem th_10; 
+%-(all ele2 (elem(ele2) -> (all ele1 (elem(ele1) -> (all se (set(se) -> ((in(ele1,trans_subs(se,ele2)) -> (-(ele1 = ele2) & in(ele1,se)))))))))).
+
+%neg. theorem th_11; 
+%-(all ele2 (elem(ele2) -> (all ele1 (elem(ele1) -> (all se (set(se) -> (((-(in(ele1,trans_subs(se,ele2))) & -(ele1 = ele2)) -> -(in(ele1,se)))))))))).
+
+%neg. theorem th_12; 
+%-(all se (set(se) -> (all ele (elem(ele) -> (trans_adds(trans_subs(se,ele),ele) = trans_adds(se,ele)))))).
+
+%neg. theorem th_13; 
+%-(all ele (elem(ele) -> (trans_subs(trans_empty,ele) = trans_empty))).
+
+%neg. theorem th_14; 
+%-(all se (set(se) -> (all ele (elem(ele) -> (trans_subs(trans_adds(se,ele),ele) = trans_subs(se,ele)))))).
+
+%neg. theorem th_15; 
+%-(all ele (elem(ele) -> (all ele1 (elem(ele1) -> ((in(ele,trans_adds(trans_empty,ele1)) <-> ele = ele1)))))).
+
+%neg. theorem th_16; 
+%-(all se (set(se) -> (all ele1 (elem(ele1) -> (all ele2 (elem(ele2) -> ((trans_subs(trans_adds(se,ele1),ele2) = trans_adds(trans_subs(se,ele2),ele1) | ele1 = ele2)))))))).

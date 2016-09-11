@@ -1,0 +1,33 @@
+structure nil, cons(car:nat, cdr:list):list;
+
+predicate le(x,y:nat) =
+if x = 0 then true
+if not x = 0 and y = 0 then false
+otherwise le(p(x), p(y));
+
+predicate ord(x:list) =
+if x = nil then true
+if x = cons(car(x), nil) then true
+if x of cons and cdr(x) of cons and le(car(x), car(cdr(x))) then ord(cdr(x))
+otherwise false;
+
+function ins(x:nat, y:list):list =
+if y = nil then cons(x, nil)
+if y of cons and le(x, car(y)) then cons(x, y)
+otherwise cons(car(y), ins(x, cdr(y)));
+
+function sort(x:list):list =
+if x = nil then nil
+otherwise ins(car(x), sort(cdr(x)));
+
+
+all x,y:nat le(x, y) or le(y, x);
+
+all x:list all n,m:nat 
+   ord(ins(n, x)) and not le(n, m) and le(m, car(x))
+   impl ord(cons(m, ins(n, x)));
+
+all x:list all n:nat ord(x) impl ord(ins(n, x));
+
+all x:list ord(sort(x));
+

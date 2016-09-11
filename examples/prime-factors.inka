@@ -1,0 +1,267 @@
+ +INSERT
+STRUCTURE 0 succ (pred:number):number
+ |
+ -INSERT
+structure empty add(head:number tail:list):list
+ |
+ -INSERT
+function append(x,y:list):list=
+if x=empty then y
+if x=add(head(x) tail(x)) then add(head(x) append(tail(x) y))
+ |
+ -INSERT
+FUNCTION min (n1,n2:number):number =
+IF n1 = 0 THEN 0
+IF n1 = succ (pred (n1)) AND n2 = 0 THEN 0
+IF n1 = succ (pred (n1)) AND n2 = succ (pred (n2))
+   THEN succ (min (pred (n1) pred (n2)))
+ |
+ -INSERT
+PREDICATE Lt (n1,n2:number) =
+IF n2 = 0 THEN False
+IF n1 = 0 AND NOT n2 = 0 THEN True
+IF n1 = succ (pred (n1)) AND n2 = succ (pred (n2))
+   THEN Lt (pred (n1) pred (n2))
+ |
+ -INSERT
+FUNCTION minus1 (n1,n2:number):number =
+IF n2 = 0 THEN n1
+IF n2 = succ (pred (n2)) THEN minus1 (pred (n1) pred (n2))
+ |
+ -INSERT
+FUNCTION remainder1 (n1,n2:number):number =
+IF n2 = 0 THEN n2
+IF Lt (n1 n2) THEN min (n1 n2)
+IF NOT Lt (n1 n2) AND n2 = succ (pred (n2))
+   THEN remainder1 (minus1 (n1 n2) n2)
+ |
+ -INSERT
+FUNCTION greatest.factor1 (n1,n2:number):number =
+IF n2 = 0 THEN n1
+IF n2 = succ (pred (n2)) AND pred (n2) = 0 THEN n1
+IF n2 = succ (pred (n2)) AND NOT pred (n2) = 0 AND remainder1 (n1 n2) = 0
+   THEN min (n1 n2)
+IF n2 = succ (pred (n2)) AND NOT pred (n2) = 0 AND NOT remainder1 (n1 n2) = 0
+   THEN greatest.factor1 (n1 pred (n2))
+ |
+ -INSERT
+PREDICATE Prime1 (n1,n2:number) =
+IF n2 = 0 THEN False
+IF n2 = succ (pred (n2)) AND pred (n2) = 0 THEN True
+IF n2 = succ (pred (n2)) AND NOT pred (n2) = 0 AND remainder1 (n1 n2) = 0
+   THEN False
+IF n2 = succ (pred (n2)) AND NOT pred (n2) = 0 AND NOT remainder1 (n1 n2) = 0
+   THEN Prime1 (n1 pred (n2))
+ |
+ -INSERT
+FUNCTION quotient1 (n1,n2:number):number =
+IF n2 = 0 THEN n1
+IF Lt (n1 n2) THEN 0
+IF NOT Lt (n1 n2) AND n2 = succ (pred (n2))
+   THEN succ (quotient1 (minus1 (pred (n1) pred (n2)) n2))
+ |
+ -INSERT
+function prime.factors1(x:number):list=
+if x=0 then empty
+if x=succ(pred(x)) and pred(x)=0 then empty
+if x=succ(pred(x)) and not pred(x)=0 and prime1(x pred(x)) then add(x empty)
+if x=succ(pred(x)) and not pred(x)=0 and not prime1(x pred(x)) then
+append(prime.factors1(greatest.factor1(x pred(x)))
+       prime.factors1(quotient1(x greatest.factor1(x pred(x)))))
+ |
+ -INSERT
+FUNCTION minus2 (n1,n2:number):number =
+IF n2 = 0 THEN n1
+IF n2 = succ (pred (n2)) THEN pred (minus2 (n1 pred (n2)))
+ |
+ -INSERT
+FUNCTION remainder2 (n1,n2:number):number =
+IF n2 = 0 THEN n2
+IF Lt (n1 n2) THEN min (n1 n2)
+IF NOT Lt (n1 n2) AND n2 = succ (pred (n2))
+   THEN remainder2 (minus2 (n1 n2) n2)
+ |
+ -INSERT
+FUNCTION greatest.factor2 (n1,n2:number):number =
+IF n2 = 0 THEN n1
+IF n2 = succ (pred (n2)) AND pred (n2) = 0 THEN n1
+IF n2 = succ (pred (n2)) AND NOT pred (n2) = 0 AND remainder2 (n1 n2) = 0
+   THEN min (n1 n2)
+IF n2 = succ (pred (n2)) AND NOT pred (n2) = 0 AND NOT remainder2 (n1 n2) = 0
+   THEN greatest.factor2 (n1 pred (n2))
+ |
+ -INSERT
+PREDICATE Prime2 (n1,n2:number) =
+IF n2 = 0 THEN False
+IF n2 = succ (pred (n2)) AND pred (n2) = 0 THEN True
+IF n2 = succ (pred (n2)) AND NOT pred (n2) = 0 AND remainder2 (n1 n2) = 0
+   THEN False
+IF n2 = succ (pred (n2)) AND NOT pred (n2) = 0 AND NOT remainder2 (n1 n2) = 0
+   THEN Prime2 (n1 pred (n2))
+ |
+ -INSERT
+FUNCTION quotient2 (n1,n2:number):number =
+IF n2 = 0 THEN n1
+IF Lt (n1 n2) THEN 0
+IF NOT Lt (n1 n2) AND n2 = succ (pred (n2))
+   THEN succ (quotient2 (minus2 (pred (n1) pred (n2)) n2))
+ |
+ -INSERT
+function prime.factors2(x:number):list=
+if x=0 then empty
+if x=succ(pred(x)) and pred(x)=0 then empty
+if x=succ(pred(x)) and not pred(x)=0 and prime2(x pred(x)) then add(x empty)
+if x=succ(pred(x)) and not pred(x)=0 and not prime2(x pred(x)) then
+append(prime.factors2(greatest.factor2(x pred(x)))
+       prime.factors2(quotient2(x greatest.factor2(x pred(x)))))
+ |
+ -INSERT
+FUNCTION minus3 (n1,n2:number):number =
+IF n1 = 0 THEN n1
+IF n1 = succ (pred (n1)) AND n2 = 0 THEN n1
+IF n1 = succ (pred (n1)) AND n2 = succ (pred (n2))
+   THEN minus3 (pred (n1) pred (n2))
+ |
+ -INSERT
+FUNCTION remainder3 (n1,n2:number):number =
+IF n2 = 0 THEN n2
+IF Lt (n1 n2) THEN min (n1 n2)
+IF NOT Lt (n1 n2) AND n2 = succ (pred (n2))
+   THEN remainder3 (minus3 (n1 n2) n2)
+ |
+ -INSERT
+FUNCTION greatest.factor3 (n1,n2:number):number =
+IF n2 = 0 THEN n1
+IF n2 = succ (pred (n2)) AND pred (n2) = 0 THEN n1
+IF n2 = succ (pred (n2)) AND NOT pred (n2) = 0 AND remainder3 (n1 n2) = 0
+   THEN min (n1 n2)
+IF n2 = succ (pred (n2)) AND NOT pred (n2) = 0 AND NOT remainder3 (n1 n2) = 0
+   THEN greatest.factor3 (n1 pred (n2))
+ |
+ -INSERT
+PREDICATE Prime3 (n1,n2:number) =
+IF n2 = 0 THEN False
+IF n2 = succ (pred (n2)) AND pred (n2) = 0 THEN True
+IF n2 = succ (pred (n2)) AND NOT pred (n2) = 0 AND remainder3 (n1 n2) = 0
+   THEN False
+IF n2 = succ (pred (n2)) AND NOT pred (n2) = 0 AND NOT remainder3 (n1 n2) = 0
+   THEN Prime3 (n1 pred (n2))
+ |
+ -INSERT
+FUNCTION quotient3 (n1,n2:number):number =
+IF n2 = 0 THEN n1
+IF Lt (n1 n2) THEN 0
+IF NOT Lt (n1 n2) AND n2 = succ (pred (n2))
+   THEN succ (quotient3 (minus3 (pred (n1) pred (n2)) n2))
+ |
+ -INSERT
+function prime.factors3(x:number):list=
+if x=0 then empty
+if x=succ(pred(x)) and pred(x)=0 then empty
+if x=succ(pred(x)) and not pred(x)=0 and prime3(x pred(x)) then add(x empty)
+if x=succ(pred(x)) and not pred(x)=0 and not prime3(x pred(x)) then
+append(prime.factors3(greatest.factor3(x pred(x)))
+       prime.factors3(quotient3(x greatest.factor3(x pred(x)))))
+ |
+ -INSERT
+FUNCTION minus4 (n1,n2:number):number =
+IF n1 = 0 THEN n1
+IF n1 = succ (pred (n1)) AND n2 = 0 THEN n1
+IF n1 = succ (pred (n1)) AND n2 = succ (pred (n2))
+   THEN pred (minus4 (n1 pred (n2)))
+ |
+ -INSERT
+FUNCTION remainder4 (n1,n2:number):number =
+IF n2 = 0 THEN n2
+IF Lt (n1 n2) THEN min (n1 n2)
+IF NOT Lt (n1 n2) AND n2 = succ (pred (n2))
+   THEN remainder4 (minus4 (n1 n2) n2)
+ |
+ -INSERT
+FUNCTION greatest.factor4 (n1,n2:number):number =
+IF n2 = 0 THEN n1
+IF n2 = succ (pred (n2)) AND pred (n2) = 0 THEN n1
+IF n2 = succ (pred (n2)) AND NOT pred (n2) = 0 AND remainder4 (n1 n2) = 0
+   THEN min (n1 n2)
+IF n2 = succ (pred (n2)) AND NOT pred (n2) = 0 AND NOT remainder4 (n1 n2) = 0
+   THEN greatest.factor4 (n1 pred (n2))
+ |
+ -INSERT
+PREDICATE Prime4 (n1,n2:number) =
+IF n2 = 0 THEN False
+IF n2 = succ (pred (n2)) AND pred (n2) = 0 THEN True
+IF n2 = succ (pred (n2)) AND NOT pred (n2) = 0 AND remainder4 (n1 n2) = 0
+   THEN False
+IF n2 = succ (pred (n2)) AND NOT pred (n2) = 0 AND NOT remainder4 (n1 n2) = 0
+   THEN Prime4 (n1 pred (n2))
+ |
+ -INSERT
+FUNCTION quotient4 (n1,n2:number):number =
+IF n2 = 0 THEN n1
+IF Lt (n1 n2) THEN 0
+IF NOT Lt (n1 n2) AND n2 = succ (pred (n2))
+   THEN succ (quotient4 (minus4 (pred (n1) pred (n2)) n2))
+ |
+ -INSERT
+function prime.factors4(x:number):list=
+if x=0 then empty
+if x=succ(pred(x)) and pred(x)=0 then empty
+if x=succ(pred(x)) and not pred(x)=0 and prime4(x pred(x)) then add(x empty)
+if x=succ(pred(x)) and not pred(x)=0 and not prime4(x pred(x)) then
+append(prime.factors4(greatest.factor4(x pred(x)))
+       prime.factors4(quotient4(x greatest.factor4(x pred(x)))))
+ |
+ -INSERT
+PREDICATE Gt (n1,n2:number) =
+IF n1 = 0 THEN False
+IF n1 = succ (pred (n1)) AND n2 = 0 THEN True
+IF n1 = succ (pred (n1)) AND n2 = succ (pred (n2))
+   THEN Gt (pred (n1) pred (n2))
+ |
+ -INSERT
+FUNCTION minus5 (n1,n2:number):number =
+IF NOT Gt (n1 n2) THEN 0
+IF Gt (n1 n2) AND n1 = succ (pred (n1)) THEN succ (minus5 (pred (n1) n2))
+ |
+ -INSERT
+FUNCTION remainder5 (n1,n2:number):number =
+IF n2 = 0 THEN n2
+IF Lt (n1 n2) THEN min (n1 n2)
+IF NOT Lt (n1 n2) AND n2 = succ (pred (n2))
+   THEN remainder5 (minus5 (n1 n2) n2)
+ |
+ -INSERT
+FUNCTION greatest.factor5 (n1,n2:number):number =
+IF n2 = 0 THEN n1
+IF n2 = succ (pred (n2)) AND pred (n2) = 0 THEN n1
+IF n2 = succ (pred (n2)) AND NOT pred (n2) = 0 AND remainder5 (n1 n2) = 0
+   THEN min (n1 n2)
+IF n2 = succ (pred (n2)) AND NOT pred (n2) = 0 AND NOT remainder5 (n1 n2) = 0
+   THEN greatest.factor5 (n1 pred (n2))
+ |
+ -INSERT
+PREDICATE Prime5 (n1,n2:number) =
+IF n2 = 0 THEN False
+IF n2 = succ (pred (n2)) AND pred (n2) = 0 THEN True
+IF n2 = succ (pred (n2)) AND NOT pred (n2) = 0 AND remainder5 (n1 n2) = 0
+   THEN False
+IF n2 = succ (pred (n2)) AND NOT pred (n2) = 0 AND NOT remainder5 (n1 n2) = 0
+   THEN Prime5 (n1 pred (n2))
+ |
+ -INSERT
+FUNCTION quotient5 (n1,n2:number):number =
+IF n2 = 0 THEN n1
+IF Lt (n1 n2) THEN 0
+IF NOT Lt (n1 n2) AND n2 = succ (pred (n2))
+   THEN succ (quotient5 (minus5 (pred (n1) pred (n2)) n2))
+ |
+ -INSERT
+function prime.factors5(x:number):list=
+if x=0 then empty
+if x=succ(pred(x)) and pred(x)=0 then empty
+if x=succ(pred(x)) and not pred(x)=0 and prime5(x pred(x)) then add(x empty)
+if x=succ(pred(x)) and not pred(x)=0 and not prime5(x pred(x)) then
+append(prime.factors5(greatest.factor5(x pred(x)))
+       prime.factors5(quotient5(x greatest.factor5(x pred(x)))))
+ |
+ OK

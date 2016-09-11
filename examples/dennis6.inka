@@ -1,0 +1,223 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Concrete side.
+
+
+% Senders, receivers, channels.
+enum structure s0 : sender;
+enum structure r0, r1 : receiver;
+enum structure c0, c1 : Channel;
+
+% Lists of free channels.
+structure nilfc, consfc(carfc:Channel, cdrfc:freeChannels):freeChannels;
+
+% An allocation table is a list of triples.
+structure entry(chn:Channel, snd:sender, rec:receiver): allocTableEntry;
+structure nilat, consat(carat:allocTableEntry, cdrat:allocTable):allocTable;
+
+% Because the function enter, to be defined below, returns 3 values,
+% we introduce triples of the appropriate type.
+structure triple(p1:freeChannels,p2:Channel,p3:allocTable):tripleType;
+
+% Returns (in this order) the updated list of free channels, the
+% channel selected for communication between s and r, and the updated
+% allocation table containing the new entry.
+function enter(t:allocTable,l:freeChannels,s:sender,r:receiver):tripleType =
+triple(cdrfc(l),carfc(l),consat(entry(carfc(l),s,r),t));
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Abstract side.
+
+
+% Abstract receivers.
+enum structure theRec, notTheRec : absReceiver;
+
+% Receiver r1 is distinguished.
+function alphaReceiver(x:receiver):absReceiver =
+if x = r1 then theRec
+otherwise notTheRec;
+
+% Abstract channels.
+enum structure theChan, notTheChan : absChannel;
+
+% Channel c0 is distinguished.
+function alphaChannel(x:Channel):absChannel =
+if x = c0 then theChan
+otherwise notTheChan;
+
+% Abstract allocation tables.
+enum structure theTable, notTheTable : absAllocTable;
+
+% A table is distinguished if it contains an entry that has theChan
+% (c0) in its chn field and theRec (r1) in its rec field.
+function alphaAllocTable(x:allocTable):absAllocTable =
+if x = nilat then notTheTable
+if x of consat and chn(carat(x)) = c0
+ and rec(carat(x)) = r1 then theTable
+otherwise alphaAllocTable(cdrat(x));
+
+% Abstract free-channel list.
+enum structure theList, notTheList : absFreeChannels;
+
+% A free-channel list is distinguished if it contains theChan (c0).
+function alphaFreeChannels(x:FreeChannels):absFreeChannels =
+if x = nilfc then notTheList
+if x = consfc(c0,cdrfc(x)) then theList
+otherwise alphaFreeChannels(cdrfc(x));
+
+
+% Like its concrete counterpart, the absEnter function returns a
+% triple. In addition, the enter operation becomes nondeterministic
+% when lifting to the abstract level, so the output type of absEnter
+% is lifted to sets.
+structure absEnterTriple(ap1:absFreeChannels,
+                         ap2:absChannel,
+                         ap3:absAllocTable):absEnterTripleType;
+
+structure absEnterSet_empty,
+          absEnterSet_insert(absEnterSet_car:absEnterTripleType,
+                             absEnterSet_cdr:absEnterSet):absEnterSet;
+
+% Testing for membership is needed for the statement of the proof
+% obligation.
+a-predicate absEnterSet_elem(e:absEnterTripleType,a:absEnterSet) =
+if a = absEnterSet_empty then false
+otherwise{ if absEnterSet_car(a) = e then true
+           otherwise absEnterSet_elem(e,absEnterSet_cdr(a))
+         };
+
+% Abstracted enter function.
+function absEnter(t:absAllocTable,l:absFreeChannels,s:Sender,r:absReceiver):absEnterSet =
+if t = theTable and l = notTheList
+ then absEnterSet_insert(absEnterTriple(notTheList,notTheChan,theTable),
+                         absEnterSet_empty)
+if t = notTheTable and l = notTheList
+ then absEnterSet_insert(absEnterTriple(notTheList,notTheChan,notTheTable),
+                         absEnterSet_empty)
+if t = theTable and l = theList
+ then absEnterSet_insert(absEnterTriple(theList,theChan,theTable),
+      absEnterSet_insert(absEnterTriple(theList,notTheChan,theTable),
+      absEnterSet_insert(absEnterTriple(notTheList,theChan,theTable),
+      absEnterSet_empty)))
+if t = notTheTable and l = theList and r = notTheRec
+ then absEnterSet_insert(absEnterTriple(theList,theChan,notTheTable),
+      absEnterSet_insert(absEnterTriple(theList,notTheChan,notTheTable),
+      absEnterSet_insert(absEnterTriple(notTheList,theChan,notTheTable),
+      absEnterSet_empty)))
+if t = notTheTable and l = theList and r = theRec
+ then absEnterSet_insert(absEnterTriple(theList,notTheChan,notTheTable),
+      absEnterSet_insert(absEnterTriple(theList,theChan,theTable),
+      absEnterSet_insert(absEnterTriple(notTheList,theChan,theTable),
+      absEnterSet_empty)));
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The original statement of the safety lemma is:;
+
+ all t:allocTable all l1:channel all l2:freeChannels all s:sender all r:receiver
+
+ absEnterSet_elem(absEnterTriple(alphaFreeChannels(p1(enter(t,consfc(l1, l2),s,r))),
+				 alphaChannel(p2(enter(t,consfc(l1, l2),s,r))),
+				 alphaAllocTable(p3(enter(t,consfc(l1, l2),s,r)))),
+       absEnter(alphaAllocTable(t), alphaFreeChannels(consfc(l1,l2)), s, alphaReceiver(r)));
+
+
+
+
+
+%%%%
+
+
+INKA doesn't handle this automatically, so my next try was to split
+the lemma into cases according to the case distinction in the
+definition of function absEnter. Here is the first case:
+
+ all t:allocTable all l:freeChannels all s:sender all r:receiver
+ not(l = nilfc) and alphaAllocTable(t) = theTable and alphaFreeChannels(l) = notTheList
+ ->
+ absEnterSet_elem(absEnterTriple(alphaFreeChannels(p1(enter(t,l,s,r))),
+				 alphaChannel(p2(enter(t,l,s,r))),
+				 alphaAllocTable(p3(enter(t,l,s,r)))),
+       absEnter(alphaAllocTable(t), alphaFreeChannels(l), s, alphaReceiver(r)))
+
+
+INKA also fails to prove this automatically, but if I remove the
+absEnterSet_elem membership test by turning its first argument into a
+set and checking for equality against its second argument (using the
+knowledge that this second argument is a singleton ideed - see the
+first case in the definition of absEnter), it goes through:
+
+ all t:allocTable all l:freeChannels all s:sender all r:receiver
+ not(l = nilfc) and alphaAllocTable(t) = theTable and alphaFreeChannels(l) = notTheList
+ ->
+ absEnterSet_insert(absEnterTriple(alphaFreeChannels(p1(enter(t,l,s,r))),
+				   alphaChannel(p2(enter(t,l,s,r))),
+				   alphaAllocTable(p3(enter(t,l,s,r)))),
+		    absEnterSet_empty)
+ =
+ absEnter(alphaAllocTable(t), alphaFreeChannels(l), s, alphaReceiver(r))
+
+
+The proof corresponding to the second case of the definition of
+absEnter goes through equally well, as expected.
+Then, I tried the third case, where the set is not a singleton, as
+follows:
+
+ all t:allocTable all l:freeChannels all s:sender all r:receiver
+ not(l = nilfc) and alphaAllocTable(t) = theTable and alphaFreeChannels(l) = theList
+ ->
+ (
+ absEnterTriple(alphaFreeChannels(p1(enter(t,l,s,r))),
+		alphaChannel(p2(enter(t,l,s,r))),
+		alphaAllocTable(p3(enter(t,l,s,r))))
+ =
+ absEnterTriple(theList,theChan,theTable)
+ or
+ absEnterTriple(alphaFreeChannels(p1(enter(t,l,s,r))),
+		alphaChannel(p2(enter(t,l,s,r))),
+		alphaAllocTable(p3(enter(t,l,s,r))))
+ =
+ absEnterTriple(theList,notTheChan,theTable)
+ or
+ absEnterTriple(alphaFreeChannels(p1(enter(t,l,s,r))),
+		alphaChannel(p2(enter(t,l,s,r))),
+		alphaAllocTable(p3(enter(t,l,s,r))))
+ =
+ absEnterTriple(notTheList,theChan,theTable)
+ )
+
+
+This is unsuccessful. Also the following simplified version doesn't
+work:
+
+ all t:allocTable all l:freeChannels all s:sender all r:receiver
+ not(l = nilfc) and alphaAllocTable(t) = theTable and alphaFreeChannels(l) = theList
+ ->
+ (
+  (alphaFreeChannels(p1(enter(t,l,s,r))) = theList
+   and 
+   alphaChannel(p2(enter(t,l,s,r))) = theChan
+   and 
+   alphaAllocTable(p3(enter(t,l,s,r))) = theTable
+  )
+ or
+  (alphaFreeChannels(p1(enter(t,l,s,r))) = theList
+   and
+   alphaChannel(p2(enter(t,l,s,r))) = notTheChan
+   and
+   alphaAllocTable(p3(enter(t,l,s,r))) = theTable
+  )
+ or
+  (alphaFreeChannels(p1(enter(t,l,s,r))) = notTheList
+   and
+   alphaChannel(p2(enter(t,l,s,r))) = theChan
+   and
+   alphaAllocTable(p3(enter(t,l,s,r))) = theTable
+  )
+ )
+
+
+
+

@@ -1,0 +1,44 @@
+ +INSERT
+STRUCTURE 0 s (nat):nat
+ |
+ +INSERT
+FUNCTION plus (n1,n2:nat):nat =
+IF n1 = 0 THEN n2
+IF EX n3:nat n1 = s (n3) THEN s (plus (n3 n2))
+ |
+ +INSERT
+FUNCTION times (n1,n2:nat):nat =
+IF n1 = 0 THEN 0
+IF EX n3:nat n1 = s (n3) THEN plus (n2 times (n3 n2))
+ |
+ +INSERT
+FUNCTION difference (n1,n2:nat):nat =
+IF n2 = 0 THEN n1
+IF NOT n2 = 0 AND n1 = 0 THEN 0
+IF EX n3,n4:nat n1 = s (n4) AND n2 = s (n3) THEN difference (n4 n3)
+ |
+ +INSERT
+FUNCTION gcd (n1,n2:nat):nat =
+IF n1 = 0 THEN n2
+IF NOT n1 = 0 AND n2 = 0 THEN n1
+IF EX n3,n4:nat n1 = s (n4) AND n2 = s (n3) AND NOT difference (n2 n1) = 0
+   THEN gcd (n1 difference (n2 n1))
+IF EX n5,n6:nat n1 = s (n6) AND n2 = s (n5) AND difference (n2 n1) = 0
+   THEN gcd (difference (n1 n2) n2)
+ |
+ +INSERT
+commutative(plus)
+ |
+ +INSERT
+associative(plus)
+ |
+ +INSERT
+ALL n1,n2:nat difference (plus (n1 n2) n1) = n2
+ |
+ +INSERT
+AXIOM ALL n1,n2:nat gcd (n2 n1) = gcd (difference (n2 n1) n1)
+ |
+ +INSERT
+all x,y,z:nat gcd(times(x z) z) = z
+ |
+ OK

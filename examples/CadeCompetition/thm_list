@@ -1,0 +1,1980 @@
+dmac1 all(x,pnat,all(y,pnat,imp(imp({true},void),eq(plus(x,y),x,pnat))))
+ 
+dmac2 all(x,pnat,all(y,pnat,eq(plus(x,s(y)),s(plus(x,y)),pnat)))
+ 
+dmac3 all(x,pnat,all(y,pnat,all(z,pnat,eq(plus(x,plus(y,z)),plus(y,plus(x,z)),pnat))))
+ 
+dmac4 all(x,pnat,all(y,pnat,eq(plus(x,y),plus(y,x),pnat)))
+ 
+dmac5 all(x,pnat,all(y,pnat,all(z,pnat,eq(plus(plus(x,y),z),plus(x,plus(y,z)),pnat))))
+ 
+dmac6 all(a,pnat,all(b,pnat,iff(eq(plus(a,b),{"int-0"},pnat),and(eq(a,0,pnat),eq(b,0,pnat)))))
+ 
+dmac7 all(x,pnat,eq(difference(x,x),{"int-0"},pnat))
+ 
+dmac8 all(x,pnat,all(y,pnat,and(eq(difference(plus(x,y),x),y,pnat),eq(difference(plus(y,x),x),y,pnat))))
+ 
+dmac9 all(a,pnat,all(b,pnat,all(c,pnat,iff(eq(plus(a,b),plus(a,c),pnat),eq(b,c,pnat)))))
+ 
+dmac10 all(x,pnat,all(y,pnat,imp(imp(lessp(y,x),void),eq(difference(x,y),{"int-0"},pnat))))
+ 
+dmac11 all(x,pnat,all(y,pnat,iff(eq({"int-0"},difference(x,y),pnat),imp(lessp(y,x),void))))
+ 
+dmac12 all(x,pnat,all(y,pnat,iff(eq(x,difference(x,y),pnat),and({true},or(eq(x,{"int-0"},pnat),eq(y,0,pnat))))))
+ 
+dmac13 all(x,pnat,all(y,pnat,all(z,pnat,iff(eq(difference(x,y),difference(z,y),pnat),if(lessp(x,y),imp(lessp(y,z),void),if(lessp(z,y),imp(lessp(y,x),void),eq(x,z,pnat)))))))
+ 
+dmac14 all(t13,u(1),all(x,t13,all(y,list(t13),imp(imp(member(x,y),void),eq(delete(x,y),y,list(t13))))))
+ 
+dmac15 all(t14,u(1),all(u,t14,all(v,list(t14),all(x,t14,imp(member(x,delete(u,v)),member(x,v))))))
+ 
+dmac16 all(t15,u(1),all(x,t15,all(y,t15,all(z,list(t15),eq(delete(x,delete(y,z)),delete(y,delete(x,z)),list(t15))))))
+ 
+dmac17 all(t16,u(1),all(u,t16,all(x,list(t16),all(y,list(t16),imp(subbagp(x,delete(u,y)),subbagp(x,y))))))
+ 
+dmac18 all(t17,u(1),all(x,list(t17),all(y,list(t17),imp(subbagp(x,y),subbagp(list_cdr(t17,x),y)))))
+ 
+dmac19 all(t18,u(1),all(x,list(t18),all(y,list(t18),imp(subbagp(x,list_cdr(t18,y)),subbagp(x,y)))))
+ 
+dmac20 all(t19,u(1),all(x,list(t19),all(y,list(t19),subbagp(bagint(x,y),x))))
+ 
+dmac21 all(t20,u(1),all(x,list(t20),all(y,list(t20),subbagp(bagint(x,y),y))))
+ 
+dmac22 all(t22,u(1),all(x,list(t22),all(y,list(t22),all(z,list(t22),eq(append(append(x,y),z),append(x,append(y,z)),list(t22))))))
+ 
+dmac23 all(t23,u(1),all(x87,t23,all(x88,list(t23),eq(append("::"(x87,x88),nil),"::"(x87,x88),list(t23)))))
+ 
+dmac24 all(t24,u(1),all(x,list(t24),listp(reverse(x))))
+ 
+dmac25 all(t25,u(1),all(a,list(t25),all(b,list(t25),eq(reverse(append(a,b)),append(reverse(b),reverse(a)),list(t25)))))
+ 
+dmac26 all(x,pnat,all(y,pnat,imp(imp({true},void),eq(times(x,y),{"int-0"},pnat))))
+ 
+dmac27 all(x,pnat,all(y,pnat,all(z,pnat,eq(times(x,plus(y,z)),plus(times(x,y),times(x,z)),pnat))))
+ 
+dmac28 all(x,pnat,all(y,pnat,eq(times(x,s(y)),plus(x,times(x,y)),pnat)))
+ 
+dmac29 all(x,pnat,all(y,pnat,eq(times(x,y),times(y,x),pnat)))
+ 
+dmac30 all(x,pnat,all(y,pnat,all(z,pnat,eq(times(x,times(y,z)),times(y,times(x,z)),pnat))))
+ 
+dmac31 all(x,pnat,all(y,pnat,all(z,pnat,eq(times(times(x,y),z),times(x,times(y,z)),pnat))))
+ 
+dmac32 all(x,pnat,all(y,pnat,iff(eq(times(x,y),{"int-0"},pnat),or(eq(x,0,pnat),eq(y,0,pnat)))))
+ 
+dmac33 all(t32,u(1),all(t33,u(1),all(t34,u(1),all(fn,t32,all(x,t33,all(y,t34,{true}))))))
+ 
+dmac34 all(x,list({sexp}),imp(listp(list_cdr({sexp},list_cdr({sexp},x))),lessp("count*"(list_car({sexp},list_cdr({sexp},x))),"count*"(x))))
+ 
+dmac37 all(t42,u(1),all(envrn,t42,all(pds,pnat,all(x,list(list(list({sexp}))),all(y,list(list(list({sexp}))),eq(exec(append(x,y),pds,envrn),exec(y,exec(x,pds,envrn),envrn),pnat))))))
+ 
+dmac40 all(x,pnat,all(y,pnat,all(z,pnat,imp(and(lessp(x,y),lessp(y,z)),lessp(x,z)))))
+ 
+dmac41 all(x,pnat,imp(lessp(x,x),void))
+ 
+dmac42 all(x,pnat,all(y,pnat,imp(and(imp(eqp(x,y),void),imp(lessp(y,x),void)),lessp(x,y))))
+ 
+dmac43 all(t43,u(1),all(x119,t43,all(x120,list(t43),eq(reverse(reverse("::"(x119,x120))),"::"(x119,x120),list(t43)))))
+ 
+dmac44 all(t46,u(1),all(x,list(t46),all(y,list(list(t46)),eq("mc-flatten"(x,y),append(flatten(x),y),list(list(t46))))))
+ 
+dmac45 all(t47,u(1),all(a,list(t47),all(b,list(t47),all(x,t47,iff(member(x,append(a,b)),or(member(x,a),member(x,b)))))))
+ 
+dmac46 all(t48,u(1),all(x,t48,all(y,list(t48),iff(member(x,reverse(y)),member(x,y)))))
+ 
+dmac47 all(t50,u(1),all(x,list(t50),eq(length(reverse(x)),length(x),pnat)))
+ 
+dmac48 all(t52,u(1),all(a,t52,all(b,list(t52),all(c,list(t52),iff(member(a,union(b,c)),or(member(a,b),member(a,c)))))))
+ 
+dmac49 all(t54,u(1),all(a,list(t54),all(b,list(t54),imp(subsetp(a,b),eq(union(a,b),b,list(t54))))))
+ 
+dmac51 all(x,pnat,all(y,pnat,all(z,pnat,imp(and(leq(x,y),leq(y,z)),leq(x,z)))))
+ 
+dmac52 all(p,u(1),all(q,u(1),imp(and(boolean(p),boolean(q)),iff(iff(p,q),iff(p,q)))))
+ 
+dmac55 all(t56,u(1),all(a,list(t56),all(i,pnat,all(j,pnat,eq(nth(a,plus(i,j)),nth(nth(a,i),j),list(t56))))))
+ 
+dmac56 all(a,u(1),all(b,u(1),all(c,u(1),imp(and(boolean(a),and(boolean(b),boolean(c))),iff(iff(iff(a,b),c),iff(a,iff(b,c)))))))
+ 
+dmac57 all(i,pnat,even1(double(i)))
+ 
+dmac58 all(i,pnat,eq(half(double(i)),i,pnat))
+ 
+dmac59 all(i,pnat,imp(and({true},even1(i)),eq(double(half(i)),i,pnat)))
+ 
+dmac60 all(i,pnat,eq(double(i),times({"int-2"},i),pnat))
+ 
+dmac61 all(t57,u(1),all(x,list(t57),all(y,list(t57),all(z,t57,imp(subsetp(x,y),subsetp(x,"::"(z,y)))))))
+ 
+dmac62 all(t59,u(1),all(a,list(t59),all(b,list(t59),eq(last(append(a,b)),if(listp(b),last(b),if(listp(a),"::"(list_car(t59,last(a)),b),b)),list(t59)))))
+ 
+dmac63 all(t60,u(1),all(a1,t60,all(a2,list(t60),eq(last(reverse("::"(a1,a2))),"::"(a1,nil),list(t60)))))
+ 
+dmac64 all(i,pnat,all(j,pnat,all(k,pnat,eq(exp(i,plus(j,k)),times(exp(i,j),exp(i,k)),pnat))))
+ 
+dmac65 all(x,pnat,iff(even1(x),even2(x)))
+ 
+dmac66 all(t61,u(1),all(i,pnat,all(l,list(t61),leq(length(nth(l,i)),length(l)))))
+ 
+dmac67 all(a,pnat,all(b,list(pnat),iff(member(a,sort(b)),member(a,b))))
+ 
+dmac68 all(a,list(pnat),eq(length(sort(a)),length(a),pnat))
+ 
+dmac69 all(t63,u(1),all(a,list(t63),all(l,list(pnat),eq("count-list"(a,sort(l)),"count-list"(a,l),pnat))))
+ 
+dmac70 all(a,list(pnat),all(b,list(pnat),imp(ordered(append(a,b)),ordered(a))))
+ 
+dmac71 all(i,pnat,leq(half(i),i))
+ 
+dmac72 all(x,list(pnat),ordered(sort(x)))
+ 
+dmac73 all(i,pnat,all(x,list(pnat),imp(and(ordered(x),and("number-listp"(x),and({true},imp(lessp(list_car(pnat,x),i),void)))),eq(addtolist(i,x),"::"(i,x),list(pnat)))))
+ 
+dmac74 all(x,list(pnat),imp(and(ordered(x),"number-listp"(x)),eq(sort(x),x,list(pnat))))
+ 
+dmac75 all(l,list(pnat),ordered(sort(l)))
+ 
+dmac76 all(l,list(pnat),imp("number-listp"(l),iff(eq(sort(l),l,list(pnat)),ordered(l))))
+ 
+dmac77 all(t66,u(1),all(a,list(t66),all(b,list(t66),eq(subst(a,a,b),b,list(t66)))))
+ 
+dmac78 all(t68,u(1),all(a,list(t68),all(b,list(t68),all(c,list(t68),imp(imp(occur(a,b),void),eq(subst(c,a,b),b,list(t68)))))))
+ 
+dmac79 all(i,pnat,all(j,pnat,eq("fact-loop"(j,i),times(i,fact(j)),pnat)))
+ 
+dmac80 all(i,pnat,eq("fact-"(i),fact(i),pnat))
+ 
+dmac81 all(t71,u(1),all(x,list(t71),all(y,list(t71),eq("reverse-loop"(x,y),append(reverse(x),y),list(t71)))))
+ 
+dmac82 all(t72,u(1),all(x,list(t72),eq("reverse-loop"(x,nil),reverse(x),list(t72))))
+ 
+dmac83 all(t73,u(1),all(a,list(t73),all(b,list(t73),eq("reverse-"(append(a,b)),append("reverse-"(b),"reverse-"(a)),list(t73)))))
+ 
+dmac84 all(t74,u(1),all(x181,t74,all(x182,list(t74),eq("reverse-"("reverse-"("::"(x181,x182))),"::"(x181,x182),list(t74)))))
+ 
+dmac85 all(x,pnat,all(y,list(pnat),imp(ordered(y),ordered(addtolist(x,y)))))
+ 
+dmac86 all(x,list(pnat),all(y,list(pnat),imp(ordered(y),ordered("sort-lp"(x,y)))))
+ 
+dmac87 all(t75,u(1),all(x,list(pnat),all(y,list(pnat),all(z,list(t75),eq("count-list"(z,"sort-lp"(x,y)),plus("count-list"(z,x),"count-list"(z,y)),pnat)))))
+ 
+dmac88 all(t76,u(1),all(a,list(t76),all(b,list(t76),all(c,list(t76),iff(eq(append(a,b),append(a,c),list(t76)),eq(b,c,list(t76)))))))
+ 
+dmac89 all(x,pnat,all(y,pnat,all(z,u(1),iff(iff(lessp(x,y),z),if(lessp(x,y),iff({true},z),iff(void,z))))))
+ 
+dmac90 all(x,pnat,all(y,pnat,imp(and({true},imp(lessp(y,x),void)),eq(plus(x,difference(y,x)),y,pnat))))
+ 
+dmac91 all(x,pnat,all(y,pnat,eq(plus(remainder(x,y),times(y,quotient(x,y))),x,pnat)))
+ 
+dmac92 all(base,pnat,all(i,pnat,all(l,list(pnat),eq("power-eval"("big-plus1"(l,i,base),base),plus("power-eval"(l,base),i),pnat))))
+ 
+dmac93 all(base,pnat,all(i,pnat,all(x,list(pnat),all(y,list(pnat),eq("power-eval"("big-plus"(x,y,i,base),base),plus(i,plus("power-eval"(x,base),"power-eval"(y,base))),pnat)))))
+ 
+dmac94 all(y,pnat,eq(remainder(y,{"int-1"}),{"int-0"},pnat))
+ 
+dmac95 all(x,pnat,all(y,pnat,imp(imp({true},void),eq(remainder(y,x),y,pnat))))
+ 
+dmac96 all(x,pnat,all(y,pnat,iff(lessp(remainder(x,y),y),imp(eq(y,0,pnat),void))))
+ 
+dmac97 all(x,pnat,eq(remainder(x,x),{"int-0"},pnat))
+ 
+dmac98 all(x,pnat,all(y,pnat,imp(and(imp(eq(y,0,pnat),void),{true}),eq(plus(remainder(x,y),times(y,quotient(x,y))),x,pnat))))
+ 
+dmac99 all(i,pnat,all(j,pnat,imp(lessp(times(s(i),j),j),void)))
+ 
+dmac100 all(i,pnat,all(j,pnat,imp(lessp(times(j,s(i)),j),void)))
+ 
+dmac101 all(i,pnat,all(j,pnat,iff(lessp(quotient(i,j),i),and(imp(eq(i,0,pnat),void),or(eq(j,0,pnat),imp(eq(j,{"int-1"},pnat),void))))))
+ 
+dmac102 all(x,pnat,all(y,pnat,iff(lessp(remainder(x,y),x),and(imp(eq(y,0,pnat),void),and(imp(eq(x,0,pnat),void),imp(lessp(x,y),void))))))
+ 
+dmac103 all(base,pnat,all(i,pnat,eq("power-eval"("power-rep"(i,base),base),i,pnat)))
+ 
+dmac104 all(base,pnat,all(i,pnat,all(j,pnat,eq("power-eval"("big-plus"("power-rep"(i,base),"power-rep"(j,base),{"int-0"},base),base),plus(i,j),pnat))))
+ 
+dmac105 all(x,pnat,all(y,pnat,{true}))
+ 
+dmac106 all(x,pnat,all(y,pnat,iff(eq(gcd(x,y),{"int-0"},pnat),and(eq(x,0,pnat),eq(y,0,pnat)))))
+ 
+dmac107 all(y,pnat,eq(gcd({"int-0"},y),y,pnat))
+ 
+dmac108 all(x,pnat,all(y,pnat,eq(gcd(x,y),gcd(y,x),pnat)))
+ 
+dmac109 all(t77,u(1),all(a,list(t77),all(b,list(t77),all(i,pnat,eq(nth(append(a,b),i),append(nth(a,i),nth(b,difference(i,length(a)))),list(t77))))))
+ 
+dmac110 all(x,pnat,all(y,pnat,eq(difference(plus(x,y),x),y,pnat)))
+ 
+dmac111 all(x,pnat,all(y,pnat,eq(difference(plus(y,x),x),y,pnat)))
+ 
+dmac112 all(x,pnat,all(y,pnat,all(z,pnat,eq(difference(plus(x,y),plus(x,z)),difference(y,z),pnat))))
+ 
+dmac113 all(c,pnat,all(w,pnat,all(x,pnat,eq(times(x,difference(c,w)),difference(times(c,x),times(w,x)),pnat))))
+ 
+dmac114 all(x,pnat,all(z,pnat,eq(remainder(times(x,z),z),{"int-0"},pnat)))
+ 
+dmac115 all(a,pnat,all(b,pnat,all(c,pnat,eq(difference(plus(b,plus(a,c)),a),plus(b,c),pnat))))
+ 
+dmac116 all(y,pnat,all(z,pnat,eq(difference(s(plus(y,z)),z),s(y),pnat)))
+ 
+dmac117 all(x,pnat,all(y,pnat,imp(and(imp(eq(y,0,pnat),void),imp(eq(y,{"int-1"},pnat),void)),imp(eq(remainder(s(times(x,y)),y),{"int-0"},pnat),void))))
+ 
+dmac118 all(x,pnat,all(y,pnat,all(z,pnat,imp(and(eq(remainder(x,z),{"int-0"},pnat),eq(remainder(y,z),{"int-0"},pnat)),eq(remainder(plus(x,y),z),{"int-0"},pnat)))))
+ 
+dmac119 all(x,pnat,all(y,pnat,all(z,pnat,imp(and(eq(remainder(x,z),{"int-0"},pnat),imp(eq(remainder(y,z),{"int-0"},pnat),void)),imp(eq(remainder(plus(x,y),z),{"int-0"},pnat),void)))))
+ 
+dmac120 all(x,pnat,all(y,pnat,all(z,pnat,imp(eq(remainder(x,z),{"int-0"},pnat),iff(eq(remainder(plus(x,y),z),{"int-0"},pnat),eq(remainder(y,z),{"int-0"},pnat))))))
+ 
+dmac121 all(x,pnat,all(y,pnat,all(z,pnat,iff(lessp(plus(x,y),plus(x,z)),lessp(y,z)))))
+ 
+dmac122 all(x,pnat,all(y,pnat,all(z,pnat,imp(eq(remainder(x,z),{"int-0"},pnat),iff(eq(remainder(plus(y,x),z),{"int-0"},pnat),eq(remainder(y,z),{"int-0"},pnat))))))
+ 
+dmac123 all(x,pnat,all(y,pnat,all(z,pnat,imp(eq(remainder(x,z),{"int-0"},pnat),iff(eq(remainder(difference(y,x),z),{"int-0"},pnat),if(lessp(x,y),eq(remainder(y,z),{"int-0"},pnat),{true}))))))
+ 
+dmac124 all(x,pnat,all(y,pnat,all(z,pnat,iff(lessp(times(x,z),times(y,z)),and(imp(eq(z,0,pnat),void),lessp(x,y))))))
+ 
+dmac125 all(x,pnat,all(y,pnat,iff(lessp(y,plus(x,y)),imp(eq(x,0,pnat),void))))
+ 
+dmac126 all(x,pnat,all(y,pnat,all(z,pnat,eq(gcd(times(x,z),times(y,z)),times(z,gcd(x,y)),pnat))))
+ 
+dmac127 all(x,pnat,all(y,pnat,and(eq(remainder(x,gcd(x,y)),{"int-0"},pnat),eq(remainder(y,gcd(x,y)),{"int-0"},pnat))))
+ 
+dmac128 all(x,pnat,all(y,pnat,all(z,pnat,imp(and(imp(eq(x,0,pnat),void),and(imp(eq(y,0,pnat),void),and(divides(z,x),divides(z,y)))),leq(z,gcd(x,y))))))
+ 
+dmac129 all(t80,u(1),all(x,t80,imp(eq("if-complexity"(x),{"int-0"},pnat),void)))
+ 
+dmac141 all(x,list({sexp}),"normalized-if-exprp"(normalize(x)))
+ 
+dmac146 all(t106,u(1),all(x,list(t106),all(y,list(t106),iff(eq(flatten(x),"::"(y,nil),list(list(t106))),and(nlistp(x),eq(x,y,list(t106)))))))
+ 
+dmac147 all(x,{sexp},imp(lessp("count*"(x),"count*"(gopher(x))),void))
+ 
+dmac148 all(t109,u(1),all(x,list(list(t109)),iff(listp(gopher(x)),listp(x))))
+ 
+dmac149 all(t111,u(1),all(x,list(list(t111)),eq(list_car(list(t111),gopher(x)),if(listp(x),list_car(list(list(t111)),flatten(x)),{"int-0"}),list(t111))))
+ 
+dmac150 all(t112,u(1),all(x,list(list(t112)),eq(flatten(list_cdr(list(t112),gopher(x))),if(listp(x),list_cdr(list(list(t112)),flatten(x)),{"cons-8"}),list(list(list(t112))))))
+ 
+dmac151 all(t113,u(1),all(x,list(list(t113)),all(y,list(list(t113)),iff(samefringe(x,y),eq(flatten(x),flatten(y),list(list(list(t113))))))))
+ 
+dmac152 all(x,pnat,all(y,pnat,imp(and(lessp(y,x),and(imp(prime1(x,y),void),and(imp(eq(x,0,pnat),void),and(imp(eq(sub(x),{"int-0"},pnat),void),imp(eq(y,0,pnat),void))))),lessp("greatest-factor"(x,y),x))))
+ 
+dmac153 all(x,pnat,all(y,pnat,imp(and(lessp(y,x),and(imp(prime1(x,y),void),and(imp(eq(x,0,pnat),void),and(imp(eq(x,{"int-1"},pnat),void),imp(eq(y,0,pnat),void))))),eq(remainder(x,"greatest-factor"(x,y)),{"int-0"},pnat))))
+ 
+dmac154 all(x,pnat,all(y,pnat,iff(eq("greatest-factor"(x,y),{"int-0"},pnat),and(or(eq(y,0,pnat),eq(y,{"int-1"},pnat)),eq(x,{"int-0"},pnat)))))
+ 
+dmac155 all(y,pnat,eq(remainder({"int-0"},y),{"int-0"},pnat))
+ 
+dmac156 all(x,pnat,all(y,pnat,iff(eq("greatest-factor"(x,y),{"int-1"},pnat),eq(x,{"int-1"},pnat))))
+ 
+dmac157 all(x,pnat,all(y,pnat,iff({true},imp(and(or(eq(y,0,pnat),eq(y,{"int-1"},pnat)),imp({true},void)),void))))
+ 
+dmac158 all(x,list(pnat),all(y,list(pnat),eq("times-list"(append(x,y)),times("times-list"(x),"times-list"(y)),pnat)))
+ 
+dmac159 all(x,list(pnat),all(y,list(pnat),iff("prime-list"(append(x,y)),and("prime-list"(x),"prime-list"(y)))))
+ 
+dmac160 all(x,pnat,"prime-list"("prime-factors"(x)))
+ 
+dmac161 all(x,pnat,all(y,pnat,imp(and({true},and({true},and(imp(eq(x,{"int-0"},pnat),void),divides(x,y)))),eq(times(x,quotient(y,x)),y,pnat))))
+ 
+dmac162 all(x,pnat,all(y,pnat,imp(and(imp(eq(x,0,pnat),void),lessp(x,y)),imp(eq(quotient(y,x),{"int-0"},pnat),void))))
+ 
+dmac163 all(x,pnat,eq("times-list"("prime-factors"(s(x))),s(x),pnat))
+ 
+dmac164 all(x,pnat,and(eq("times-list"("prime-factors"(s(x))),s(x),pnat),"prime-list"("prime-factors"(s(x)))))
+ 
+dmac165 all(w,pnat,all(z,pnat,iff(eq(z,times(w,z),pnat),and({true},or(eq(z,{"int-0"},pnat),eq(w,{"int-1"},pnat))))))
+ 
+dmac166 all(u,pnat,all(w,pnat,all(z,pnat,imp(and(imp(eq(z,{"int-1"},pnat),void),and(imp(eq(z,{"int-0"},pnat),void),and({true},greatereqpr(u,z)))),imp(prime1(times(w,z),u),void)))))
+ 
+dmac167 all(x,pnat,all(y,pnat,iff(greatereqpr(x,y),imp(lessp(x,y),void))))
+ 
+dmac168 all(v,pnat,all(z,pnat,imp(and(imp(eq(z,s(v),pnat),void),divides(z,s(v))),greatereqpr(v,z))))
+ 
+dmac169 all(x,pnat,all(z,pnat,imp(and(imp(eq(z,{"int-1"},pnat),void),and(imp(eq(z,x,pnat),void),and(imp(eq(x,0,pnat),void),and(imp(eq(x,{"int-1"},pnat),void),divides(z,x))))),imp(prime1(x,sub(x)),void))))
+ 
+dmac170 all(b,pnat,all(x,pnat,all(y,pnat,imp(eq(gcd(b,x),y,pnat),eq(remainder(b,y),{"int-0"},pnat)))))
+ 
+dmac171 all(b,pnat,all(x,pnat,imp(imp(eq(remainder(b,x),{"int-0"},pnat),void),imp(eq(gcd(b,x),x,pnat),void))))
+ 
+dmac172 all(y,pnat,all(z,pnat,eq(remainder(times(z,y),z),{"int-0"},pnat)))
+ 
+dmac173 all(x,pnat,all(y,pnat,imp(and({true},and(imp(eq(y,{"int-1"},pnat),void),and(imp(eq(y,{"int-0"},pnat),void),imp(eq(x,{"int-0"},pnat),void)))),imp(eq(x,times(x,y),pnat),void))))
+ 
+dmac174 all(x,pnat,all(y,pnat,iff(eq(x,times(x,y),pnat),or(eq(x,{"int-0"},pnat),and({true},eq(y,{"int-1"},pnat))))))
+ 
+dmac175 all(a,pnat,all(k,pnat,all(x,pnat,eq(gcd(times(k,x),times(a,x)),times(x,gcd(a,k)),pnat))))
+ 
+dmac176 all(a,pnat,all(b,pnat,all(k,pnat,all(x,pnat,imp(and(imp(divides(x,a),void),eq(a,gcd(times(x,a),times(b,a)),pnat)),imp(eq(times(k,x),times(b,a),pnat),void))))))
+ 
+dmac177 all(b,pnat,all(x,pnat,imp(and(imp(divides(x,b),void),and(imp(eq(x,0,pnat),void),and(imp(eq(sub(x),{"int-0"},pnat),void),prime1(x,sub(x))))),iff(eq(gcd(b,x),{"int-1"},pnat),{true}))))
+ 
+dmac178 all(b,pnat,all(free,pnat,all(x,pnat,all(z,pnat,imp(and({true},and(imp(eq(x,{"int-0"},pnat),void),eq(free,times(x,z),pnat))),eq(gcd(times(b,z),free),times(z,gcd(b,x)),pnat))))))
+ 
+dmac179 all(b,pnat,all(k,pnat,all(x,pnat,all(z,pnat,imp(and({true},and(prime(x),and(imp(divides(x,z),void),imp(divides(x,b),void)))),imp(eq(times(x,k),times(b,z),pnat),void))))))
+ 
+dmac180 all(x,pnat,all(y,pnat,imp(and({true},imp(eq(times(x,quotient(y,x)),y,pnat),void)),imp(eq(remainder(y,x),{"int-0"},pnat),void))))
+ 
+dmac181 all(x,pnat,all(y,pnat,imp(and(prime(x),and(imp(eq(y,{"int-1"},pnat),void),imp(eq(x,y,pnat),void))),imp(eq(remainder(x,y),{"int-0"},pnat),void))))
+ 
+dmac182 all(t114,u(1),all(l,list(t114),all(n,t114,imp(member(n,l),lessp("count*"(delete(n,l)),"count*"(l))))))
+ 
+dmac183 all(x,pnat,all(y,pnat,eq(remainder(times(y,x),y),{"int-0"},pnat)))
+ 
+dmac184 all(l2,list(pnat),all(x,pnat,imp("prime-list"(l2),"prime-list"(delete(x,l2)))))
+ 
+dmac185 all(c,pnat,all(l,list(pnat),imp(and(imp(eq(c,0,pnat),void),member(c,l)),eq(remainder("times-list"(l),c),{"int-0"},pnat))))
+ 
+dmac186 all(x,pnat,all(y,pnat,eq(quotient(times(y,x),y),if(eq(y,0,pnat),{"int-0"},x),pnat)))
+ 
+dmac187 all(a,pnat,all(c,pnat,all(w,pnat,imp(and(imp(eq(a,0,pnat),void),divides(a,w)),eq(times(c,quotient(w,a)),quotient(times(c,w),a),pnat)))))
+ 
+dmac188 all(c,pnat,all(l,list(pnat),imp(and(imp(eq(c,0,pnat),void),member(c,l)),eq("times-list"(delete(c,l)),quotient("times-list"(l),c),pnat))))
+ 
+dmac189 all(c,pnat,all(l2,list(pnat),imp(and(prime(c),and("prime-list"(l2),imp(member(c,l2),void))),imp(eq(remainder("times-list"(l2),c),{"int-0"},pnat),void))))
+ 
+dmac190 all(c,pnat,all(x,pnat,all(y,pnat,imp(and(imp(eq(c,0,pnat),void),imp(divides(c,x),void)),imp(eq(times(c,y),x,pnat),void)))))
+ 
+dmac191 all(a,pnat,all(b,pnat,iff(eq(times(a,b),{"int-1"},pnat),and(imp(eq(a,{"int-0"},pnat),void),and(imp(eq(b,{"int-0"},pnat),void),and({true},and({true},and(eq(sub(a),{"int-0"},pnat),eq(sub(b),{"int-0"},pnat)))))))))
+ 
+dmac192 all(c,pnat,all(l1,list(pnat),all(l2,list(pnat),imp(and(eq(times(c,"times-list"(l1)),"times-list"(l2),pnat),and(prime(c),"prime-list"(l2))),member(c,l2)))))
+ 
+dmac193 all(a,pnat,all(b,pnat,all(c,pnat,imp(and(imp(eq(a,0,pnat),void),and({true},eq(times(a,c),b,pnat))),iff(eq(c,quotient(b,a),pnat),{true})))))
+ 
+dmac194 all(l1,list(pnat),all(l2,list(pnat),imp(and("prime-list"(l1),and("prime-list"(l2),eq("times-list"(l1),"times-list"(l2),pnat))),perm(l1,l2))))
+ 
+dmac195 all(x201,pnat,all(x202,list(pnat),member(maximum("::"(x201,x202)),"::"(x201,x202))))
+ 
+dmac196 all(t116,u(1),all(l,list(t116),all(x,t116,iff(lessp("count*"(delete(x,l)),"count*"(l)),member(x,l)))))
+ 
+dmac197 all(x,list(pnat),listp(sort2(x)))
+ 
+dmac198 all(x,list(pnat),ordered2(sort2(x)))
+ 
+dmac199 all(x,list(pnat),and(listp(sort2(x)),ordered2(sort2(x))))
+ 
+dmac200 all(v,pnat,all(x,pnat,all(y,list(pnat),imp(and(listp(y),and(ordered2(y),imp(eq(x,v,pnat),void))),eq(addtolist2(v,delete(x,y)),delete(x,addtolist2(v,y)),list(pnat))))))
+ 
+dmac201 all(v,pnat,all(y41,pnat,all(y42,list(pnat),eq(delete(v,addtolist2(v,"::"(y41,y42))),"::"(y41,y42),list(pnat)))))
+ 
+dmac202 all(v,pnat,all(w,pnat,all(y,list(pnat),imp(and(imp(lessp(v,w),void),eq(addtolist2(v,y),"::"(v,y),list(pnat))),eq(addtolist2(v,addtolist2(w,y)),"::"(v,addtolist2(w,y)),list(pnat))))))
+ 
+dmac203 all(v,pnat,all(z,list(pnat),imp(imp(lessp(v,maximum(z)),void),eq(addtolist2(v,sort2(z)),"::"(v,sort2(z)),list(pnat)))))
+ 
+dmac204 all(x203,pnat,all(x204,list(pnat),eq("::"(maximum("::"(x203,x204)),delete(maximum("::"(x203,x204)),sort2("::"(x203,x204)))),sort2("::"(x203,x204)),list(pnat))))
+ 
+dmac205 all(l,list(pnat),all(x,pnat,eq(sort2(delete(x,l)),delete(x,sort2(l)),list(pnat))))
+ 
+dmac206 all(x,list(pnat),eq(dsort(x),sort2(x),list(pnat)))
+ 
+dmac207 all(t117,u(1),all(a,list(t117),all(l,list(pnat),eq("count-list"(a,sort2(l)),"count-list"(a,l),pnat))))
+ 
+dmac208 all(x,pnat,eq(difference(x,{"int-1"}),sub(x),pnat))
+ 
+dmac209 all(ac,pnat,all(i,pnat,eq("prog-trans-of-sigma"(i,ac),plus(ac,sigma({"int-0"},i)),pnat)))
+ 
+dmac210 all(i,pnat,eq("prog-trans-of-sigma"(i,{"int-0"}),sigma({"int-0"},i),pnat))
+ 
+dmac211 all(k,pnat,and(eq({"int-0"},sigma(k,k),pnat),leq(k,k)))
+ 
+dmac212 all(i,pnat,all(k,pnat,imp(and(imp(eq(i,0,pnat),void),leq(i,k)),and(eq(plus(sigma(i,k),i),sigma(sub(i),k),pnat),leq(sub(i),k)))))
+ 
+dmac213 all(i,pnat,all(k,pnat,imp(and(eq(i,0,pnat),leq(i,k)),eq(sigma(i,k),sigma({"int-0"},k),pnat))))
+ 
+dmac214 all(t120,u(1),all(i,pnat,all(j,pnat,all(mem,list(t120),all(val,t120,eq(get(j,set(i,val,mem)),if(eqp(j,i),val,get(j,mem)),t120))))))
+ 
+dmac215 all(x,list(list(list({sexp}))),imp(eq(list_car(list(list({sexp})),list_cdr(list(list({sexp})),list_cdr(list(list({sexp})),list_cdr(list(list({sexp})),list_cdr(list(list({sexp})),x))))),{"cons-10"},list(list({sexp}))),eq(length(x),plus({"int-5"},length(list_cdr(list(list({sexp})),list_cdr(list(list({sexp})),list_cdr(list(list({sexp})),list_cdr(list(list({sexp})),list_cdr(list(list({sexp})),x))))))),pnat)))
+ 
+dmac216 all(t122,u(1),all(x1,t122,all(x2,t122,all(x3,t122,all(x4,t122,all(x5,t122,all(x6,t122,all(x7,list(t122),eq(length("::"(x1,"::"(x2,"::"(x3,"::"(x4,"::"(x5,"::"(x6,x7))))))),plus({"int-6"},length(x7)),pnat)))))))))
+ 
+dmac225 all(x,pnat,eq(difference(s(s(x)),{"int-2"}),x,pnat))
+ 
+dmac226 all(x,pnat,all(y,pnat,eq(quotient(plus(x,plus(x,y)),{"int-2"}),plus(x,quotient(y,{"int-2"})),pnat)))
+ 
+dmac227 all(i,pnat,eq(sigma({"int-0"},i),quotient(times(i,s(i)),{"int-2"}),pnat))
+ 
+dmac228 all(t126,u(1),all(t127,u(1),all(t128,u(1),all(x,t126,all(y,t127,all(z,t128,eq("h*"(x,"h*"(y,z)),"h*"(y,"h*"(x,z)),pnat)))))))
+ 
+dmac229 all(t132,u(1),all(t133,u(1),all(a,pnat,all(x,list(t132),all(z,t133,eq("h-pr"(x,"h*"(z,a)),"h*"(z,"h-pr"(x,a)),pnat))))))
+ 
+dmac230 all(t134,u(1),all(ac,pnat,all(l,list(t134),eq("h-ac"(l,ac),"h-pr"(l,ac),pnat))))
+ 
+dmac231 all(x,pnat,eq(times({"int-1"},x),x,pnat))
+ 
+dmac232 all(x,pnat,eq(times({"int-2"},x),plus(x,x),pnat))
+ 
+dmac233 all(k,pnat,eq(exp({"int-0"},k),if(eq(k,0,pnat),{"int-1"},{"int-0"}),pnat))
+ 
+dmac234 all(k,pnat,eq(exp({"int-1"},k),{"int-1"},pnat))
+ 
+dmac235 all(x,pnat,eq(exp(x,{"int-0"}),{"int-1"},pnat))
+ 
+dmac236 all(i,pnat,all(j,pnat,all(k,pnat,eq(exp(times(i,j),k),times(exp(i,k),exp(j,k)),pnat))))
+ 
+dmac237 all(i,pnat,all(j,pnat,all(k,pnat,eq(exp(exp(i,j),k),exp(i,times(j,k)),pnat))))
+ 
+dmac238 all(i,pnat,all(j,pnat,all(x,pnat,eq(remainder(plus(x,times(i,j)),j),remainder(x,j),pnat))))
+ 
+dmac239 all(i,pnat,all(j,pnat,all(x,pnat,eq(remainder(plus(x,times(j,i)),j),remainder(x,j),pnat))))
+ 
+dmac240 all(a,pnat,all(b,pnat,all(c,pnat,eq(remainder(times(b,times(a,c)),a),{"int-0"},pnat))))
+ 
+dmac241 all(x,pnat,eq(remainder({"int-1"},x),if(eq(x,{"int-1"},pnat),{"int-0"},{"int-1"}),pnat))
+ 
+dmac242 all(t135,u(1),all(x,list(t135),iff(eq(length(x),{"int-0"},pnat),nlistp(x))))
+ 
+dmac243 all(t136,u(1),all(l,list(t136),all(x,t136,eq(length(delete(x,l)),if(member(x,l),length(list_cdr(t136,l)),length(l)),pnat))))
+ 
+dmac244 all(p,pnat,all(x,pnat,all(y,pnat,eq(remainder(difference(times(p,x),times(p,y)),p),{"int-0"},pnat))))
+ 
+dmac245 all(a,pnat,all(b,pnat,all(p,pnat,imp(prime(p),iff(eq(remainder(times(a,b),p),{"int-0"},pnat),or(eq(remainder(a,p),{"int-0"},pnat),eq(remainder(b,p),{"int-0"},pnat)))))))
+ 
+dmac246 all(l,list(pnat),all(x,pnat,imp(member(x,l),eq(times(x,"times-list"(delete(x,l))),"times-list"(l),pnat))))
+ 
+dmac247 all(x,pnat,all(y,pnat,lessp(remainder(x,s(y)),s(y))))
+ 
+dmac248 all(a,list(list(pnat)),all(new,pnat,all(old,pnat,all(term,pnat,eq(eval2(subst2(new,old,term),a),eval2(term,"::"("::"(old,eval2(new,a)),a)),pnat)))))
+ 
+dmac249 all(n,pnat,eq(s("nbr-calls-fib"(n)),times({"int-2"},fib(s(n))),pnat))
+ 
+dmac250 all(n,pnat,eq("nbr-calls-fib"(n),sub(times({"int-2"},fib(s(n)))),pnat))
+ 
+dmac251 all(n,pnat,eq(s("nbr-plus-fib"(n)),fib(s(n)),pnat))
+ 
+dmac252 all(n,pnat,eq("nbr-plus-fib"(n),sub(fib(s(n))),pnat))
+ 
+dmac253 all(n,pnat,eq(s("sum-fib<k>"(n)),fib(s(s(n))),pnat))
+ 
+dmac254 all(n,pnat,eq("sum-fib<k>"(n),sub(fib(s(s(n)))),pnat))
+ 
+dmac255 all(n,pnat,eq("sum-fib<k>"(n),"nbr-plus-fib"(s(n)),pnat))
+ 
+dmac256 all(n,pnat,eq(s("sum-fib<2k>"(n)),fib(s(times({"int-2"},n))),pnat))
+ 
+dmac257 all(n,pnat,eq("sum-fib<2k>"(n),sub(fib(s(times({"int-2"},n)))),pnat))
+ 
+dmac258 all(n,pnat,eq("sum-fib<2k+1>"(n),fib(s(s(times({"int-2"},n)))),pnat))
+ 
+dmac259 all(n,pnat,eq(s(times({"int-2"},"sum-fib<3k>"(n))),fib(s(s(times({"int-3"},n)))),pnat))
+ 
+dmac260 all(n,pnat,eq(times({"int-2"},"sum-fib<3k>"(n)),sub(fib(s(s(times({"int-3"},n))))),pnat))
+ 
+dmac261 all(n,pnat,eq("sum-fib<3k>"(n),quotient(sub(fib(s(s(times({"int-3"},n))))),{"int-2"}),pnat))
+ 
+dmac262 all(n,pnat,eq(times({"int-2"},"sum-fib<3k+1>"(n)),fib(s(s(s(times({"int-3"},n))))),pnat))
+ 
+dmac263 all(n,pnat,eq("sum-fib<3k+1>"(n),quotient(fib(s(s(s(times({"int-3"},n))))),{"int-2"}),pnat))
+ 
+dmac264 all(n,pnat,eq(s(times({"int-2"},"sum-fib<3k+2>"(n))),fib(s(s(s(s(times({"int-3"},n)))))),pnat))
+ 
+dmac265 all(n,pnat,eq(times({"int-2"},"sum-fib<3k+2>"(n)),sub(fib(s(s(s(s(times({"int-3"},n))))))),pnat))
+ 
+dmac266 all(n,pnat,eq("sum-fib<3k+2>"(n),quotient(sub(fib(s(s(s(s(times({"int-3"},n))))))),{"int-2"}),pnat))
+ 
+dmac267 all(n,pnat,and(eq(fib(s(times({"int-2"},n))),plus(times(fib(n),fib(n)),times(fib(s(n)),fib(s(n)))),pnat),eq(fib(s(s(times({"int-2"},n)))),plus(times(fib(n),fib(s(n))),times(fib(s(n)),fib(s(s(n))))),pnat)))
+ 
+dmac268 all(n,pnat,eq(fib(s(times({"int-2"},n))),plus(times(fib(n),fib(n)),times(fib(s(n)),fib(s(n)))),pnat))
+ 
+dmac269 all(n,pnat,eq(fib(s(s(times({"int-2"},n)))),plus(times(fib(n),fib(s(n))),times(fib(s(n)),fib(s(s(n))))),pnat))
+ 
+dmac270 all(n,pnat,eq(times({"int-4"},n),times({"int-2"},times({"int-2"},n)),pnat))
+ 
+dmac271 all(n,pnat,eq(fib(s(times({"int-4"},n))),plus(times(fib(times({"int-2"},n)),fib(times({"int-2"},n))),times(fib(s(times({"int-2"},n))),fib(s(times({"int-2"},n))))),pnat))
+ 
+dmac272 all(n,pnat,eq("sum-fib<4k+1>"(n),times(fib(s(times({"int-2"},n))),fib(s(s(times({"int-2"},n))))),pnat))
+ 
+dmac273 all(n,pnat,eq(fib(s(s(times({"int-4"},n)))),plus(times(fib(times({"int-2"},n)),fib(s(times({"int-2"},n)))),times(fib(s(times({"int-2"},n))),fib(s(s(times({"int-2"},n)))))),pnat))
+ 
+dmac274 all(n,pnat,eq("sum-fib<4k+2>"(n),times(fib(s(s(times({"int-2"},n)))),fib(s(s(times({"int-2"},n))))),pnat))
+ 
+dmac275 all(n,pnat,eq(fib(s(s(s(times({"int-4"},n))))),plus(times(fib(s(times({"int-2"},n))),fib(s(times({"int-2"},n)))),times(fib(s(s(times({"int-2"},n)))),fib(s(s(times({"int-2"},n)))))),pnat))
+ 
+dmac276 all(n,pnat,eq("sum-fib<4k+3>"(n),times(fib(s(s(s(times({"int-2"},n))))),fib(s(s(times({"int-2"},n))))),pnat))
+ 
+dmac277 all(n,pnat,imp(lessp({"int-0"},n),eq(fib(times({"int-2"},n)),plus(times(fib(sub(n)),fib(n)),times(fib(n),fib(s(n)))),pnat)))
+ 
+dmac278 all(n,pnat,imp(lessp({"int-0"},n),eq(fib(times({"int-4"},n)),plus(times(fib(sub(times({"int-2"},n))),fib(times({"int-2"},n))),times(fib(times({"int-2"},n)),fib(s(times({"int-2"},n))))),pnat)))
+ 
+dmac279 all(n,pnat,eq("sum-fib<4k>"(n),times(fib(times({"int-2"},n)),fib(s(s(times({"int-2"},n))))),pnat))
+ 
+dmac281 all(x,pnat,eq(plus(x,{"int-0"}),x,pnat))
+ 
+dmac282 all(x,pnat,all(y,pnat,imp(imp({true},void),eq(plus(x,y),x,pnat))))
+ 
+dmac283 all(x,pnat,all(y,pnat,eq(plus(x,s(y)),s(plus(x,y)),pnat)))
+ 
+dmac284 all(x,pnat,all(y,pnat,all(z,pnat,eq(plus(x,plus(y,z)),plus(y,plus(x,z)),pnat))))
+ 
+dmac285 all(x,pnat,all(y,pnat,eq(plus(x,y),plus(y,x),pnat)))
+ 
+dmac286 all(x,pnat,all(y,pnat,all(z,pnat,eq(plus(plus(x,y),z),plus(x,plus(y,z)),pnat))))
+ 
+dmac287 all(x,pnat,eq(times(x,{"int-0"}),{"int-0"},pnat))
+ 
+dmac288 all(x,pnat,all(y,pnat,imp(imp({true},void),eq(times(x,y),{"int-0"},pnat))))
+ 
+dmac289 all(x,pnat,all(y,pnat,all(z,pnat,eq(times(x,plus(y,z)),plus(times(x,y),times(x,z)),pnat))))
+ 
+dmac290 all(x,pnat,all(y,pnat,eq(times(x,s(y)),plus(x,times(x,y)),pnat)))
+ 
+dmac291 all(x,pnat,all(y,pnat,all(z,pnat,eq(times(x,times(y,z)),times(y,times(x,z)),pnat))))
+ 
+dmac292 all(x,pnat,all(y,pnat,eq(times(x,y),times(y,x),pnat)))
+ 
+dmac293 all(x,pnat,all(y,pnat,all(z,pnat,eq(times(times(x,y),z),times(x,times(y,z)),pnat))))
+ 
+dmac294 all(x,pnat,all(y,pnat,iff(eq(times(x,y),{"int-0"},pnat),or(eq(x,0,pnat),eq(y,0,pnat)))))
+ 
+dmac295 all(x,pnat,all(y,pnat,all(z,u(1),iff(iff(lessp(x,y),z),if(lessp(x,y),iff({true},z),iff(void,z))))))
+ 
+dmac296 all(a1,{sexp},all(a2,{sexp},all(e,list({sexp}),all(i,{sexp},all(j,{sexp},all(u,pnat,all(v,pnat,all(w,list({sexp}),imp(and(imp(eq(elt1(a2,j),w,list({sexp})),void),and(eq(w,if(eq(j,i,{sexp}),e,elt1(a1,j)),list({sexp})),and(imp(eq(u,0,pnat),void),and(imp(lessp(j,u),void),imp(lessp(v,j),void))))),imp("almost-equal1"(a1,a2,u,v,i,e),void))))))))))
+ 
+dmac298 all(a1,{sexp},all(a2,{sexp},all(e,list({sexp}),all(i,pnat,all(u,pnat,all(v,pnat,all(x,pnat,all(y,pnat,imp(and("almost-equal1"(a1,a2,u,v,i,e),and(imp(eq(u,0,pnat),void),and(imp(lessp(x,u),void),imp(lessp(v,y),void)))),"almost-equal1"(a1,a2,x,y,i,e))))))))))
+ 
+dmac299 {true}
+ 
+dmac300 all(x,pnat,all(y,pnat,all(z,pnat,eq("h**"(x,"h**"(y,z)),"h**"(y,"h**"(x,z)),pnat))))
+ 
+dmac301 all(l,list(pnat),all(z,pnat,eq("ac-h"(l,z),"pr-h"(l,z),pnat)))
+ 
+dmac302 all(t144,u(1),all(t145,u(1),all(v,t144,all(z,t145,imp(lt(z,v),imp(lt(v,z),void))))))
+ 
+dmac303 all(t149,u(1),all(l,list(t149),"ordered-lt"("sort-lt"(l))))
+ 
+dmac304 {true}
+ 
+dmac305 all(u,list(pnat),all(v,list(pnat),eq("map-fn"(append(u,v)),append("map-fn"(u),"map-fn"(v)),list(pnat))))
+ 
+dmac306 all(t151,u(1),all(x,list(t151),"true-rec"(x)))
+ 
+dmac307 all(x,u(1),imp({"all-x-p-x"},"p*"(x)))
+ 
+dmac308 all(x,u(1),imp({"all-x-not-p-x"},imp("p*"(x),void)))
+ 
+dmac309 all(x,u(1),imp("p*"(x),{"not-4"}))
+ 
+dmac310 imp({"all-x-p-x"},{"some-x-p-x"})
+ 
+dmac311 all(n,pnat,and(fair("fair-true-witness"(n)),and(imp(fair("fair-false-witness"(n)),void),and(imp(lessp("fair-true-witness"(n),n),void),imp(lessp("fair-false-witness"(n),n),void)))))
+ 
+dmac312 all(x,pnat,{true})
+ 
+dmac313 all(x,pnat,{true})
+ 
+dmac314 all(x,pnat,"even*"("p-alias"(x)))
+ 
+dmac315 all(x,pnat,"even*"("p*"(x)))
+ 
+dmac316 eq({pp},{"int-0"},pnat)
+ 
+dmac317 eq({"int-0"},{pp},pnat)
+ 
+dmac318 all(x,pnat,all(y,pnat,eq(fn2(x,y),fn2(y,x),pnat)))
+ 
+dmac319 all(lst,list(pnat),all(r,pnat,eq("foldr-fn"(lst,r),"foldl-fn"("reverse*"(lst),r),pnat)))
+ 
+dmac320 all(x,pnat,all(y,pnat,eq(times(x,s(y)),plus(x,times(x,y)),pnat)))
+ 
+dmac321 all(x,pnat,all(y,pnat,eq(times(x,y),times(y,x),pnat)))
+ 
+dmac322 all(n,pnat,all(x,pnat,all(y,pnat,eq(remainder(times(x,remainder(y,n)),n),remainder(times(x,y),n),pnat))))
+ 
+dmac323 all(a,pnat,all(b,pnat,all(n,pnat,all(y,pnat,eq(remainder(times(a,times(b,remainder(y,n))),n),remainder(times(a,times(b,y)),n),pnat)))))
+ 
+dmac324 all(e,pnat,all(m,pnat,all(n,pnat,imp(imp(eq(n,{"int-1"},pnat),void),eq(crypt(m,e,n),remainder(exp(m,e),n),pnat)))))
+ 
+dmac325 all(a,pnat,all(b,pnat,all(n,pnat,eq(remainder(times(remainder(a,n),b),n),remainder(times(a,b),n),pnat))))
+ 
+dmac326 all(a,pnat,all(x,pnat,all(y,pnat,all(z,pnat,imp(eq(remainder(y,a),remainder(z,a),pnat),iff(eq(remainder(times(x,y),a),remainder(times(x,z),a),pnat),{true}))))))
+ 
+dmac327 all(a,pnat,all(i,pnat,all(n,pnat,eq(remainder(exp(remainder(a,n),i),n),remainder(exp(a,i),n),pnat))))
+ 
+dmac328 all(i,pnat,all(j,pnat,all(m,pnat,all(p,pnat,imp(eq(remainder(exp(m,j),p),{"int-1"},pnat),eq(remainder(exp(m,times(i,j)),p),{"int-1"},pnat))))))
+ 
+dmac329 all(a,pnat,all(b,pnat,all(m,pnat,eq(times(m,pdifference(a,b)),pdifference(times(m,a),times(m,b)),pnat))))
+ 
+dmac330 all(a,pnat,all(b,pnat,all(p,pnat,imp(eq(remainder(pdifference(a,b),p),{"int-0"},pnat),iff(eq(remainder(a,p),remainder(b,p),pnat),{true})))))
+ 
+dmac331 all(a,pnat,all(b,pnat,all(p,pnat,imp(eq(remainder(a,p),remainder(b,p),pnat),eq(remainder(pdifference(a,b),p),{"int-0"},pnat)))))
+ 
+dmac332 all(a,pnat,all(b,pnat,all(m,pnat,all(p,pnat,imp(and(eq(remainder(times(m,a),p),remainder(times(m,b),p),pnat),and(imp(eq(remainder(m,p),{"int-0"},pnat),void),prime(p))),iff(eq(remainder(a,p),remainder(b,p),pnat),{true}))))))
+ 
+dmac333 all(x,pnat,all(y,pnat,all(z,pnat,imp(eq(remainder(x,z),{"int-0"},pnat),eq(remainder(times(y,x),times(y,z)),{"int-0"},pnat)))))
+ 
+dmac334 all(p,pnat,all(q,pnat,all(x,pnat,imp(and(eq(remainder(x,p),{"int-0"},pnat),and(eq(remainder(x,q),{"int-0"},pnat),and(prime(p),and(prime(q),imp(eq(p,q,pnat),void))))),eq(remainder(x,times(p,q)),{"int-0"},pnat)))))
+ 
+dmac335 all(a,pnat,all(b,pnat,all(p,pnat,all(q,pnat,imp(and(prime(p),and(prime(q),and(imp(eq(p,q,pnat),void),and(eq(remainder(a,p),remainder(b,p),pnat),eq(remainder(a,q),remainder(b,q),pnat))))),eq(remainder(a,times(p,q)),remainder(b,times(p,q)),pnat))))))
+ 
+dmac336 all(a,pnat,all(b,pnat,all(p,pnat,all(q,pnat,imp(and(prime(p),and(prime(q),and(imp(eq(p,q,pnat),void),and(eq(remainder(a,p),remainder(b,p),pnat),and(eq(remainder(a,q),remainder(b,q),pnat),and({true},lessp(b,times(p,q)))))))),iff(eq(remainder(a,times(p,q)),b,pnat),{true}))))))
+ 
+dmac337 all(m,pnat,all(p,pnat,all(x,pnat,all(y,pnat,imp(and(prime(p),imp(eq(remainder(m,p),{"int-0"},pnat),void)),iff(eq(remainder(times(m,x),p),remainder(times(m,y),p),pnat),eq(remainder(x,p),remainder(y,p),pnat)))))))
+ 
+dmac338 all(m,pnat,all(p,pnat,all(x,pnat,imp(prime(p),iff(eq(remainder(times(m,x),p),remainder(m,p),pnat),or(eq(remainder(m,p),{"int-0"},pnat),eq(remainder(x,p),{"int-1"},pnat)))))))
+ 
+dmac339 all(n,pnat,iff(listp(positives(n)),imp(eq(n,0,pnat),void)))
+ 
+dmac340 all(n,pnat,eq(list_car(pnat,positives(n)),if(eq(n,0,pnat),{"int-0"},n),pnat))
+ 
+dmac341 all(n,pnat,all(x,pnat,iff(member(x,positives(n)),if(eq(x,0,pnat),void,lessp(x,s(n))))))
+ 
+dmac342 all(l,list(pnat),all(x,pnat,imp("all-non-zerop"(l),"all-non-zerop"(delete(x,l)))))
+ 
+dmac343 all(t156,u(1),all(l,list(t156),all(x,t156,imp("all-distinct"(l),"all-distinct"(delete(x,l))))))
+ 
+dmac344 all(l,list(pnat),all(n,pnat,imp(and("all-distinct"(l),"all-lesseqp"(l,s(n))),"all-lesseqp"(delete(s(n),l),n))))
+ 
+dmac345 all(n,pnat,all(x,list(pnat),imp(and(imp(member(s(n),x),void),"all-lesseqp"(x,s(n))),"all-lesseqp"(x,n))))
+ 
+dmac346 all(t157,u(1),all(a,list(t157),all(b,list(t157),all(x,t157,imp(and(perm(a,b),member(x,a)),member(x,b))))))
+ 
+dmac347 all(l,list(pnat),imp(and("all-non-zerop"(l),and("all-distinct"(l),"all-lesseqp"(l,length(l)))),perm(positives(length(l)),l)))
+ 
+dmac348 all(l1,list(pnat),all(l2,list(pnat),imp(perm(l1,l2),eq("times-list"(l1),"times-list"(l2),pnat))))
+ 
+dmac349 all(n,pnat,eq("times-list"(positives(n)),fact(n),pnat))
+ 
+dmac350 all(l,list(pnat),all(n,pnat,imp(perm(positives(n),l),eq("times-list"(l),fact(n),pnat))))
+ 
+dmac351 all(n,pnat,all(p,pnat,imp(and(prime(p),lessp(n,p)),imp(eq(remainder(fact(n),p),{"int-0"},pnat),void))))
+ 
+dmac352 all(m,pnat,all(n,pnat,all(p,pnat,eq(remainder("times-list"("s*"(n,m,p)),p),remainder(times(fact(n),exp(m,n)),p),pnat))))
+ 
+dmac353 all(m,pnat,all(n1,pnat,all(n2,pnat,all(p,pnat,imp(and(prime(p),and(imp(eq(remainder(m,p),{"int-0"},pnat),void),and({true},and(lessp(n2,n1),lessp(n1,p))))),imp(member(remainder(times(m,n1),p),"s*"(n2,m,p)),void))))))
+ 
+dmac354 all(m,pnat,all(n,pnat,all(p,pnat,imp(and(prime(p),and(imp(eq(remainder(m,p),{"int-0"},pnat),void),lessp(n,p))),"all-distinct"("s*"(n,m,p))))))
+ 
+dmac355 all(m,pnat,all(n,pnat,all(p,pnat,imp(and(prime(p),and(imp(eq(remainder(m,p),{"int-0"},pnat),void),lessp(n,p))),"all-non-zerop"("s*"(n,m,p))))))
+ 
+dmac356 all(m,pnat,all(n,pnat,all(p,pnat,"all-lesseqp"("s*"(n,m,s(p)),p))))
+ 
+dmac357 all(m,pnat,all(n,pnat,all(p,pnat,eq(length("s*"(n,m,p)),n,pnat))))
+ 
+dmac358 all(m,pnat,all(p,pnat,imp(and(prime(p),imp(eq(remainder(m,p),{"int-0"},pnat),void)),eq(remainder(exp(m,sub(p)),p),{"int-1"},pnat))))
+ 
+dmac359 all(k,pnat,all(m,pnat,all(p,pnat,imp(prime(p),eq(remainder(times(m,exp(m,times(k,sub(p)))),p),remainder(m,p),pnat)))))
+ 
+dmac360 all(k,pnat,all(m,pnat,all(p,pnat,all(q,{:(x,or(pnat,imp(eq(x,0,pnat),void)))},imp(prime(p),eq(remainder(times(m,exp(m,times(k,times(sub(p),sub(q))))),p),remainder(m,p),pnat))))))
+ 
+dmac361 all(k,pnat,all(m,pnat,all(p,{:(x,or(pnat,imp(eq(x,0,pnat),void)))},all(q,pnat,imp(prime(q),eq(remainder(times(m,exp(m,times(k,times(sub(p),sub(q))))),q),remainder(m,q),pnat))))))
+ 
+dmac362 all(ed,pnat,all(m,pnat,all(p,pnat,all(q,pnat,imp(and(prime(p),and(prime(q),and(imp(eq(p,q,pnat),void),and({true},and(lessp(m,times(p,q)),eq(remainder(ed,times(sub(p),sub(q))),{"int-1"},pnat)))))),eq(remainder(exp(m,ed),times(p,q)),m,pnat))))))
+ 
+dmac363 all(d,pnat,all(e,pnat,all(m,pnat,all(n,pnat,all(p,pnat,all(q,pnat,imp(and(prime(p),and(prime(q),and(imp(eq(p,q,pnat),void),and(eq(n,times(p,q),pnat),and({true},and(lessp(m,n),eq(remainder(times(e,d),times(sub(p),sub(q))),{"int-1"},pnat))))))),eq(crypt(crypt(m,e,n),d,n),m,pnat))))))))
+ 
+dmac364 all(j,pnat,all(p,pnat,eq(remainder(times(inverse(j,s(p)),j),s(p)),remainder(exp(j,p),s(p)),pnat)))
+ 
+dmac365 all(j,pnat,all(p,pnat,imp(and(prime(p),imp(eq(remainder(j,p),{"int-0"},pnat),void)),eq(remainder(times(inverse(j,p),j),p),{"int-1"},pnat))))
+ 
+dmac366 all(m,pnat,all(p,pnat,all(x,pnat,imp(and(prime(p),eq({"int-1"},remainder(times(m,x),p),pnat)),eq(inverse(m,p),remainder(x,p),pnat)))))
+ 
+dmac367 all(n,pnat,imp(and(imp(eq(n,0,pnat),void),imp(eq(n,{"int-1"},pnat),void)),eq(times(sub(n),sub(n)),plus({"int-1"},times(n,sub(sub(n)))),pnat)))
+ 
+dmac368 all(n,pnat,imp(and(imp(eq(n,0,pnat),void),imp(eq(n,{"int-1"},pnat),void)),eq(remainder(times(sub(n),sub(n)),n),{"int-1"},pnat)))
+ 
+dmac369 all(p,pnat,imp(prime(p),eq(inverse(sub(p),p),sub(p),pnat)))
+ 
+dmac370 all(x,pnat,eq(difference(times(x,x),{"int-1"}),times(s(x),sub(x)),pnat))
+ 
+dmac371 all(j,pnat,all(p,pnat,imp(and(prime(p),eq(remainder(difference(times(j,j),{"int-1"}),p),{"int-0"},pnat)),or(eq(remainder(s(j),p),{"int-0"},pnat),eq(remainder(sub(j),p),{"int-0"},pnat)))))
+ 
+dmac372 all(a,pnat,all(p,pnat,imp(and(imp(lessp(a,{"int-1"}),void),eq(remainder(a,p),{"int-1"},pnat)),eq(remainder(sub(a),p),{"int-0"},pnat))))
+ 
+dmac373 all(j,pnat,all(p,pnat,imp(and(prime(p),and(imp(eq(remainder(j,p),{"int-0"},pnat),void),eq(inverse(j,p),j,pnat))),or(eq(remainder(s(j),p),{"int-0"},pnat),eq(remainder(sub(j),p),{"int-0"},pnat)))))
+ 
+dmac374 all(j,pnat,all(p,pnat,imp(and(prime(p),and(lessp(j,sub(p)),lessp({"int-1"},j))),imp(eq(inverse(j,p),j,pnat),void))))
+ 
+dmac375 all(p,pnat,eq(sub(times(difference(p,{"int-2"}),difference(p,{"int-2"}))),times(difference(p,{"int-3"}),sub(p)),pnat))
+ 
+dmac376 all(j,pnat,all(p,pnat,imp(and(prime(p),imp(eq(remainder(j,p),{"int-0"},pnat),void)),eq(inverse(inverse(j,p),p),remainder(j,p),pnat))))
+ 
+dmac377 all(i,pnat,all(p,pnat,imp(and(eq(i,0,pnat),lessp({"int-1"},p)),eq(inverse(i,p),{"int-0"},pnat))))
+ 
+dmac378 all(j,pnat,all(p,pnat,imp(and(prime(p),imp(eq(remainder(j,p),{"int-0"},pnat),void)),imp(eq(inverse(j,p),0,pnat),void))))
+ 
+dmac379 all(j,pnat,all(p,pnat,imp(and(prime(p),and(imp(eq(remainder(j,p),{"int-0"},pnat),void),eq(inverse(j,p),sub(p),pnat))),eq(remainder(j,p),sub(p),pnat))))
+ 
+dmac380 all(j,pnat,all(p,pnat,imp(lessp({"int-1"},p),leq(inverse(j,p),sub(p)))))
+ 
+dmac381 all(j,pnat,all(p,pnat,imp(and(prime(p),lessp(j,sub(p))),lessp(inverse(j,p),sub(p)))))
+ 
+dmac382 all(i,pnat,all(p,pnat,imp(and(prime(p),lessp(i,sub(p))),"all-non-zerop"("inverse-list"(i,p)))))
+ 
+dmac383 all(i,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(lessp(i,sub(p)),eq(j,difference(p,{"int-2"}),pnat))),"all-lesseqp"("inverse-list"(i,p),j)))))
+ 
+dmac384 all(n,pnat,all(p,pnat,subsetp(positives(n),"inverse-list"(n,p))))
+ 
+dmac385 all(p,pnat,imp(lessp({"int-1"},p),eq(inverse({"int-1"},p),{"int-1"},pnat)))
+ 
+dmac386 all(i,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(imp(eq(remainder(i,p),{"int-0"},pnat),void),and(lessp(i,p),member(j,"inverse-list"(i,p))))),member(inverse(j,p),"inverse-list"(i,p))))))
+ 
+dmac387 all(i,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(imp(eq(remainder(i,p),{"int-0"},pnat),void),and(imp(eq(remainder(j,p),{"int-0"},pnat),void),and(lessp(i,p),and(lessp(j,p),member(inverse(j,p),"inverse-list"(i,p))))))),member(j,"inverse-list"(i,p))))))
+ 
+dmac388 all(i,pnat,all(p,pnat,imp(and(prime(p),and(lessp(i,sub(p)),"all-distinct"("inverse-list"(sub(i),p)))),"all-distinct"("inverse-list"(i,p)))))
+ 
+dmac389 all(i,pnat,all(p,pnat,imp(and(prime(p),lessp(i,sub(p))),"all-distinct"("inverse-list"(i,p)))))
+ 
+dmac390 all(a,pnat,all(b,pnat,all(c,pnat,all(p,pnat,imp(eq(remainder(times(a,b),p),{"int-1"},pnat),eq(remainder(times(a,times(b,c)),p),remainder(c,p),pnat))))))
+ 
+dmac391 all(i,pnat,all(p,pnat,imp(eq(remainder(times(i,inverse(i,p)),p),{"int-1"},pnat),eq(remainder("times-list"("inverse-list"(i,p)),p),remainder("times-list"("inverse-list"(sub(i),p)),p),pnat))))
+ 
+dmac392 all(i,pnat,all(p,pnat,imp(and(prime(p),imp(eq(remainder(i,p),{"int-0"},pnat),void)),eq(remainder("times-list"("inverse-list"(i,p)),p),remainder("times-list"("inverse-list"(sub(i),p)),p),pnat))))
+ 
+dmac393 all(i,pnat,all(p,pnat,imp(leq(i,{"int-1"}),eq("times-list"("inverse-list"(i,p)),{"int-1"},pnat))))
+ 
+dmac394 all(i,pnat,all(p,pnat,imp(and(prime(p),lessp(i,p)),eq(remainder("times-list"("inverse-list"(i,p)),p),{"int-1"},pnat))))
+ 
+dmac395 all(t158,u(1),all(a,t158,all(s,list(t158),all(x,t158,imp(and(member(a,s),imp(eq(a,x,t158),void)),member(a,delete(x,s)))))))
+ 
+dmac396 all(t159,u(1),all(r,list(t159),all(s,list(t159),all(x,t159,imp(and(subsetp(r,s),imp(member(x,r),void)),subsetp(r,delete(x,s)))))))
+ 
+dmac397 all(l,list(pnat),all(n,pnat,imp(and("all-distinct"(l),"all-lesseqp"(l,n)),"all-lesseqp"(delete(n,l),sub(n)))))
+ 
+dmac398 all(m,pnat,all(n,pnat,imp(lessp(n,m),imp(member(m,positives(n)),void))))
+ 
+dmac399 all(l,list(pnat),all(n,pnat,imp(subsetp(positives(n),l),subsetp(positives(sub(n)),delete(n,l)))))
+ 
+dmac400 all(n,pnat,all(l209,pnat,all(l210,list(pnat),imp(and(eq(n,0,pnat),and("all-lesseqp"("::"(l209,l210),n),"all-non-zerop"("::"(l209,l210)))),void))))
+ 
+dmac401 all(l,list(pnat),all(n,pnat,imp(and("all-distinct"(l),and("all-non-zerop"(l),and("all-lesseqp"(l,n),subsetp(positives(n),l)))),perm(positives(n),l))))
+ 
+dmac402 all(i,pnat,all(p,pnat,imp(and(prime(p),eq(i,difference(p,{"int-2"}),pnat)),perm(positives(i),"inverse-list"(i,p)))))
+ 
+dmac403 all(i,pnat,all(p,pnat,imp(and(prime(p),eq(i,difference(p,{"int-2"}),pnat)),eq("times-list"("inverse-list"(i,p)),fact(i),pnat))))
+ 
+dmac404 all(i,pnat,all(p,pnat,imp(and(prime(p),eq(i,difference(p,{"int-2"}),pnat)),eq(remainder(fact(i),p),{"int-1"},pnat))))
+ 
+dmac405 all(p,pnat,imp(prime(p),eq(remainder(fact(sub(p)),p),sub(p),pnat)))
+ 
+dmac406 all(m,pnat,all(n,pnat,all(p,pnat,imp(and(imp(eq(p,0,pnat),void),leq(m,n)),member(remainder(times(m,m),p),squares(n,p))))))
+ 
+dmac407 all(p,pnat,all(y,pnat,eq(remainder(times(y,y),p),remainder(times(remainder(y,p),remainder(y,p)),p),pnat)))
+ 
+dmac408 all(p,pnat,all(y,pnat,imp(and(imp(eq(p,0,pnat),void),imp(member(remainder(times(y,y),p),squares(p,p)),void)),void)))
+ 
+dmac409 all(p,pnat,imp(imp(divides({"int-2"},p),void),eq(times({"int-2"},quotient(p,{"int-2"})),sub(p),pnat)))
+ 
+dmac410 all(i,pnat,all(p,pnat,imp(imp(divides({"int-2"},p),void),eq(exp(times(i,i),quotient(p,{"int-2"})),exp(i,sub(p)),pnat))))
+ 
+dmac411 all(a,pnat,all(b,pnat,all(c,pnat,all(p,pnat,imp(eq(remainder(a,p),remainder(b,p),pnat),eq(remainder(exp(a,c),p),remainder(exp(b,c),p),pnat))))))
+ 
+dmac412 all(i,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides({"int-2"},p),void),imp(divides(p,i),void))),eq(remainder(exp(times(i,i),quotient(p,{"int-2"})),p),{"int-1"},pnat))))
+ 
+dmac413 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,a),void),eq(remainder(a,p),remainder(times(i,i),p),pnat))),imp(divides(p,i),void)))))
+ 
+dmac414 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides({"int-2"},p),void),and(imp(divides(p,a),void),eq(remainder(a,p),remainder(times(i,i),p),pnat)))),eq(remainder(exp(a,quotient(p,{"int-2"})),p),{"int-1"},pnat)))))
+ 
+dmac415 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides({"int-2"},p),void),and(imp(divides(p,a),void),member(remainder(a,p),squares(i,p))))),eq(remainder(exp(a,quotient(p,{"int-2"})),p),{"int-1"},pnat)))))
+ 
+dmac416 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides({"int-2"},p),void),residue(a,p))),eq(remainder(exp(a,quotient(p,{"int-2"})),p),{"int-1"},pnat))))
+ 
+dmac417 all(a,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),imp(divides(p,j),void)),eq(remainder(times(j,complement(j,a,p)),p),remainder(a,p),pnat)))))
+ 
+dmac418 all(a,pnat,all(j,pnat,all(p,pnat,lessp(complement(j,a,s(p)),s(p)))))
+ 
+dmac419 all(a,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,j),void),imp(divides(p,a),void))),imp(eq(complement(j,a,p),0,pnat),void)))))
+ 
+dmac420 all(a,pnat,all(j,pnat,all(p,pnat,all(x,pnat,imp(and(prime(p),and(imp(divides(p,a),void),eq(remainder(times(j,x),p),remainder(a,p),pnat))),eq(complement(j,a,p),remainder(x,p),pnat))))))
+ 
+dmac421 all(a,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,j),void),and(imp(divides(p,a),void),imp(residue(a,p),void)))),imp(eq(j,complement(j,a,p),pnat),void)))))
+ 
+dmac422 all(a,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,j),void),imp(divides(p,a),void))),eq(complement(complement(j,a,p),a,p),remainder(j,p),pnat)))))
+ 
+dmac423 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(prime(p),and(lessp(i,p),imp(divides(p,a),void))),"all-non-zerop"("comp-list"(i,a,p))))))
+ 
+dmac424 all(a,pnat,all(i,pnat,all(p,pnat,imp(lessp(i,p),"all-lesseqp"("comp-list"(i,a,p),sub(p))))))
+ 
+dmac425 all(a,pnat,all(n,pnat,all(p,pnat,subsetp(positives(n),"comp-list"(n,a,p)))))
+ 
+dmac426 all(a,pnat,all(i,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(imp(eq(i,0,pnat),void),and(lessp(i,p),and(imp(divides(p,a),void),member(j,"comp-list"(i,a,p)))))),member(complement(j,a,p),"comp-list"(i,a,p)))))))
+ 
+dmac427 all(a,pnat,all(i,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(imp(eq(i,0,pnat),void),and(imp(eq(j,0,pnat),void),and(lessp(i,p),and(lessp(j,p),and(imp(divides(p,a),void),member(complement(j,a,p),"comp-list"(i,a,p)))))))),member(j,"comp-list"(i,a,p)))))))
+ 
+dmac428 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(prime(p),and(lessp(i,p),and(imp(divides(p,a),void),and(imp(residue(a,p),void),"all-distinct"("comp-list"(sub(i),a,p)))))),"all-distinct"("comp-list"(i,a,p))))))
+ 
+dmac429 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(prime(p),and(lessp(i,p),and(imp(divides(p,a),void),imp(residue(a,p),void)))),"all-distinct"("comp-list"(i,a,p))))))
+ 
+dmac430 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,a),void),imp(residue(a,p),void))),perm(positives(sub(p)),"comp-list"(sub(p),a,p)))))
+ 
+dmac431 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,a),void),imp(residue(a,p),void))),eq("times-list"("comp-list"(sub(p),a,p)),fact(sub(p)),pnat))))
+ 
+dmac432 all(a,pnat,all(i,pnat,all(j,pnat,all(k,pnat,all(p,pnat,imp(eq(remainder(times(i,j),p),remainder(a,p),pnat),eq(remainder(times(i,times(j,k)),p),remainder(times(a,remainder(k,p)),p),pnat)))))))
+ 
+dmac433 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(eq(remainder(times(i,complement(i,a,p)),p),remainder(a,p),pnat),and(imp(eq(i,0,pnat),void),imp(member(i,"comp-list"(sub(i),a,p)),void))),eq(remainder("times-list"("comp-list"(i,a,p)),p),remainder(times(a,remainder("times-list"("comp-list"(sub(i),a,p)),p)),p),pnat)))))
+ 
+dmac434 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,i),void),imp(member(i,"comp-list"(sub(i),a,p)),void))),eq(remainder("times-list"("comp-list"(i,a,p)),p),remainder(times(a,remainder("times-list"("comp-list"(sub(i),a,p)),p)),p),pnat)))))
+ 
+dmac435 all(n,pnat,all(x,pnat,all(y,pnat,imp(and(imp(eq(n,0,pnat),void),and({true},eq(y,plus(x,n),pnat))),eq(quotient(y,n),s(quotient(x,n)),pnat)))))
+ 
+dmac436 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(imp(eq(i,0,pnat),void),imp(member(i,"comp-list"(sub(i),a,p)),void)),eq(quotient(length("comp-list"(i,a,p)),{"int-2"}),s(quotient(length("comp-list"(sub(i),a,p)),{"int-2"})),pnat)))))
+ 
+dmac437 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(prime(p),and(imp(eq(i,0,pnat),void),and(lessp(i,p),eq(remainder("times-list"("comp-list"(sub(i),a,p)),p),remainder(exp(a,quotient(length("comp-list"(sub(i),a,p)),{"int-2"})),p),pnat)))),eq(remainder("times-list"("comp-list"(i,a,p)),p),remainder(exp(a,quotient(length("comp-list"(i,a,p)),{"int-2"})),p),pnat)))))
+ 
+dmac438 all(a,pnat,all(p,pnat,eq(remainder("times-list"("comp-list"(0,a,p)),p),remainder(exp(a,quotient(length("comp-list"(0,a,p)),{"int-2"})),p),pnat)))
+ 
+dmac439 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(prime(p),lessp(i,p)),eq(remainder("times-list"("comp-list"(i,a,p)),p),remainder(exp(a,quotient(length("comp-list"(i,a,p)),{"int-2"})),p),pnat)))))
+ 
+dmac440 all(t160,u(1),all(b,list(t160),all(x,t160,imp(member(x,b),eq(length(delete(x,b)),sub(length(b)),pnat)))))
+ 
+dmac441 all(t161,u(1),all(a,list(t161),all(b,list(t161),imp(perm(a,b),eq(length(a),length(b),pnat)))))
+ 
+dmac442 all(n,pnat,eq(length(positives(n)),n,pnat))
+ 
+dmac443 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,a),void),imp(residue(a,p),void))),eq(remainder(exp(a,quotient(length("comp-list"(sub(p),a,p)),{"int-2"})),p),sub(p),pnat))))
+ 
+dmac444 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,a),void),imp(residue(a,p),void))),eq(length("comp-list"(sub(p),a,p)),sub(p),pnat))))
+ 
+dmac445 all(p,pnat,iff(divides({"int-2"},s(p)),imp(divides({"int-2"},p),void)))
+ 
+dmac446 all(p,pnat,imp(imp(divides({"int-2"},p),void),eq(quotient(sub(p),{"int-2"}),quotient(p,{"int-2"}),pnat)))
+ 
+dmac447 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides({"int-2"},p),void),and(imp(divides(p,a),void),imp(residue(a,p),void)))),eq(remainder(exp(a,quotient(p,{"int-2"})),p),sub(p),pnat))))
+ 
+dmac448 all(a,pnat,all(b,pnat,all(p,pnat,imp(leq(b,a),eq(remainder(difference(a,remainder(b,p)),p),remainder(difference(a,b),p),pnat)))))
+ 
+dmac449 all(b,pnat,all(p,pnat,all(x,pnat,imp(and(lessp(x,p),and(imp(eq(x,0,pnat),void),imp(eq(b,0,pnat),void))),eq(remainder(difference(times(b,p),x),p),difference(p,x),pnat)))))
+ 
+dmac450 all(p,pnat,all(x,pnat,all(y,pnat,imp(leq(y,p),eq(remainder(times(reflect(y,p),x),p),remainder(reflect(remainder(times(y,x),p),p),p),pnat)))))
+ 
+dmac451 all(p,pnat,all(x,pnat,all(y,pnat,imp(leq(y,p),eq(remainder(times(x,reflect(y,p)),p),remainder(reflect(remainder(times(x,y),p),p),p),pnat)))))
+ 
+dmac452 all(a,pnat,all(n,pnat,all(p,pnat,eq(remainder(times(times(a,s(n)),times(exp(a,n),fact(n))),p),remainder(times(exp(a,s(n)),fact(s(n))),p),pnat))))
+ 
+dmac453 all(a,pnat,all(n,pnat,all(p,pnat,imp(and(imp(eq(p,0,pnat),void),and(imp(eq(n,0,pnat),void),and(imp(lessp(quotient(p,{"int-2"}),remainder(times(a,n),p)),void),eq(remainder("times-list"("reflect-list"(sub(n),a,p)),p),remainder(times(exp(a,sub(n)),fact(sub(n))),p),pnat)))),eq(remainder("times-list"("reflect-list"(n,a,p)),p),remainder(times(exp(a,n),fact(n)),p),pnat)))))
+ 
+dmac454 all(a,pnat,all(n,pnat,all(p,pnat,imp(and(imp(eq(p,0,pnat),void),and(imp(eq(n,0,pnat),void),and(lessp(quotient(p,{"int-2"}),remainder(times(a,n),p)),eq(remainder("times-list"("reflect-list"(sub(n),a,p)),p),remainder(times(exp(a,sub(n)),fact(sub(n))),p),pnat)))),eq(remainder("times-list"("reflect-list"(n,a,p)),p),remainder(reflect(remainder(times(exp(a,n),fact(n)),p),p),p),pnat)))))
+ 
+dmac455 all(a,pnat,all(n,pnat,all(p,pnat,imp(and(imp(eq(p,0,pnat),void),and(imp(eq(n,0,pnat),void),and(imp(lessp(quotient(p,{"int-2"}),remainder(times(a,n),p)),void),eq(remainder("times-list"("reflect-list"(sub(n),a,p)),p),remainder(reflect(remainder(times(exp(a,sub(n)),fact(sub(n))),p),p),p),pnat)))),eq(remainder("times-list"("reflect-list"(n,a,p)),p),remainder(reflect(remainder(times(exp(a,n),fact(n)),p),p),p),pnat)))))
+ 
+dmac456 all(a,pnat,all(p,pnat,imp(leq(a,p),eq(remainder(reflect(remainder(reflect(a,p),p),p),p),remainder(a,p),pnat))))
+ 
+dmac457 all(a,pnat,all(n,pnat,all(p,pnat,imp(and(imp(eq(p,0,pnat),void),and(imp(eq(n,0,pnat),void),and(lessp(quotient(p,{"int-2"}),remainder(times(a,n),p)),eq(remainder("times-list"("reflect-list"(sub(n),a,p)),p),remainder(reflect(remainder(times(exp(a,sub(n)),fact(sub(n))),p),p),p),pnat)))),eq(remainder("times-list"("reflect-list"(n,a,p)),p),remainder(times(exp(a,n),fact(n)),p),pnat)))))
+ 
+dmac458 all(a,pnat,all(p,pnat,eq(remainder("times-list"("reflect-list"(0,a,p)),p),remainder(times(exp(a,0),fact(0)),p),pnat)))
+ 
+dmac459 all(a,pnat,all(n,pnat,all(p,pnat,eq(remainder("times-list"("reflect-list"(n,a,s(p))),s(p)),if(res1(n,a,s(p)),remainder(times(exp(a,n),fact(n)),s(p)),remainder(reflect(remainder(times(exp(a,n),fact(n)),s(p)),s(p)),s(p))),pnat))))
+ 
+dmac460 all(a,pnat,all(n,pnat,all(p,pnat,eq(length("reflect-list"(n,a,p)),n,pnat))))
+ 
+dmac461 all(p,pnat,all(x,pnat,imp(lessp(quotient(p,{"int-2"}),x),imp(lessp(quotient(p,{"int-2"}),reflect(x,p)),void))))
+ 
+dmac462 all(a,pnat,all(n,pnat,all(p,pnat,"all-lesseqp"("reflect-list"(n,a,p),quotient(p,{"int-2"})))))
+ 
+dmac463 all(a,pnat,all(b,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,a),void),lessp(b,p))),"all-non-zerop"("reflect-list"(b,a,p))))))
+ 
+dmac464 all(a,pnat,all(i,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(lessp(j,i),and(lessp(i,p),imp(divides(p,a),void)))),imp(eq(remainder(times(a,i),p),remainder(times(a,j),p),pnat),void))))))
+ 
+dmac465 all(p,pnat,all(x,pnat,all(y,pnat,imp(and({true},and({true},and(lessp(x,p),lessp(y,p)))),iff(eq(difference(p,x),difference(p,y),pnat),eq(x,y,pnat))))))
+ 
+dmac466 all(a,pnat,all(p,pnat,{true}))
+ 
+dmac467 all(a,pnat,all(i,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(lessp(j,i),and(lessp(i,p),imp(divides(p,a),void)))),imp(eq(reflect(remainder(times(a,i),p),p),reflect(remainder(times(a,j),p),p),pnat),void))))))
+ 
+dmac468 all(p,pnat,all(x,pnat,all(y,pnat,eq(remainder(plus(remainder(x,p),y),p),remainder(plus(x,y),p),pnat))))
+ 
+dmac469 all(p,pnat,all(x,pnat,all(y,pnat,eq(remainder(plus(y,remainder(x,p)),p),remainder(plus(x,y),p),pnat))))
+ 
+dmac470 all(p,pnat,all(x,pnat,all(y,pnat,imp(and(eq(x,difference(p,y),pnat),lessp(y,p)),eq(remainder(plus(x,y),p),{"int-0"},pnat)))))
+ 
+dmac471 all(a,pnat,all(i,pnat,all(j,pnat,all(p,pnat,imp(and(eq(remainder(times(a,i),p),difference(p,remainder(times(a,j),p)),pnat),imp(eq(p,0,pnat),void)),eq(remainder(times(a,plus(i,j)),p),{"int-0"},pnat))))))
+ 
+dmac472 all(i,pnat,all(j,pnat,all(p,pnat,imp(and(leq(i,quotient(p,{"int-2"})),lessp(j,i)),and(imp(eq(plus(i,j),0,pnat),void),lessp(plus(i,j),p))))))
+ 
+dmac473 all(a,pnat,all(i,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,a),void),and(leq(i,quotient(p,{"int-2"})),lessp(j,i)))),imp(eq(remainder(times(a,i),p),reflect(remainder(times(a,j),p),p),pnat),void))))))
+ 
+dmac474 all(a,pnat,all(i,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,a),void),and(leq(i,quotient(p,{"int-2"})),lessp(j,i)))),imp(eq(reflect(remainder(times(a,i),p),p),remainder(times(a,j),p),pnat),void))))))
+ 
+dmac475 all(a,pnat,all(i,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides({"int-2"},p),void),and(imp(divides(p,a),void),and(leq(i,quotient(p,{"int-2"})),lessp(j,i))))),imp(member(remainder(times(a,i),p),"reflect-list"(j,a,p)),void))))))
+ 
+dmac476 all(a,pnat,all(i,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides({"int-2"},p),void),and(imp(divides(p,a),void),and(leq(i,quotient(p,{"int-2"})),lessp(j,i))))),imp(member(reflect(remainder(times(a,i),p),p),"reflect-list"(j,a,p)),void))))))
+ 
+dmac477 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides({"int-2"},p),void),and(imp(divides(p,a),void),leq(i,quotient(p,{"int-2"}))))),"all-distinct"("reflect-list"(i,a,p))))))
+ 
+dmac478 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides({"int-2"},p),void),imp(divides(p,a),void))),eq("times-list"("reflect-list"(quotient(p,{"int-2"}),a,p)),fact(quotient(p,{"int-2"})),pnat))))
+ 
+dmac479 all(x,pnat,eq(remainder(plus(x,x),{"int-2"}),{"int-0"},pnat))
+ 
+dmac480 all(p,pnat,all(x,pnat,imp(and(imp(eq(x,0,pnat),void),imp(divides({"int-2"},p),void)),imp(eq(remainder(difference(p,x),p),x,pnat),void))))
+ 
+dmac481 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides({"int-2"},p),void),and(imp(divides(p,a),void),res1(quotient(p,{"int-2"}),a,p)))),eq(remainder(exp(a,quotient(p,{"int-2"})),p),{"int-1"},pnat))))
+ 
+dmac482 all(a,pnat,all(p,pnat,imp(lessp(a,p),eq(remainder(a,p),a,pnat))))
+ 
+dmac483 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides({"int-2"},p),void),and(imp(divides(p,a),void),imp(res1(quotient(p,{"int-2"}),a,p),void)))),imp(eq(remainder(exp(a,quotient(p,{"int-2"})),p),{"int-1"},pnat),void))))
+ 
+dmac484 all(p,pnat,imp(imp(divides({"int-2"},p),void),imp(eq(sub(p),{"int-1"},pnat),void)))
+ 
+dmac485 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,a),void),imp(divides({"int-2"},p),void))),iff(res1(quotient(p,{"int-2"}),a,p),residue(a,p)))))
+ 
+dmac486 all(a,pnat,all(n,pnat,all(p,pnat,eq(times(a,"plus-list"(positives(n))),plus(times(p,"plus-list"("quot-list"(n,a,p))),"plus-list"("rem-list"(n,a,p))),pnat))))
+ 
+dmac487 all(a,pnat,all(b,pnat,iff(even3(plus(a,b)),iff(even3(a),even3(b)))))
+ 
+dmac488 all(p,pnat,all(x,pnat,imp(leq(x,p),iff(even3(difference(p,x)),iff(even3(p),even3(x))))))
+ 
+dmac489 all(a,pnat,all(b,pnat,iff(even3(times(a,b)),or(even3(a),even3(b)))))
+ 
+dmac490 all(p,pnat,all(x,pnat,imp(imp(even3(p),void),iff(even3(difference(p,remainder(x,p))),imp(even3(remainder(x,p)),void)))))
+ 
+dmac491 all(a,pnat,all(n,pnat,all(p,pnat,imp(imp(even3(p),void),iff(res1(n,a,p),iff(even3("plus-list"("rem-list"(n,a,p))),even3("plus-list"("reflect-list"(n,a,p)))))))))
+ 
+dmac492 all(m,list(pnat),all(x,pnat,imp(member(x,m),eq(plus(x,"plus-list"(delete(x,m))),"plus-list"(m),pnat))))
+ 
+dmac493 all(l,list(pnat),all(m,list(pnat),imp(perm(l,m),eq("plus-list"(l),"plus-list"(m),pnat))))
+ 
+dmac494 all(p,pnat,iff(divides({"int-2"},p),even3(p)))
+ 
+dmac495 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,a),void),imp(even3(p),void))),eq("plus-list"("reflect-list"(quotient(p,{"int-2"}),a,p)),"plus-list"(positives(quotient(p,{"int-2"}))),pnat))))
+ 
+dmac496 all(y,pnat,iff(even3(y),even3(y)))
+ 
+dmac497 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(even3(p),void),and(imp(even3(a),void),imp(divides(p,a),void)))),iff(res1(quotient(p,{"int-2"}),a,p),even3("plus-list"("quot-list"(quotient(p,{"int-2"}),a,p)))))))
+ 
+dmac498 all(l,list(pnat),all(x,pnat,imp(and(imp(member(x,l),void),"all-non-zerop"(l)),eq(plus(losses1(x,l),wins1(x,l)),length(l),pnat))))
+ 
+dmac499 all(l,list(pnat),all(m,list(list(pnat)),imp(and(nlistp(intersect(l,m)),and("all-non-zerop"(l),"all-non-zerop"(m))),eq(plus(wins(l,m),losses(l,m)),times(length(l),length(m)),pnat))))
+ 
+dmac500 all(l,list(pnat),all(m,list(pnat),eq(losses(l,m),wins(m,l),pnat)))
+ 
+dmac501 all(l,list(pnat),all(m,list(list(pnat)),imp(and(nlistp(intersect(l,m)),and("all-non-zerop"(l),"all-non-zerop"(m))),eq(plus(wins(l,m),wins(m,l)),times(length(l),length(m)),pnat))))
+ 
+dmac502 all(n,pnat,all(p,pnat,eq(length(mults(n,p)),n,pnat)))
+ 
+dmac503 all(a,pnat,all(n,pnat,all(p,pnat,imp(lessp(times(n,p),a),leq(n,wins1(a,mults(n,p)))))))
+ 
+dmac504 all(a,pnat,all(m,pnat,all(n,pnat,all(p,pnat,imp(leq(n,m),leq(wins1(a,mults(n,p)),wins1(a,mults(m,p))))))))
+ 
+dmac505 all(a,pnat,all(b,pnat,all(c,pnat,all(d,pnat,imp(and(imp(eq(b,0,pnat),void),leq(times(a,b),times(c,d))),leq(quotient(a,d),quotient(c,b)))))))
+ 
+dmac506 all(p,pnat,all(q,pnat,leq(quotient(times(quotient(p,{"int-2"}),q),p),quotient(q,{"int-2"}))))
+ 
+dmac507 all(i,pnat,all(j,pnat,all(p,pnat,imp(leq(j,i),leq(quotient(j,p),quotient(i,p))))))
+ 
+dmac508 all(j,pnat,all(p,pnat,all(q,pnat,imp(leq(j,quotient(p,{"int-2"})),leq(quotient(times(j,q),p),quotient(q,{"int-2"}))))))
+ 
+dmac509 all(p,pnat,all(x,pnat,imp(imp(divides(p,x),void),lessp(times(quotient(x,p),p),x))))
+ 
+dmac510 all(j,pnat,all(p,pnat,all(q,pnat,imp(and(prime(p),and(imp(divides(p,q),void),and(imp(eq(q,0,pnat),void),and(imp(eq(j,0,pnat),void),lessp(j,p))))),lessp(times(quotient(times(j,q),p),p),times(j,q))))))
+ 
+dmac511 all(j,pnat,all(p,pnat,all(q,pnat,imp(and(prime(p),and(imp(divides(p,q),void),and(leq(j,quotient(p,{"int-2"})),and(imp(eq(j,0,pnat),void),imp(eq(q,0,pnat),void))))),leq(quotient(times(j,q),p),wins1(times(j,q),mults(quotient(q,{"int-2"}),p)))))))
+ 
+dmac512 all(a,pnat,all(n,pnat,all(p,pnat,leq(times(wins2(a,n,p),p),a))))
+ 
+dmac513 all(a,pnat,all(n,pnat,all(p,pnat,leq(wins1(a,mults(n,p)),n))))
+ 
+dmac514 all(a,pnat,all(n,pnat,all(p,pnat,leq(wins1(a,mults(n,p)),wins2(a,n,p)))))
+ 
+dmac515 all(a,pnat,all(n,pnat,all(p,pnat,leq(times(wins1(a,mults(n,p)),p),a))))
+ 
+dmac516 all(a,pnat,all(n,pnat,all(p,pnat,leq(wins1(a,mults(n,s(p))),quotient(a,s(p))))))
+ 
+dmac517 all(j,pnat,all(p,pnat,all(q,pnat,imp(and(prime(p),and(imp(divides(p,q),void),and(leq(j,quotient(p,{"int-2"})),and(imp(eq(j,0,pnat),void),imp(eq(q,0,pnat),void))))),eq(wins1(times(j,q),mults(quotient(q,{"int-2"}),p)),quotient(times(j,q),p),pnat)))))
+ 
+dmac518 all(j,pnat,all(p,pnat,all(q,pnat,imp(and(prime(p),and(imp(divides(p,q),void),and(imp(eq(q,0,pnat),void),and(imp(eq(j,0,pnat),void),leq(j,quotient(p,{"int-2"})))))),eq(wins(mults(j,q),mults(quotient(q,{"int-2"}),p)),"plus-list"("quot-list"(j,q,p)),pnat)))))
+ 
+dmac519 all(p,pnat,all(q,pnat,imp(and(prime(p),and(prime(q),and(imp(eq(p,{"int-2"},pnat),void),and(imp(eq(q,{"int-2"},pnat),void),imp(eq(p,q,pnat),void))))),iff(res1(quotient(p,{"int-2"}),q,p),residue(q,p)))))
+ 
+dmac520 all(p,pnat,all(q,pnat,imp(and(prime(p),and(prime(q),and(imp(eq(p,q,pnat),void),and(imp(eq(p,{"int-2"},pnat),void),imp(eq(q,{"int-2"},pnat),void))))),iff(iff(residue(q,p),residue(p,q)),even3(plus("plus-list"("quot-list"(quotient(p,{"int-2"}),q,p)),"plus-list"("quot-list"(quotient(q,{"int-2"}),p,q))))))))
+ 
+dmac521 all(n,pnat,all(p,pnat,"all-non-zerop"(mults(n,s(p)))))
+ 
+dmac522 all(i,pnat,all(j,pnat,all(p,pnat,all(q,pnat,imp(and(prime(p),and(prime(q),and(imp(eq(p,q,pnat),void),and(lessp(i,q),lessp(j,p))))),imp(member(times(i,p),mults(j,q)),void))))))
+ 
+dmac523 all(i,pnat,all(p,pnat,all(q,pnat,imp(and(prime(p),and(prime(q),and(imp(eq(p,q,pnat),void),lessp(i,q)))),imp(listp(intersect(mults(i,p),mults(quotient(p,{"int-2"}),q))),void)))))
+ 
+dmac524 all(p,pnat,all(q,pnat,imp(and(prime(p),and(prime(q),imp(eq(p,q,pnat),void))),eq("plus-list"("quot-list"(quotient(p,{"int-2"}),q,p)),wins(mults(quotient(p,{"int-2"}),q),mults(quotient(q,{"int-2"}),p)),pnat))))
+ 
+dmac525 all(p,pnat,all(q,pnat,imp(and(prime(p),and(prime(q),and(imp(eq(p,q,pnat),void),and(imp(eq(p,{"int-2"},pnat),void),imp(eq(q,{"int-2"},pnat),void))))),iff(iff(residue(q,p),residue(p,q)),even(times(quotient(p,{"int-2"}),quotient(q,{"int-2"})))))))
+ 
+dmac526 all(m,pnat,all(n,pnat,all(p,pnat,imp(and(imp(eq(p,0,pnat),void),leq(m,n)),member(remainder(times(m,m),p),"squares*"(n,p))))))
+ 
+dmac527 all(p,pnat,all(y,pnat,eq(remainder(times(y,y),p),remainder(times(remainder(y,p),remainder(y,p)),p),pnat)))
+ 
+dmac528 all(p,pnat,all(y,pnat,imp(and(imp(eq(p,0,pnat),void),imp(member(remainder(times(y,y),p),"squares*"(p,p)),void)),void)))
+ 
+dmac529 all(p,pnat,imp(imp(divides({"int-2"},p),void),eq(times({"int-2"},quotient(p,{"int-2"})),sub(p),pnat)))
+ 
+dmac530 all(i,pnat,all(p,pnat,imp(imp(divides({"int-2"},p),void),eq(exp(times(i,i),quotient(p,{"int-2"})),exp(i,sub(p)),pnat))))
+ 
+dmac531 all(a,pnat,all(b,pnat,all(c,pnat,all(p,pnat,imp(eq(remainder(a,p),remainder(b,p),pnat),eq(remainder(exp(a,c),p),remainder(exp(b,c),p),pnat))))))
+ 
+dmac532 all(i,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides({"int-2"},p),void),imp(divides(p,i),void))),eq(remainder(exp(times(i,i),quotient(p,{"int-2"})),p),{"int-1"},pnat))))
+ 
+dmac533 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,a),void),eq(remainder(a,p),remainder(times(i,i),p),pnat))),imp(divides(p,i),void)))))
+ 
+dmac534 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides({"int-2"},p),void),and(imp(divides(p,a),void),eq(remainder(a,p),remainder(times(i,i),p),pnat)))),eq(remainder(exp(a,quotient(p,{"int-2"})),p),{"int-1"},pnat)))))
+ 
+dmac535 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides({"int-2"},p),void),and(imp(divides(p,a),void),member(remainder(a,p),"squares*"(i,p))))),eq(remainder(exp(a,quotient(p,{"int-2"})),p),{"int-1"},pnat)))))
+ 
+dmac536 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides({"int-2"},p),void),and(imp(divides(p,a),void),"residue*"(a,p)))),eq(remainder(exp(a,quotient(p,{"int-2"})),p),{"int-1"},pnat))))
+ 
+dmac537 all(a,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),imp(divides(p,j),void)),eq(remainder(times(j,"complement*"(j,a,p)),p),remainder(a,p),pnat)))))
+ 
+dmac538 all(a,pnat,all(j,pnat,all(p,pnat,lessp("complement*"(j,a,s(p)),s(p)))))
+ 
+dmac539 all(a,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,j),void),imp(divides(p,a),void))),imp(eq("complement*"(j,a,p),0,pnat),void)))))
+ 
+dmac540 all(a,pnat,all(j,pnat,all(p,pnat,all(x,pnat,imp(and(prime(p),and(imp(divides(p,a),void),eq(remainder(times(j,x),p),remainder(a,p),pnat))),eq("complement*"(j,a,p),remainder(x,p),pnat))))))
+ 
+dmac541 all(a,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,j),void),and(imp(divides(p,a),void),imp("residue*"(a,p),void)))),imp(eq(j,"complement*"(j,a,p),pnat),void)))))
+ 
+dmac542 all(a,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,j),void),imp(divides(p,a),void))),eq("complement*"("complement*"(j,a,p),a,p),remainder(j,p),pnat)))))
+ 
+dmac543 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(prime(p),and(lessp(i,p),imp(divides(p,a),void))),"all-non-zerop"(complements(i,a,p))))))
+ 
+dmac544 all(a,pnat,all(i,pnat,all(p,pnat,imp(lessp(i,p),"all-lesseqp"(complements(i,a,p),sub(p))))))
+ 
+dmac545 all(a,pnat,all(n,pnat,all(p,pnat,subsetp(positives(n),complements(n,a,p)))))
+ 
+dmac546 all(a,pnat,all(i,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(imp(eq(i,0,pnat),void),and(lessp(i,p),and(imp(divides(p,a),void),member(j,complements(i,a,p)))))),member("complement*"(j,a,p),complements(i,a,p)))))))
+ 
+dmac547 all(a,pnat,all(i,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(imp(eq(i,0,pnat),void),and(imp(eq(j,0,pnat),void),and(lessp(i,p),and(lessp(j,p),and(imp(divides(p,a),void),member("complement*"(j,a,p),complements(i,a,p)))))))),member(j,complements(i,a,p)))))))
+ 
+dmac548 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(prime(p),and(lessp(i,p),and(imp(divides(p,a),void),and(imp("residue*"(a,p),void),"all-distinct"(complements(sub(i),a,p)))))),"all-distinct"(complements(i,a,p))))))
+ 
+dmac549 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(prime(p),and(lessp(i,p),and(imp(divides(p,a),void),imp("residue*"(a,p),void)))),"all-distinct"(complements(i,a,p))))))
+ 
+dmac550 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,a),void),imp("residue*"(a,p),void))),perm(positives(sub(p)),complements(sub(p),a,p)))))
+ 
+dmac551 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,a),void),imp("residue*"(a,p),void))),eq("times-list"(complements(sub(p),a,p)),fact(sub(p)),pnat))))
+ 
+dmac552 all(a,pnat,all(i,pnat,all(j,pnat,all(k,pnat,all(p,pnat,imp(eq(remainder(times(i,j),p),remainder(a,p),pnat),eq(remainder(times(i,times(j,k)),p),remainder(times(a,remainder(k,p)),p),pnat)))))))
+ 
+dmac553 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(eq(remainder(times(i,"complement*"(i,a,p)),p),remainder(a,p),pnat),and(imp(eq(i,0,pnat),void),imp(member(i,complements(sub(i),a,p)),void))),eq(remainder("times-list"(complements(i,a,p)),p),remainder(times(a,remainder("times-list"(complements(sub(i),a,p)),p)),p),pnat)))))
+ 
+dmac554 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,i),void),imp(member(i,complements(sub(i),a,p)),void))),eq(remainder("times-list"(complements(i,a,p)),p),remainder(times(a,remainder("times-list"(complements(sub(i),a,p)),p)),p),pnat)))))
+ 
+dmac555 all(n,pnat,all(x,pnat,all(y,pnat,imp(and(imp(eq(n,0,pnat),void),and({true},eq(y,plus(x,n),pnat))),eq(quotient(y,n),s(quotient(x,n)),pnat)))))
+ 
+dmac556 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(imp(eq(i,0,pnat),void),imp(member(i,complements(sub(i),a,p)),void)),eq(quotient(length(complements(i,a,p)),{"int-2"}),s(quotient(length(complements(sub(i),a,p)),{"int-2"})),pnat)))))
+ 
+dmac557 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(prime(p),and(imp(eq(i,0,pnat),void),and(lessp(i,p),eq(remainder("times-list"(complements(sub(i),a,p)),p),remainder(exp(a,quotient(length(complements(sub(i),a,p)),{"int-2"})),p),pnat)))),eq(remainder("times-list"(complements(i,a,p)),p),remainder(exp(a,quotient(length(complements(i,a,p)),{"int-2"})),p),pnat)))))
+ 
+dmac558 all(a,pnat,all(p,pnat,eq(remainder("times-list"(complements(0,a,p)),p),remainder(exp(a,quotient(length(complements(0,a,p)),{"int-2"})),p),pnat)))
+ 
+dmac559 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(prime(p),lessp(i,p)),eq(remainder("times-list"(complements(i,a,p)),p),remainder(exp(a,quotient(length(complements(i,a,p)),{"int-2"})),p),pnat)))))
+ 
+dmac560 all(t162,u(1),all(b,list(t162),all(x,t162,imp(member(x,b),eq(length(delete(x,b)),sub(length(b)),pnat)))))
+ 
+dmac561 all(t163,u(1),all(a,list(t163),all(b,list(t163),imp(perm(a,b),eq(length(a),length(b),pnat)))))
+ 
+dmac562 all(n,pnat,eq(length(positives(n)),n,pnat))
+ 
+dmac563 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,a),void),imp("residue*"(a,p),void))),eq(remainder(exp(a,quotient(length(complements(sub(p),a,p)),{"int-2"})),p),sub(p),pnat))))
+ 
+dmac564 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,a),void),imp("residue*"(a,p),void))),eq(length(complements(sub(p),a,p)),sub(p),pnat))))
+ 
+dmac565 all(p,pnat,iff(divides({"int-2"},s(p)),imp(divides({"int-2"},p),void)))
+ 
+dmac566 all(p,pnat,imp(imp(divides({"int-2"},p),void),eq(quotient(sub(p),{"int-2"}),quotient(p,{"int-2"}),pnat)))
+ 
+dmac567 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides({"int-2"},p),void),and(imp(divides(p,a),void),imp("residue*"(a,p),void)))),eq(remainder(exp(a,quotient(p,{"int-2"})),p),sub(p),pnat))))
+ 
+dmac568 all(a,pnat,all(b,pnat,iff(evenp(plus(a,b)),iff(evenp(a),evenp(b)))))
+ 
+dmac569 all(p,pnat,all(x,pnat,iff(evenp(difference(p,x)),or(lessp(p,x),iff(evenp(p),evenp(x))))))
+ 
+dmac570 all(a,pnat,all(b,pnat,iff(evenp(times(a,b)),or(evenp(a),evenp(b)))))
+ 
+dmac571 all(p,pnat,iff(even(p),evenp(p)))
+ 
+dmac572 all(a,pnat,all(b,pnat,iff(even(plus(a,b)),iff(even(a),even(b)))))
+ 
+dmac573 all(p,pnat,all(x,pnat,iff(even(difference(p,x)),or(lessp(p,x),iff(even(p),even(x))))))
+ 
+dmac574 all(a,pnat,all(b,pnat,iff(even(times(a,b)),or(even(a),even(b)))))
+ 
+dmac575 all(p,pnat,all(x,pnat,imp(imp(even(p),void),iff(even(difference(p,remainder(x,p))),imp(even(remainder(x,p)),void)))))
+ 
+dmac576 all(x,pnat,iff(even(s(x)),imp(even(x),void)))
+ 
+dmac577 all(p,pnat,imp(and(prime(p),imp(eq(p,{"int-2"},pnat),void)),imp(even(p),void)))
+ 
+dmac578 all(p,pnat,imp(and(prime(p),imp(eq(p,{"int-2"},pnat),void)),imp(eq(remainder(p,{"int-2"}),{"int-0"},pnat),void)))
+ 
+dmac579 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(eq(p,{"int-2"},pnat),void),imp(divides(p,a),void))),eq(remainder(exp(a,quotient(p,{"int-2"})),p),if("residue*"(a,p),{"int-1"},sub(p)),pnat))))
+ 
+dmac580 all(a,pnat,all(b,pnat,all(p,pnat,imp(leq(b,a),eq(remainder(difference(a,remainder(b,p)),p),remainder(difference(a,b),p),pnat)))))
+ 
+dmac581 all(b,pnat,all(p,pnat,all(x,pnat,imp(and(lessp(x,p),and(imp(eq(x,0,pnat),void),imp(eq(b,0,pnat),void))),eq(remainder(difference(times(b,p),x),p),difference(p,x),pnat)))))
+ 
+dmac582 all(p,pnat,all(x,pnat,all(y,pnat,imp(leq(y,p),eq(remainder(times(difference(p,y),x),p),remainder(difference(p,remainder(times(y,x),p)),p),pnat)))))
+ 
+dmac583 all(p,pnat,all(x,pnat,all(y,pnat,imp(leq(y,p),eq(remainder(times(x,difference(p,y)),p),remainder(difference(p,remainder(times(x,y),p)),p),pnat)))))
+ 
+dmac584 all(a,pnat,all(n,pnat,all(p,pnat,eq(remainder(times(times(a,s(n)),times(exp(a,n),fact(n))),p),remainder(times(exp(a,s(n)),fact(s(n))),p),pnat))))
+ 
+dmac585 all(a,pnat,all(n,pnat,all(p,pnat,imp(and(imp(eq(p,0,pnat),void),and(imp(eq(n,0,pnat),void),and(imp(lessp(quotient(p,{"int-2"}),remainder(times(a,n),p)),void),eq(remainder("times-list"(reflections(sub(n),a,p)),p),remainder(times(exp(a,sub(n)),fact(sub(n))),p),pnat)))),eq(remainder("times-list"(reflections(n,a,p)),p),remainder(times(exp(a,n),fact(n)),p),pnat)))))
+ 
+dmac586 all(a,pnat,all(n,pnat,all(p,pnat,imp(and(imp(eq(p,0,pnat),void),and(imp(eq(n,0,pnat),void),and(lessp(quotient(p,{"int-2"}),remainder(times(a,n),p)),eq(remainder("times-list"(reflections(sub(n),a,p)),p),remainder(times(exp(a,sub(n)),fact(sub(n))),p),pnat)))),eq(remainder("times-list"(reflections(n,a,p)),p),remainder(difference(p,remainder(times(exp(a,n),fact(n)),p)),p),pnat)))))
+ 
+dmac587 all(a,pnat,all(n,pnat,all(p,pnat,imp(and(imp(eq(p,0,pnat),void),and(imp(eq(n,0,pnat),void),and(leq(remainder(times(a,n),p),quotient(p,{"int-2"})),eq(remainder("times-list"(reflections(sub(n),a,p)),p),remainder(difference(p,remainder(times(exp(a,sub(n)),fact(sub(n))),p)),p),pnat)))),eq(remainder("times-list"(reflections(n,a,p)),p),remainder(difference(p,remainder(times(exp(a,n),fact(n)),p)),p),pnat)))))
+ 
+dmac588 all(a,pnat,all(p,pnat,imp(leq(a,p),eq(remainder(difference(p,remainder(difference(p,a),p)),p),remainder(a,p),pnat))))
+ 
+dmac589 all(a,pnat,all(n,pnat,all(p,pnat,imp(and(imp(eq(p,0,pnat),void),and(imp(eq(n,0,pnat),void),and(lessp(quotient(p,{"int-2"}),remainder(times(a,n),p)),eq(remainder("times-list"(reflections(sub(n),a,p)),p),remainder(difference(p,remainder(times(exp(a,sub(n)),fact(sub(n))),p)),p),pnat)))),eq(remainder("times-list"(reflections(n,a,p)),p),remainder(times(exp(a,n),fact(n)),p),pnat)))))
+ 
+dmac590 all(a,pnat,all(p,pnat,eq(remainder("times-list"(reflections(0,a,p)),p),remainder(times(exp(a,0),fact(0)),p),pnat)))
+ 
+dmac591 all(a,pnat,all(n,pnat,all(p,pnat,eq(remainder("times-list"(reflections(n,a,s(p))),s(p)),if("res1*"(n,a,s(p)),remainder(times(exp(a,n),fact(n)),s(p)),remainder(difference(s(p),remainder(times(exp(a,n),fact(n)),s(p))),s(p))),pnat))))
+ 
+dmac592 all(a,pnat,all(n,pnat,all(p,pnat,eq(length(reflections(n,a,p)),n,pnat))))
+ 
+dmac593 all(p,pnat,all(x,pnat,imp(lessp(quotient(p,{"int-2"}),x),imp(lessp(quotient(p,{"int-2"}),difference(p,x)),void))))
+ 
+dmac594 all(a,pnat,all(n,pnat,all(p,pnat,"all-lesseqp"(reflections(n,a,p),quotient(p,{"int-2"})))))
+ 
+dmac595 all(a,pnat,all(b,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,a),void),lessp(b,p))),"all-non-zerop"(reflections(b,a,p))))))
+ 
+dmac596 all(a,pnat,all(i,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(lessp(j,i),and(lessp(i,p),imp(divides(p,a),void)))),imp(eq(remainder(times(a,i),p),remainder(times(a,j),p),pnat),void))))))
+ 
+dmac597 all(p,pnat,all(x,pnat,all(y,pnat,imp(and({true},and({true},and(lessp(x,p),lessp(y,p)))),iff(eq(difference(p,x),difference(p,y),pnat),eq(x,y,pnat))))))
+ 
+dmac598 all(a,pnat,all(p,pnat,{true}))
+ 
+dmac599 all(a,pnat,all(i,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(lessp(j,i),and(lessp(i,p),imp(divides(p,a),void)))),imp(eq(difference(p,remainder(times(a,i),p)),difference(p,remainder(times(a,j),p)),pnat),void))))))
+ 
+dmac600 all(p,pnat,all(x,pnat,all(y,pnat,eq(remainder(plus(remainder(x,p),y),p),remainder(plus(x,y),p),pnat))))
+ 
+dmac601 all(p,pnat,all(x,pnat,all(y,pnat,eq(remainder(plus(y,remainder(x,p)),p),remainder(plus(x,y),p),pnat))))
+ 
+dmac602 all(p,pnat,all(x,pnat,all(y,pnat,imp(and(eq(x,difference(p,y),pnat),lessp(y,p)),eq(remainder(plus(x,y),p),{"int-0"},pnat)))))
+ 
+dmac603 all(a,pnat,all(i,pnat,all(j,pnat,all(p,pnat,imp(and(eq(remainder(times(a,i),p),difference(p,remainder(times(a,j),p)),pnat),imp(eq(p,0,pnat),void)),eq(remainder(times(a,plus(i,j)),p),{"int-0"},pnat))))))
+ 
+dmac604 all(i,pnat,all(j,pnat,all(p,pnat,imp(and(leq(i,quotient(p,{"int-2"})),lessp(j,i)),and(imp(eq(plus(i,j),0,pnat),void),lessp(plus(i,j),p))))))
+ 
+dmac605 all(a,pnat,all(i,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,a),void),and(leq(i,quotient(p,{"int-2"})),lessp(j,i)))),imp(eq(remainder(times(a,i),p),difference(p,remainder(times(a,j),p)),pnat),void))))))
+ 
+dmac606 all(a,pnat,all(i,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,a),void),and(leq(i,quotient(p,{"int-2"})),lessp(j,i)))),imp(eq(difference(p,remainder(times(a,i),p)),remainder(times(a,j),p),pnat),void))))))
+ 
+dmac607 all(a,pnat,all(i,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides({"int-2"},p),void),and(imp(divides(p,a),void),and(leq(i,quotient(p,{"int-2"})),lessp(j,i))))),imp(member(remainder(times(a,i),p),reflections(j,a,p)),void))))))
+ 
+dmac608 all(a,pnat,all(i,pnat,all(j,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides({"int-2"},p),void),and(imp(divides(p,a),void),and(leq(i,quotient(p,{"int-2"})),lessp(j,i))))),imp(member(difference(p,remainder(times(a,i),p)),reflections(j,a,p)),void))))))
+ 
+dmac609 all(a,pnat,all(i,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides({"int-2"},p),void),and(imp(divides(p,a),void),leq(i,quotient(p,{"int-2"}))))),"all-distinct"(reflections(i,a,p))))))
+ 
+dmac610 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides({"int-2"},p),void),imp(divides(p,a),void))),eq("times-list"(reflections(quotient(p,{"int-2"}),a,p)),fact(quotient(p,{"int-2"})),pnat))))
+ 
+dmac611 all(x,pnat,eq(remainder(plus(x,x),{"int-2"}),{"int-0"},pnat))
+ 
+dmac612 all(p,pnat,all(x,pnat,imp(and(imp(eq(x,0,pnat),void),imp(divides({"int-2"},p),void)),imp(eq(remainder(difference(p,x),p),x,pnat),void))))
+ 
+dmac613 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides({"int-2"},p),void),and(imp(divides(p,a),void),"res1*"(quotient(p,{"int-2"}),a,p)))),eq(remainder(exp(a,quotient(p,{"int-2"})),p),{"int-1"},pnat))))
+ 
+dmac614 all(a,pnat,all(p,pnat,imp(lessp(a,p),eq(remainder(a,p),a,pnat))))
+ 
+dmac615 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides({"int-2"},p),void),and(imp(divides(p,a),void),imp("res1*"(quotient(p,{"int-2"}),a,p),void)))),imp(eq(remainder(exp(a,quotient(p,{"int-2"})),p),{"int-1"},pnat),void))))
+ 
+dmac616 all(p,pnat,imp(imp(divides({"int-2"},p),void),imp(eq(sub(p),{"int-1"},pnat),void)))
+ 
+dmac617 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(eq(p,{"int-2"},pnat),void),imp(divides(p,a),void))),perm(positives(quotient(p,{"int-2"})),reflections(quotient(p,{"int-2"}),a,p)))))
+ 
+dmac618 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(divides(p,a),void),imp(divides({"int-2"},p),void))),iff("res1*"(quotient(p,{"int-2"}),a,p),"residue*"(a,p)))))
+ 
+dmac620 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(eq(p,{"int-2"},pnat),void),imp(divides(p,a),void))),iff(gauss(a,p),"residue*"(a,p)))))
+ 
+dmac621 all(a,pnat,all(n,pnat,all(p,pnat,eq(times(a,sum(positives(n))),plus(times(p,sum(quotients(n,a,p))),sum(remainders(n,a,p))),pnat))))
+ 
+dmac622 all(a,pnat,all(n,pnat,all(p,pnat,iff(even(times(a,sum(positives(n)))),even(plus(times(p,sum(quotients(n,a,p))),sum(remainders(n,a,p))))))))
+ 
+dmac624 all(m,list(pnat),all(x,pnat,imp(member(x,m),eq(plus(x,sum(delete(x,m))),sum(m),pnat))))
+ 
+dmac625 all(l,list(pnat),all(m,list(pnat),imp(perm(l,m),eq(sum(l),sum(m),pnat))))
+ 
+dmac626 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(eq(p,{"int-2"},pnat),void),imp(divides(p,a),void))),eq(sum(reflections(quotient(p,{"int-2"}),a,p)),sum(positives(quotient(p,{"int-2"}))),pnat))))
+ 
+dmac627 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(eq(p,{"int-2"},pnat),void),and(imp(even(a),void),imp(divides(p,a),void)))),iff(gauss(a,p),even(sum(quotients(quotient(p,{"int-2"}),a,p)))))))
+ 
+dmac628 all(p,pnat,all(q,pnat,imp(and(prime(p),and(imp(eq(p,{"int-2"},pnat),void),and(prime(q),and(imp(eq(q,{"int-2"},pnat),void),imp(eq(p,q,pnat),void))))),iff(iff("residue*"(q,p),"residue*"(p,q)),even(plus(sum(quotients(quotient(p,{"int-2"}),q,p)),sum(quotients(quotient(q,{"int-2"}),p,q))))))))
+ 
+dmac629 all(l,list(pnat),all(x,pnat,imp(and(imp(member(x,l),void),and({true},"all-numberp"(l))),eq(plus("l*"(x,l),"w*"(x,l)),length(l),pnat))))
+ 
+dmac630 all(l,list(pnat),all(m,list(list(pnat)),imp(and(nlistp(intersect(l,m)),and("all-numberp"(l),"all-numberp"(m))),eq(plus("wins*"(l,m),"losses*"(l,m)),times(length(l),length(m)),pnat))))
+ 
+dmac631 all(l,list(pnat),all(m,list(pnat),eq("losses*"(l,m),"wins*"(m,l),pnat)))
+ 
+dmac632 all(l,list(pnat),all(m,list(list(pnat)),imp(and(nlistp(intersect(l,m)),and("all-numberp"(l),"all-numberp"(m))),eq(plus("wins*"(l,m),"wins*"(m,l)),times(length(l),length(m)),pnat))))
+ 
+dmac633 all(n,pnat,all(p,pnat,"all-numberp"("mults*"(n,s(p)))))
+ 
+dmac634 all(i,pnat,all(j,pnat,all(p,pnat,all(q,pnat,imp(and(prime(p),and(prime(q),and(imp(eq(p,q,pnat),void),and(lessp(i,q),lessp(j,p))))),imp(member(times(i,p),"mults*"(j,q)),void))))))
+ 
+dmac635 all(i,pnat,all(p,pnat,all(q,pnat,imp(and(prime(p),and(prime(q),and(imp(eq(p,q,pnat),void),lessp(i,q)))),imp(listp(intersect("mults*"(i,p),"mults*"(quotient(p,{"int-2"}),q))),void)))))
+ 
+dmac636 all(n,pnat,all(p,pnat,eq(length("mults*"(n,p)),n,pnat)))
+ 
+dmac637 all(a,pnat,all(p,pnat,lessp(a,times(s(quotient(a,s(p))),s(p)))))
+ 
+dmac638 all(a,pnat,all(n,pnat,all(p,pnat,imp(lessp(n,"w*"(a,"mults*"(n,p))),void))))
+ 
+dmac639 all(a,pnat,all(m,pnat,all(n,pnat,all(p,pnat,imp(and(lessp(a,times(m,p)),leq(m,n)),lessp(a,times(n,p)))))))
+ 
+dmac640 all(a,pnat,all(m,pnat,all(n,pnat,all(p,pnat,imp(lessp(a,times(m,p)),lessp("w*"(a,"mults*"(n,p)),m))))))
+ 
+dmac641 all(a,pnat,all(n,pnat,all(p,pnat,leq("w*"(a,"mults*"(n,s(p))),quotient(a,s(p))))))
+ 
+dmac642 all(a,pnat,all(m,pnat,all(n,pnat,all(p,pnat,imp(leq(m,n),leq("w*"(a,"mults*"(m,p)),"w*"(a,"mults*"(n,p))))))))
+ 
+dmac643 all(a,pnat,all(n,pnat,all(p,pnat,imp(lessp(times(n,p),a),leq(n,"w*"(a,"mults*"(n,p)))))))
+ 
+dmac644 all(a,pnat,all(n,pnat,all(p,pnat,imp(and(imp(eq(p,0,pnat),void),and(imp(divides(p,a),void),leq(quotient(a,p),n))),leq(quotient(a,p),"w*"(a,"mults*"(n,p)))))))
+ 
+dmac645 all(a,pnat,all(b,pnat,all(c,pnat,all(d,pnat,imp(and(imp(eq(b,0,pnat),void),leq(times(a,b),times(c,d))),leq(quotient(a,d),quotient(c,b)))))))
+ 
+dmac646 all(a,pnat,all(j,pnat,all(q,pnat,imp(leq(j,a),leq(times(j,q),times(a,q))))))
+ 
+dmac647 all(j,pnat,all(p,pnat,all(q,pnat,imp(leq(j,quotient(p,{"int-2"})),leq(quotient(times(j,q),p),quotient(q,{"int-2"}))))))
+ 
+dmac648 all(j,pnat,all(p,pnat,all(q,pnat,imp(and(prime(p),and(imp(divides(p,q),void),and(imp(eq(j,0,pnat),void),leq(j,quotient(p,{"int-2"}))))),eq("w*"(times(j,q),"mults*"(quotient(q,{"int-2"}),p)),quotient(times(j,q),p),pnat)))))
+ 
+dmac649 all(j,pnat,all(p,pnat,all(q,pnat,imp(and(prime(p),and(imp(divides(p,q),void),leq(j,quotient(p,{"int-2"})))),eq(sum(quotients(j,q,p)),"wins*"("mults*"(j,q),"mults*"(quotient(q,{"int-2"}),p)),pnat)))))
+ 
+dmac650 all(p,pnat,all(q,pnat,imp(and(prime(p),and(imp(eq(p,{"int-2"},pnat),void),and(prime(q),and(imp(eq(q,{"int-2"},pnat),void),imp(eq(p,q,pnat),void))))),iff(iff("residue*"(q,p),"residue*"(p,q)),even(times(quotient(p,{"int-2"}),quotient(q,{"int-2"})))))))
+ 
+dmac651 all(t204,u(1),all(n,pnat,all(x,list(t204),eq(cdrn(s(n),x),cdrn(n,list_cdr(t204,x)),list(t204)))))
+ 
+dmac655 all(x,list(list({sexp})),imp(eq(list_car(list({sexp}),x),{"sym-for"},list({sexp})),lessp("count*"("abbreviated-for-range"(x)),"count*"(x))))
+ 
+dmac656 all(x,list(list({sexp})),imp(eq(list_car(list({sexp}),x),{"sym-for"},list({sexp})),lessp("count*"("abbreviated-for-when"(x)),"count*"(x))))
+ 
+dmac657 all(x,{sexp},imp(lessp("count*"(x),"count*"("last*"(x))),void))
+ 
+dmac658 all(x,list(list({sexp})),imp(eq(list_car(list({sexp}),x),{"sym-for"},list({sexp})),lessp("count*"("abbreviated-for-body"(x)),"count*"(x))))
+ 
+dmac659 all(t254,u(1),all(lst,list(list(t254)),imp(doublets(lst),imp(lessp("count*"(lst),"count*"("strip-cars"(lst))),void))))
+ 
+dmac660 all(t255,u(1),all(lst,list(list(t255)),imp(doublets(lst),imp(lessp("count*"(lst),"count*"("strip-cadrs"(lst))),void))))
+ 
+dmac661 all(x,list({sexp}),imp(listp(list_cdr({sexp},list_cdr({sexp},x))),eq("count*"(x),s(s(plus("count*"(list_car({sexp},x)),plus("count*"(list_car({sexp},list_cdr({sexp},x))),"count*"(list_cdr({sexp},list_cdr({sexp},x))))))),pnat)))
+ 
+dmac662 all(x,list({sexp}),imp(listp(list_cdr({sexp},list_cdr({sexp},list_cdr({sexp},x)))),eq("count*"(x),s(s(s(plus("count*"(list_car({sexp},x)),plus("count*"(list_car({sexp},list_cdr({sexp},x))),plus("count*"(list_car({sexp},list_cdr({sexp},list_cdr({sexp},x)))),"count*"(list_cdr({sexp},list_cdr({sexp},list_cdr({sexp},x)))))))))),pnat)))
+ 
+dmac663 all(a,pnat,all(m,pnat,all(n,pnat,imp(and(imp(eq(m,0,pnat),void),lessp({"int-1"},n)),eq("a*"(m,n,a),"a*"(sub(m),"a*"(m,sub(n),a),a),pnat)))))
+ 
+dmac664 all(m,pnat,eq("a*"(m,{"int-2"},{"int-2"}),{"int-4"},pnat))
+ 
+dmac665 all(x,pnat,eq(plus({"int-2"},x),s(s(x)),pnat))
+ 
+dmac666 all(m,pnat,all(n,pnat,and(eq("p**"({"int-0"},n),s(n),pnat),imp(lessp({"int-0"},m),eq(plus({"int-3"},"p**"(m,n)),"a*"(sub(m),s(s(s(n))),{"int-2"}),pnat)))))
+ 
+dmac667 all(x,pnat,all(y,pnat,eq(times(x,s(y)),plus(x,times(x,y)),pnat)))
+ 
+dmac668 all(x,pnat,all(y,pnat,eq(plus(x,s(y)),s(plus(x,y)),pnat)))
+ 
+dmac669 all(x,pnat,iff(eq(times(x,x),{"int-0"},pnat),eq(x,0,pnat)))
+ 
+dmac670 all(a,pnat,all(b,pnat,imp(imp(lessp(b,a),void),imp(lessp(times(b,b),times(a,a)),void))))
+ 
+dmac671 all(y,pnat,and(imp(lessp(y,times(rt(y),rt(y))),void),lessp(y,s(plus(rt(y),plus(rt(y),times(rt(y),rt(y))))))))
+ 
+dmac672 all(a,pnat,all(y,pnat,imp(and({true},and(leq(times(a,a),y),lessp(y,times(s(a),s(a))))),eq(a,rt(y),pnat))))
+ 
+dmac673 all(u,pnat,all(v,pnat,eq(rt(plus(u,times(plus(u,v),plus(u,v)))),plus(u,v),pnat)))
+ 
+dmac674 all(i,pnat,all(j,pnat,eq(ncar(ncons(i,j)),i,pnat)))
+ 
+dmac675 all(i,pnat,all(j,pnat,eq(ncdr(ncons(i,j)),j,pnat)))
+ 
+dmac676 all(x,pnat,imp(and(imp(eq(x,0,pnat),void),imp(eq(x,{"int-1"},pnat),void)),lessp(rt(x),x)))
+ 
+dmac677 all(x,pnat,imp(lessp(x,rt(x)),void))
+ 
+dmac678 all(x,pnat,all(y,pnat,imp(lessp(x,y),eq(difference(x,y),{"int-0"},pnat))))
+ 
+dmac679 all(a,pnat,all(b,pnat,all(c,pnat,iff(lessp(difference(a,b),c),if(lessp(a,b),lessp({"int-0"},c),lessp(a,plus(b,c)))))))
+ 
+dmac680 all(x,pnat,imp(lessp(x,ncar(x)),void))
+ 
+dmac681 all(d,pnat,all(x,pnat,iff(lessp(x,difference(rt(x),d)),void)))
+ 
+dmac682 all(x,pnat,imp(lessp(x,ncdr(x)),void))
+ 
+dmac683 all(fn,pnat,imp(and({true},and(imp(eq(ncar(fn),{"int-0"},pnat),void),imp(eq(ncar(fn),{"int-1"},pnat),void))),lessp(ncdr(fn),fn)))
+ 
+dmac684 all(fn,pnat,imp(eq("non-pr-fn"("counter-example-for"(fn)),"pr-apply"(fn,"counter-example-for"(fn)),pnat),void))
+ 
+dmac685 all(x,pnat,{true})
+ 
+dmac686 all(i,pnat,all(j,pnat,imp(lessp(max2(i,j),"pr-apply"(i,j)),void)))
+ 
+dmac687 all(fn,pnat,all(i,pnat,all(j,pnat,imp(lessp("max1*"(plus(j,fn),i),"pr-apply"(fn,i)),void))))
+ 
+dmac688 all(fn,pnat,all(j,pnat,imp(lessp("max1*"(plus(j,fn),plus(j,fn)),"pr-apply"(fn,plus(j,fn))),void)))
+ 
+dmac689 all(fn,pnat,all(j,pnat,lessp("pr-apply"(fn,plus(j,"exceed-at"(fn))),exceed(plus(j,"exceed-at"(fn))))))
+ 
+dmac691 all(t275,u(1),all(i,pnat,all(j,pnat,all(s,t275,eq(sm(s,plus(i,j)),sm(sm(s,i),j),t275)))))
+ 
+dmac693 all(t276,u(1),all(s,t276,eq(sm(s,{"int-0"}),s,t276)))
+ 
+dmac694 all(ans,pnat,all(i,pnat,all(j,pnat,eq("times-fn"(i,j,ans),plus(times(i,j),ans),pnat))))
+ 
+dmac695 all(x,pnat,eq(plus(x,{"int-0"}),x,pnat))
+ 
+dmac698 all(i,pnat,all(j,pnat,all(k,pnat,eq(times(times(i,j),k),times(i,times(j,k)),pnat))))
+ 
+dmac699 all(i,pnat,eq(times(i,{"int-1"}),i,pnat))
+ 
+dmac700 all(t280,u(1),all(t281,u(1),all(r0,t280,all(r1,pnat,all(r2,t281,all(r3,pnat,all(r4,pnat,eq("exp-fn"(r0,r1,r2,r3,r4),times("exp***"(r3,r4),r1),pnat))))))))
+ 
+dmac703 all(t284,u(1),all(addr,pnat,all(mem,list(t284),all(val,t284,imp(and(lessp(addr,"length**"(mem)),eq("get*"(addr,mem),val,t284)),eq(put(addr,val,mem),mem,list(t284)))))))
+ 
+dmac704 all(t285,u(1),all(addr,pnat,all(mem,list(t285),all(v1,t285,all(v2,t285,eq(put(addr,v2,put(addr,v1,mem)),put(addr,v2,mem),list(t285)))))))
+ 
+dmac705 all(t286,u(1),all(addr1,pnat,all(addr2,pnat,all(mem,list(t286),all(v1,t286,all(v2,t286,imp(and({true},and({true},imp(eq(addr1,addr2,pnat),void))),eq(put(addr2,v2,put(addr1,v1,mem)),put(addr1,v1,put(addr2,v2,mem)),list(t286)))))))))
+ 
+dmac706 all(t287,u(1),all(addr1,pnat,all(addr2,pnat,all(mem,list(t287),all(val,t287,imp(and({true},{true}),eq("get*"(addr1,put(addr2,val,mem)),if(eq(addr1,addr2,pnat),val,"get*"(addr1,mem)),t287)))))))
+ 
+dmac707 all(t288,u(1),all(addr,pnat,all(mem,list(t288),all(val,t288,imp(lessp(addr,"length**"(mem)),eq("length**"(put(addr,val,mem)),"length**"(mem),pnat))))))
+ 
+dmac708 all(x,pnat,eq(difference(x,{"int-1"}),sub(x),pnat))
+ 
+dmac709 all(i,pnat,all(j,pnat,imp(and({true},imp(lessp(i,j),void)),eq(plus(j,difference(i,j)),i,pnat))))
+ 
+dmac710 all(i,pnat,all(j,pnat,all(k,pnat,eq(plus(plus(i,j),k),plus(i,plus(j,k)),pnat))))
+ 
+dmac711 all(i,pnat,all(j,pnat,eq(plus(i,j),plus(j,i),pnat)))
+ 
+dmac712 all(i,pnat,all(j,pnat,all(k,pnat,eq(plus(i,plus(k,j)),plus(k,plus(i,j)),pnat))))
+ 
+dmac713 all(mem,list(pnat),imp(and({true},and({true},lessp({"int-2"},"length**"(mem)))),eq("times-mem-fn-loop"(mem),put({"int-0"},{"int-0"},put({"int-2"},plus(times("get*"({"int-0"},mem),"get*"({"int-1"},mem)),"get*"({"int-2"},mem)),mem)),list(pnat))))
+ 
+dmac714 all(mem,list(pnat),imp(and({true},lessp({"int-2"},"length**"(mem))),eq("times-mem-fn"(mem),put({"int-0"},{"int-0"},put({"int-2"},times("get*"({"int-0"},mem),"get*"({"int-1"},mem)),mem)),list(pnat))))
+ 
+dmac718 all(i0,pnat,all(i1,pnat,all(r0,pnat,all(r1,pnat,all(r2,pnat,and(imp(and({true},{true}),and({"numberp-4"},eq(times(i0,i1),plus({"int-0"},times(i0,i1)),pnat))),and(imp(and({true},and(eq(times(i0,i1),plus(r2,times(r0,r1)),pnat),imp(eq(r0,0,pnat),void))),and({true},eq(times(i0,i1),plus(plus(r2,r1),times(sub(r0),r1)),pnat))),imp(and({true},and(eq(times(i0,i1),plus(r2,times(r0,r1)),pnat),eq(r0,0,pnat))),eq(r2,times(i0,i1),pnat)))))))))
+ 
+dmac720 all(t292,u(1),all(n,pnat,all(s0,t292,imp("p***"(s0),"p***"(sm(s0,n))))))
+ 
+dmac735 all(t315,u(1),all(a,list(t315),all(b,list(t315),iff(listp(append(a,b)),or(listp(a),listp(b))))))
+ 
+dmac739 all(t321,u(1),all(x,list(t321),iff(eq("length**"(x),{"int-0"},pnat),nlistp(x))))
+ 
+dmac744 all(t326,u(1),all(a,list(t326),all(b,list(t326),eq("length**"(append(a,b)),plus("length**"(a),"length**"(b)),pnat))))
+ 
+dmac753 all(x,pnat,all(y,pnat,imp(imp({true},void),eq(plus(x,y),x,pnat))))
+ 
+dmac754 all(x,pnat,all(y,pnat,eq(plus(x,s(y)),s(plus(x,y)),pnat)))
+ 
+dmac755 all(x,pnat,all(y,pnat,all(z,pnat,eq(plus(x,plus(y,z)),plus(y,plus(x,z)),pnat))))
+ 
+dmac756 all(x,pnat,all(y,pnat,eq(plus(x,y),plus(y,x),pnat)))
+ 
+dmac757 all(x,pnat,all(y,pnat,all(z,pnat,eq(plus(plus(x,y),z),plus(x,plus(y,z)),pnat))))
+ 
+dmac758 all(a,pnat,all(b,pnat,iff(eq(plus(a,b),{"int-0"},pnat),and(eq(a,0,pnat),eq(b,0,pnat)))))
+ 
+dmac759 all(x,pnat,eq(difference(x,x),{"int-0"},pnat))
+ 
+dmac760 all(x,pnat,all(y,pnat,and(eq(difference(plus(x,y),x),y,pnat),eq(difference(plus(y,x),x),y,pnat))))
+ 
+dmac761 all(a,pnat,all(b,pnat,all(c,pnat,iff(eq(plus(a,b),plus(a,c),pnat),eq(b,c,pnat)))))
+ 
+dmac762 all(x,pnat,all(y,pnat,imp(imp(lessp(y,x),void),eq(difference(x,y),{"int-0"},pnat))))
+ 
+dmac763 all(x,pnat,all(y,pnat,iff(eq({"int-0"},difference(x,y),pnat),imp(lessp(y,x),void))))
+ 
+dmac764 all(x,pnat,all(y,pnat,iff(eq(x,difference(x,y),pnat),and({true},or(eq(x,{"int-0"},pnat),eq(y,0,pnat))))))
+ 
+dmac765 all(x,pnat,all(y,pnat,all(z,pnat,iff(eq(difference(x,y),difference(z,y),pnat),if(lessp(x,y),imp(lessp(y,z),void),if(lessp(z,y),imp(lessp(y,x),void),eq(x,z,pnat)))))))
+ 
+dmac766 all(t341,u(1),all(x,t341,all(y,list(t341),imp(imp(member(x,y),void),eq("delete**"(x,y),y,list(t341))))))
+ 
+dmac767 all(t342,u(1),all(u,t342,all(v,list(t342),all(x,t342,imp(member(x,"delete**"(u,v)),member(x,v))))))
+ 
+dmac768 all(t343,u(1),all(x,t343,all(y,t343,all(z,list(t343),eq("delete**"(x,"delete**"(y,z)),"delete**"(y,"delete**"(x,z)),list(t343))))))
+ 
+dmac769 all(t344,u(1),all(u,t344,all(x,list(t344),all(y,list(t344),imp("subbagp*"(x,"delete**"(u,y)),"subbagp*"(x,y))))))
+ 
+dmac770 all(t345,u(1),all(x,list(t345),all(y,list(t345),imp("subbagp*"(x,y),"subbagp*"(list_cdr(t345,x),y)))))
+ 
+dmac771 all(t346,u(1),all(x,list(t346),all(y,list(t346),imp("subbagp*"(x,list_cdr(t346,y)),"subbagp*"(x,y)))))
+ 
+dmac772 all(t347,u(1),all(x,list(t347),all(y,list(t347),"subbagp*"("bagint*"(x,y),x))))
+ 
+dmac773 all(t348,u(1),all(x,list(t348),all(y,list(t348),"subbagp*"("bagint*"(x,y),y))))
+ 
+dmac774 all(t350,u(1),all(x,list(t350),all(y,list(t350),all(z,list(t350),eq(append(append(x,y),z),append(x,append(y,z)),list(t350))))))
+ 
+dmac775 all(t352,u(1),all(x,list(t352),imp("plistp*"(x),eq(append(x,nil),x,list(t352)))))
+ 
+dmac776 all(t353,u(1),all(x,list(t353),"plistp*"("reverse**"(x))))
+ 
+dmac777 all(t354,u(1),all(a,list(t354),all(b,list(t354),eq("reverse**"(append(a,b)),append("reverse**"(b),"reverse**"(a)),list(t354)))))
+ 
+dmac778 all(x,pnat,all(y,pnat,imp(imp({true},void),eq(times(x,y),{"int-0"},pnat))))
+ 
+dmac779 all(x,pnat,all(y,pnat,all(z,pnat,eq(times(x,plus(y,z)),plus(times(x,y),times(x,z)),pnat))))
+ 
+dmac780 all(x,pnat,all(y,pnat,eq(times(x,s(y)),plus(x,times(x,y)),pnat)))
+ 
+dmac781 all(x,pnat,all(y,pnat,eq(times(x,y),times(y,x),pnat)))
+ 
+dmac782 all(x,pnat,all(y,pnat,all(z,pnat,eq(times(x,times(y,z)),times(y,times(x,z)),pnat))))
+ 
+dmac783 all(x,pnat,all(y,pnat,all(z,pnat,eq(times(times(x,y),z),times(x,times(y,z)),pnat))))
+ 
+dmac784 all(x,pnat,all(y,pnat,iff(eq(times(x,y),{"int-0"},pnat),or(eq(x,0,pnat),eq(y,0,pnat)))))
+ 
+dmac785 all(t361,u(1),all(t362,u(1),all(t363,u(1),all(fn,t361,all(x,t362,all(y,t363,{true}))))))
+ 
+dmac786 all(x,list({sexp}),imp(listp(list_cdr({sexp},list_cdr({sexp},x))),lessp("count*"(list_car({sexp},list_cdr({sexp},x))),"count*"(x))))
+ 
+dmac789 all(t371,u(1),all(envrn,t371,all(pds,pnat,all(x,list(list(list({sexp}))),all(y,list(list(list({sexp}))),eq("exec*"(append(x,y),pds,envrn),"exec*"(y,"exec*"(x,pds,envrn),envrn),pnat))))))
+ 
+dmac792 all(x,pnat,all(y,pnat,all(z,pnat,imp(and(lessp(x,y),lessp(y,z)),lessp(x,z)))))
+ 
+dmac793 all(x,pnat,imp(lessp(x,x),void))
+ 
+dmac794 all(x,pnat,all(y,pnat,imp(and(imp("eqp*"(x,y),void),imp(lessp(y,x),void)),lessp(x,y))))
+ 
+dmac795 all(t372,u(1),all(x,list(t372),imp("plistp*"(x),eq("reverse**"("reverse**"(x)),x,list(t372)))))
+ 
+dmac796 all(t375,u(1),all(x,list(t375),all(y,list(list(t375)),eq("mc-flatten*"(x,y),append("flatten*"(x),y),list(list(t375))))))
+ 
+dmac797 all(t376,u(1),all(a,list(t376),all(b,list(t376),all(x,t376,iff(member(x,append(a,b)),or(member(x,a),member(x,b)))))))
+ 
+dmac798 all(t377,u(1),all(x,t377,all(y,list(t377),iff(member(x,"reverse**"(y)),member(x,y)))))
+ 
+dmac799 all(t379,u(1),all(x,list(t379),eq("length***"("reverse**"(x)),"length***"(x),pnat)))
+ 
+dmac800 all(t381,u(1),all(a,t381,all(b,list(t381),all(c,list(t381),iff(member(a,union(b,c)),or(member(a,b),member(a,c)))))))
+ 
+dmac801 all(t383,u(1),all(a,list(t383),all(b,list(t383),imp("subsetp**"(a,b),eq(union(a,b),b,list(t383))))))
+ 
+dmac803 all(x,pnat,all(y,pnat,all(z,pnat,imp(and(leq(x,y),leq(y,z)),leq(x,z)))))
+ 
+dmac804 all(p,u(1),all(q,u(1),imp(and("boolean*"(p),"boolean*"(q)),iff(iff(p,q),iff(p,q)))))
+ 
+dmac807 all(t385,u(1),all(a,list(t385),all(i,pnat,all(j,pnat,eq("nth*"(a,plus(i,j)),"nth*"("nth*"(a,i),j),list(t385))))))
+ 
+dmac808 all(a,u(1),all(b,u(1),all(c,u(1),imp(and("boolean*"(a),and("boolean*"(b),"boolean*"(c))),iff(iff(iff(a,b),c),iff(a,iff(b,c)))))))
+ 
+dmac809 all(i,pnat,"even1*"("double*"(i)))
+ 
+dmac810 all(i,pnat,eq("half*"("double*"(i)),i,pnat))
+ 
+dmac811 all(i,pnat,imp(and({true},"even1*"(i)),eq("double*"("half*"(i)),i,pnat)))
+ 
+dmac812 all(i,pnat,eq("double*"(i),times({"int-2"},i),pnat))
+ 
+dmac813 all(t386,u(1),all(x,list(t386),all(y,list(t386),all(z,t386,imp("subsetp**"(x,y),"subsetp**"(x,"::"(z,y)))))))
+ 
+dmac814 all(t388,u(1),all(a,list(t388),all(b,list(t388),eq("last**"(append(a,b)),if(listp(b),"last**"(b),if(listp(a),"::"(list_car(t388,"last**"(a)),b),b)),list(t388)))))
+ 
+dmac815 all(t389,u(1),all(a27,t389,all(a28,list(t389),eq("last**"("reverse**"("::"(a27,a28))),"::"(a27,nil),list(t389)))))
+ 
+dmac816 all(i,pnat,all(j,pnat,all(k,pnat,eq("exp****"(i,plus(j,k)),times("exp****"(i,j),"exp****"(i,k)),pnat))))
+ 
+dmac817 all(x,pnat,iff("even1*"(x),"even2*"(x)))
+ 
+dmac818 all(t390,u(1),all(i,pnat,all(l,list(t390),leq("length***"("nth*"(l,i)),"length***"(l)))))
+ 
+dmac819 all(a,pnat,all(b,list(pnat),iff(member(a,"sort*"(b)),member(a,b))))
+ 
+dmac820 all(a,list(pnat),eq("length***"("sort*"(a)),"length***"(a),pnat))
+ 
+dmac821 all(t392,u(1),all(a,list(t392),all(l,list(pnat),eq("count-list*"(a,"sort*"(l)),"count-list*"(a,l),pnat))))
+ 
+dmac822 all(a,list(pnat),all(b,list(pnat),imp("ordered*"(append(a,b)),"ordered*"(a))))
+ 
+dmac823 all(i,pnat,leq("half*"(i),i))
+ 
+dmac824 all(x,list(pnat),"ordered*"("sort*"(x)))
+ 
+dmac825 all(i,pnat,all(x,list(pnat),imp(and("ordered*"(x),and("number-listp*"(x),and({true},imp(lessp(list_car(pnat,x),i),void)))),eq("addtolist*"(i,x),"::"(i,x),list(pnat)))))
+ 
+dmac826 all(x,list(pnat),imp(and("ordered*"(x),"number-listp*"(x)),eq("sort*"(x),x,list(pnat))))
+ 
+dmac827 all(l,list(pnat),"ordered*"("sort*"(l)))
+ 
+dmac828 all(l,list(pnat),imp("number-listp*"(l),iff(eq("sort*"(l),l,list(pnat)),"ordered*"(l))))
+ 
+dmac829 all(t395,u(1),all(a,list(t395),all(b,list(t395),eq("subst*"(a,a,b),b,list(t395)))))
+ 
+dmac830 all(t397,u(1),all(a,list(t397),all(b,list(t397),all(c,list(t397),imp(imp("occur*"(a,b),void),eq("subst*"(c,a,b),b,list(t397)))))))
+ 
+dmac831 all(i,pnat,all(j,pnat,eq("fact-loop*"(j,i),times(i,"fact*"(j)),pnat)))
+ 
+dmac832 all(i,pnat,eq("fact-*"(i),"fact*"(i),pnat))
+ 
+dmac833 all(t400,u(1),all(x,list(t400),all(y,list(t400),eq("reverse-loop*"(x,y),append("reverse**"(x),y),list(t400)))))
+ 
+dmac834 all(t401,u(1),all(x,list(t401),eq("reverse-loop*"(x,nil),"reverse**"(x),list(t401))))
+ 
+dmac835 all(t402,u(1),all(a,list(t402),all(b,list(t402),eq("reverse-*"(append(a,b)),append("reverse-*"(b),"reverse-*"(a)),list(t402)))))
+ 
+dmac836 all(t403,u(1),all(x,list(t403),imp("plistp*"(x),eq("reverse-*"("reverse-*"(x)),x,list(t403)))))
+ 
+dmac837 all(x,pnat,all(y,list(pnat),imp("ordered*"(y),"ordered*"("addtolist*"(x,y)))))
+ 
+dmac838 all(x,list(pnat),all(y,list(pnat),imp("ordered*"(y),"ordered*"("sort-lp*"(x,y)))))
+ 
+dmac839 all(t404,u(1),all(x,list(pnat),all(y,list(pnat),all(z,list(t404),eq("count-list*"(z,"sort-lp*"(x,y)),plus("count-list*"(z,x),"count-list*"(z,y)),pnat)))))
+ 
+dmac840 all(t405,u(1),all(a,list(t405),all(b,list(t405),all(c,list(t405),iff(eq(append(a,b),append(a,c),list(t405)),eq(b,c,list(t405)))))))
+ 
+dmac841 all(x,pnat,all(y,pnat,all(z,u(1),iff(iff(lessp(x,y),z),if(lessp(x,y),iff({true},z),iff(void,z))))))
+ 
+dmac842 all(x,pnat,all(y,pnat,imp(and({true},imp(lessp(y,x),void)),eq(plus(x,difference(y,x)),y,pnat))))
+ 
+dmac843 all(x,pnat,all(y,pnat,eq(plus(remainder(x,y),times(y,quotient(x,y))),x,pnat)))
+ 
+dmac844 all(base,pnat,all(i,pnat,all(l,list(pnat),eq("power-eval*"("big-plus1*"(l,i,base),base),plus("power-eval*"(l,base),i),pnat))))
+ 
+dmac845 all(base,pnat,all(i,pnat,all(x,list(pnat),all(y,list(pnat),eq("power-eval*"("big-plus*"(x,y,i,base),base),plus(i,plus("power-eval*"(x,base),"power-eval*"(y,base))),pnat)))))
+ 
+dmac846 all(y,pnat,eq(remainder(y,{"int-1"}),{"int-0"},pnat))
+ 
+dmac847 all(x,pnat,all(y,pnat,imp(imp({true},void),eq(remainder(y,x),y,pnat))))
+ 
+dmac848 all(x,pnat,all(y,pnat,iff(lessp(remainder(x,y),y),imp(eq(y,0,pnat),void))))
+ 
+dmac849 all(x,pnat,eq(remainder(x,x),{"int-0"},pnat))
+ 
+dmac850 all(x,pnat,all(y,pnat,imp(and(imp(eq(y,0,pnat),void),{true}),eq(plus(remainder(x,y),times(y,quotient(x,y))),x,pnat))))
+ 
+dmac851 all(i,pnat,all(j,pnat,imp(lessp(times(s(i),j),j),void)))
+ 
+dmac852 all(i,pnat,all(j,pnat,imp(lessp(times(j,s(i)),j),void)))
+ 
+dmac853 all(i,pnat,all(j,pnat,iff(lessp(quotient(i,j),i),and(imp(eq(i,0,pnat),void),or(eq(j,0,pnat),imp(eq(j,{"int-1"},pnat),void))))))
+ 
+dmac854 all(x,pnat,all(y,pnat,iff(lessp(remainder(x,y),x),and(imp(eq(y,0,pnat),void),and(imp(eq(x,0,pnat),void),imp(lessp(x,y),void))))))
+ 
+dmac855 all(base,pnat,all(i,pnat,eq("power-eval*"("power-rep*"(i,base),base),i,pnat)))
+ 
+dmac856 all(base,pnat,all(i,pnat,all(j,pnat,eq("power-eval*"("big-plus*"("power-rep*"(i,base),"power-rep*"(j,base),{"int-0"},base),base),plus(i,j),pnat))))
+ 
+dmac857 all(x,pnat,all(y,pnat,{true}))
+ 
+dmac858 all(x,pnat,all(y,pnat,iff(eq("gcd*"(x,y),{"int-0"},pnat),and(eq(x,0,pnat),eq(y,0,pnat)))))
+ 
+dmac859 all(y,pnat,eq("gcd*"({"int-0"},y),y,pnat))
+ 
+dmac860 all(x,pnat,all(y,pnat,eq("gcd*"(x,y),"gcd*"(y,x),pnat)))
+ 
+dmac861 all(t406,u(1),all(a,list(t406),all(b,list(t406),all(i,pnat,eq("nth*"(append(a,b),i),append("nth*"(a,i),"nth*"(b,difference(i,"length***"(a)))),list(t406))))))
+ 
+dmac862 all(x,pnat,all(y,pnat,eq(difference(plus(x,y),x),y,pnat)))
+ 
+dmac863 all(x,pnat,all(y,pnat,eq(difference(plus(y,x),x),y,pnat)))
+ 
+dmac864 all(x,pnat,all(y,pnat,all(z,pnat,eq(difference(plus(x,y),plus(x,z)),difference(y,z),pnat))))
+ 
+dmac865 all(c,pnat,all(w,pnat,all(x,pnat,eq(times(x,difference(c,w)),difference(times(c,x),times(w,x)),pnat))))
+ 
+dmac866 all(x,pnat,all(z,pnat,eq(remainder(times(x,z),z),{"int-0"},pnat)))
+ 
+dmac867 all(a,pnat,all(b,pnat,all(c,pnat,eq(difference(plus(b,plus(a,c)),a),plus(b,c),pnat))))
+ 
+dmac868 all(y,pnat,all(z,pnat,eq(difference(s(plus(y,z)),z),s(y),pnat)))
+ 
+dmac869 all(x,pnat,all(y,pnat,imp(and(imp(eq(y,0,pnat),void),imp(eq(y,{"int-1"},pnat),void)),imp(eq(remainder(s(times(x,y)),y),{"int-0"},pnat),void))))
+ 
+dmac870 all(x,pnat,all(y,pnat,all(z,pnat,imp(and(eq(remainder(x,z),{"int-0"},pnat),eq(remainder(y,z),{"int-0"},pnat)),eq(remainder(plus(x,y),z),{"int-0"},pnat)))))
+ 
+dmac871 all(x,pnat,all(y,pnat,all(z,pnat,imp(and(eq(remainder(x,z),{"int-0"},pnat),imp(eq(remainder(y,z),{"int-0"},pnat),void)),imp(eq(remainder(plus(x,y),z),{"int-0"},pnat),void)))))
+ 
+dmac872 all(x,pnat,all(y,pnat,all(z,pnat,imp(eq(remainder(x,z),{"int-0"},pnat),iff(eq(remainder(plus(x,y),z),{"int-0"},pnat),eq(remainder(y,z),{"int-0"},pnat))))))
+ 
+dmac873 all(x,pnat,all(y,pnat,all(z,pnat,iff(lessp(plus(x,y),plus(x,z)),lessp(y,z)))))
+ 
+dmac874 all(x,pnat,all(y,pnat,all(z,pnat,imp(eq(remainder(x,z),{"int-0"},pnat),iff(eq(remainder(plus(y,x),z),{"int-0"},pnat),eq(remainder(y,z),{"int-0"},pnat))))))
+ 
+dmac875 all(x,pnat,all(y,pnat,all(z,pnat,imp(eq(remainder(x,z),{"int-0"},pnat),iff(eq(remainder(difference(y,x),z),{"int-0"},pnat),if(lessp(x,y),eq(remainder(y,z),{"int-0"},pnat),{true}))))))
+ 
+dmac876 all(x,pnat,all(y,pnat,all(z,pnat,iff(lessp(times(x,z),times(y,z)),and(imp(eq(z,0,pnat),void),lessp(x,y))))))
+ 
+dmac877 all(x,pnat,all(y,pnat,iff(lessp(y,plus(x,y)),imp(eq(x,0,pnat),void))))
+ 
+dmac878 all(x,pnat,all(y,pnat,all(z,pnat,eq("gcd*"(times(x,z),times(y,z)),times(z,"gcd*"(x,y)),pnat))))
+ 
+dmac879 all(x,pnat,all(y,pnat,and(eq(remainder(x,"gcd*"(x,y)),{"int-0"},pnat),eq(remainder(y,"gcd*"(x,y)),{"int-0"},pnat))))
+ 
+dmac880 all(x,pnat,all(y,pnat,all(z,pnat,imp(and(imp(eq(x,0,pnat),void),and(imp(eq(y,0,pnat),void),and("divides*"(z,x),"divides*"(z,y)))),leq(z,"gcd*"(x,y))))))
+ 
+dmac881 all(t409,u(1),all(x,t409,imp(eq("if-complexity*"(x),{"int-0"},pnat),void)))
+ 
+dmac893 all(x,list({sexp}),"normalized-if-exprp*"("normalize*"(x)))
+ 
+dmac898 all(t435,u(1),all(x,list(t435),all(y,list(t435),iff(eq("flatten*"(x),"::"(y,nil),list(list(t435))),and(nlistp(x),eq(x,y,list(t435)))))))
+ 
+dmac899 all(x,{sexp},imp(lessp("count*"(x),"count*"("gopher*"(x))),void))
+ 
+dmac900 all(t438,u(1),all(x,list(list(t438)),iff(listp("gopher*"(x)),listp(x))))
+ 
+dmac901 all(t440,u(1),all(x,list(list(t440)),eq(list_car(list(t440),"gopher*"(x)),if(listp(x),list_car(list(list(t440)),"flatten*"(x)),{"int-0"}),list(t440))))
+ 
+dmac902 all(t441,u(1),all(x,list(list(t441)),eq("flatten*"(list_cdr(list(t441),"gopher*"(x))),if(listp(x),list_cdr(list(list(t441)),"flatten*"(x)),{"cons-8"}),list(list(list(t441))))))
+ 
+dmac903 all(t442,u(1),all(x,list(list(t442)),all(y,list(list(t442)),iff("samefringe*"(x,y),eq("flatten*"(x),"flatten*"(y),list(list(list(t442))))))))
+ 
+dmac904 all(x,pnat,all(y,pnat,imp(and(lessp(y,x),and(imp("prime1*"(x,y),void),and(imp(eq(x,0,pnat),void),and(imp(eq(sub(x),{"int-0"},pnat),void),imp(eq(y,0,pnat),void))))),lessp("greatest-factor*"(x,y),x))))
+ 
+dmac905 all(x,pnat,all(y,pnat,imp(and(lessp(y,x),and(imp("prime1*"(x,y),void),and(imp(eq(x,0,pnat),void),and(imp(eq(x,{"int-1"},pnat),void),imp(eq(y,0,pnat),void))))),eq(remainder(x,"greatest-factor*"(x,y)),{"int-0"},pnat))))
+ 
+dmac906 all(x,pnat,all(y,pnat,iff(eq("greatest-factor*"(x,y),{"int-0"},pnat),and(or(eq(y,0,pnat),eq(y,{"int-1"},pnat)),eq(x,{"int-0"},pnat)))))
+ 
+dmac907 all(y,pnat,eq(remainder({"int-0"},y),{"int-0"},pnat))
+ 
+dmac908 all(x,pnat,all(y,pnat,iff(eq("greatest-factor*"(x,y),{"int-1"},pnat),eq(x,{"int-1"},pnat))))
+ 
+dmac909 all(x,pnat,all(y,pnat,iff({true},imp(and(or(eq(y,0,pnat),eq(y,{"int-1"},pnat)),imp({true},void)),void))))
+ 
+dmac910 all(x,list(pnat),all(y,list(pnat),eq("times-list*"(append(x,y)),times("times-list*"(x),"times-list*"(y)),pnat)))
+ 
+dmac911 all(x,list(pnat),all(y,list(pnat),iff("prime-list*"(append(x,y)),and("prime-list*"(x),"prime-list*"(y)))))
+ 
+dmac912 all(x,pnat,"prime-list*"("prime-factors*"(x)))
+ 
+dmac913 all(x,pnat,all(y,pnat,imp(and({true},and({true},and(imp(eq(x,{"int-0"},pnat),void),"divides*"(x,y)))),eq(times(x,quotient(y,x)),y,pnat))))
+ 
+dmac914 all(x,pnat,all(y,pnat,imp(and(imp(eq(x,0,pnat),void),lessp(x,y)),imp(eq(quotient(y,x),{"int-0"},pnat),void))))
+ 
+dmac915 all(x,pnat,eq("times-list*"("prime-factors*"(s(x))),s(x),pnat))
+ 
+dmac916 all(x,pnat,and(eq("times-list*"("prime-factors*"(s(x))),s(x),pnat),"prime-list*"("prime-factors*"(s(x)))))
+ 
+dmac917 all(w,pnat,all(z,pnat,iff(eq(z,times(w,z),pnat),and({true},or(eq(z,{"int-0"},pnat),eq(w,{"int-1"},pnat))))))
+ 
+dmac918 all(u,pnat,all(w,pnat,all(z,pnat,imp(and(imp(eq(z,{"int-1"},pnat),void),and(imp(eq(z,{"int-0"},pnat),void),and({true},"greatereqpr*"(u,z)))),imp("prime1*"(times(w,z),u),void)))))
+ 
+dmac919 all(x,pnat,all(y,pnat,iff("greatereqpr*"(x,y),imp(lessp(x,y),void))))
+ 
+dmac920 all(v,pnat,all(z,pnat,imp(and(imp(eq(z,s(v),pnat),void),"divides*"(z,s(v))),"greatereqpr*"(v,z))))
+ 
+dmac921 all(x,pnat,all(z,pnat,imp(and(imp(eq(z,{"int-1"},pnat),void),and(imp(eq(z,x,pnat),void),and(imp(eq(x,0,pnat),void),and(imp(eq(x,{"int-1"},pnat),void),"divides*"(z,x))))),imp("prime1*"(x,sub(x)),void))))
+ 
+dmac922 all(b,pnat,all(x,pnat,all(y,pnat,imp(eq("gcd*"(b,x),y,pnat),eq(remainder(b,y),{"int-0"},pnat)))))
+ 
+dmac923 all(b,pnat,all(x,pnat,imp(imp(eq(remainder(b,x),{"int-0"},pnat),void),imp(eq("gcd*"(b,x),x,pnat),void))))
+ 
+dmac924 all(y,pnat,all(z,pnat,eq(remainder(times(z,y),z),{"int-0"},pnat)))
+ 
+dmac925 all(x,pnat,all(y,pnat,imp(and({true},and(imp(eq(y,{"int-1"},pnat),void),and(imp(eq(y,{"int-0"},pnat),void),imp(eq(x,{"int-0"},pnat),void)))),imp(eq(x,times(x,y),pnat),void))))
+ 
+dmac926 all(x,pnat,all(y,pnat,iff(eq(x,times(x,y),pnat),or(eq(x,{"int-0"},pnat),and({true},eq(y,{"int-1"},pnat))))))
+ 
+dmac927 all(a,pnat,all(k,pnat,all(x,pnat,eq("gcd*"(times(k,x),times(a,x)),times(x,"gcd*"(a,k)),pnat))))
+ 
+dmac928 all(a,pnat,all(b,pnat,all(k,pnat,all(x,pnat,imp(and(imp("divides*"(x,a),void),eq(a,"gcd*"(times(x,a),times(b,a)),pnat)),imp(eq(times(k,x),times(b,a),pnat),void))))))
+ 
+dmac929 all(b,pnat,all(x,pnat,imp(and(imp("divides*"(x,b),void),and(imp(eq(x,0,pnat),void),and(imp(eq(sub(x),{"int-0"},pnat),void),"prime1*"(x,sub(x))))),iff(eq("gcd*"(b,x),{"int-1"},pnat),{true}))))
+ 
+dmac930 all(b,pnat,all(free,pnat,all(x,pnat,all(z,pnat,imp(and({true},and(imp(eq(x,{"int-0"},pnat),void),eq(free,times(x,z),pnat))),eq("gcd*"(times(b,z),free),times(z,"gcd*"(b,x)),pnat))))))
+ 
+dmac931 all(b,pnat,all(k,pnat,all(x,pnat,all(z,pnat,imp(and({true},and("prime*"(x),and(imp("divides*"(x,z),void),imp("divides*"(x,b),void)))),imp(eq(times(x,k),times(b,z),pnat),void))))))
+ 
+dmac932 all(x,pnat,all(y,pnat,imp(and({true},imp(eq(times(x,quotient(y,x)),y,pnat),void)),imp(eq(remainder(y,x),{"int-0"},pnat),void))))
+ 
+dmac933 all(x,pnat,all(y,pnat,imp(and("prime*"(x),and(imp(eq(y,{"int-1"},pnat),void),imp(eq(x,y,pnat),void))),imp(eq(remainder(x,y),{"int-0"},pnat),void))))
+ 
+dmac934 all(t443,u(1),all(l,list(t443),all(n,t443,imp(member(n,l),lessp("count*"("delete**"(n,l)),"count*"(l))))))
+ 
+dmac935 all(x,pnat,all(y,pnat,eq(remainder(times(y,x),y),{"int-0"},pnat)))
+ 
+dmac936 all(l2,list(pnat),all(x,pnat,imp("prime-list*"(l2),"prime-list*"("delete**"(x,l2)))))
+ 
+dmac937 all(c,pnat,all(l,list(pnat),imp(and(imp(eq(c,0,pnat),void),member(c,l)),eq(remainder("times-list*"(l),c),{"int-0"},pnat))))
+ 
+dmac938 all(x,pnat,all(y,pnat,eq(quotient(times(y,x),y),if(eq(y,0,pnat),{"int-0"},x),pnat)))
+ 
+dmac939 all(a,pnat,all(c,pnat,all(w,pnat,imp(and(imp(eq(a,0,pnat),void),"divides*"(a,w)),eq(times(c,quotient(w,a)),quotient(times(c,w),a),pnat)))))
+ 
+dmac940 all(c,pnat,all(l,list(pnat),imp(and(imp(eq(c,0,pnat),void),member(c,l)),eq("times-list*"("delete**"(c,l)),quotient("times-list*"(l),c),pnat))))
+ 
+dmac941 all(c,pnat,all(l2,list(pnat),imp(and("prime*"(c),and("prime-list*"(l2),imp(member(c,l2),void))),imp(eq(remainder("times-list*"(l2),c),{"int-0"},pnat),void))))
+ 
+dmac942 all(c,pnat,all(x,pnat,all(y,pnat,imp(and(imp(eq(c,0,pnat),void),imp("divides*"(c,x),void)),imp(eq(times(c,y),x,pnat),void)))))
+ 
+dmac943 all(a,pnat,all(b,pnat,iff(eq(times(a,b),{"int-1"},pnat),and(imp(eq(a,{"int-0"},pnat),void),and(imp(eq(b,{"int-0"},pnat),void),and({true},and({true},and(eq(sub(a),{"int-0"},pnat),eq(sub(b),{"int-0"},pnat)))))))))
+ 
+dmac944 all(c,pnat,all(l1,list(pnat),all(l2,list(pnat),imp(and(eq(times(c,"times-list*"(l1)),"times-list*"(l2),pnat),and("prime*"(c),"prime-list*"(l2))),member(c,l2)))))
+ 
+dmac945 all(a,pnat,all(b,pnat,all(c,pnat,imp(and(imp(eq(a,0,pnat),void),and({true},eq(times(a,c),b,pnat))),iff(eq(c,quotient(b,a),pnat),{true})))))
+ 
+dmac946 all(l1,list(pnat),all(l2,list(pnat),imp(and("prime-list*"(l1),and("prime-list*"(l2),eq("times-list*"(l1),"times-list*"(l2),pnat))),"perm*"(l1,l2))))
+ 
+dmac947 all(x445,pnat,all(x446,list(pnat),member("maximum*"("::"(x445,x446)),"::"(x445,x446))))
+ 
+dmac948 all(t445,u(1),all(l,list(t445),all(x,t445,iff(lessp("count*"("delete**"(x,l)),"count*"(l)),member(x,l)))))
+ 
+dmac949 all(x,list(pnat),"plistp*"("sort2*"(x)))
+ 
+dmac950 all(x,list(pnat),"ordered2*"("sort2*"(x)))
+ 
+dmac951 all(x,list(pnat),and("plistp*"("sort2*"(x)),"ordered2*"("sort2*"(x))))
+ 
+dmac952 all(v,pnat,all(x,pnat,all(y,list(pnat),imp(and("plistp*"(y),and("ordered2*"(y),imp(eq(x,v,pnat),void))),eq("addtolist2*"(v,"delete**"(x,y)),"delete**"(x,"addtolist2*"(v,y)),list(pnat))))))
+ 
+dmac953 all(v,pnat,all(y,list(pnat),imp("plistp*"(y),eq("delete**"(v,"addtolist2*"(v,y)),y,list(pnat)))))
+ 
+dmac954 all(v,pnat,all(w,pnat,all(y,list(pnat),imp(and(imp(lessp(v,w),void),eq("addtolist2*"(v,y),"::"(v,y),list(pnat))),eq("addtolist2*"(v,"addtolist2*"(w,y)),"::"(v,"addtolist2*"(w,y)),list(pnat))))))
+ 
+dmac955 all(v,pnat,all(z,list(pnat),imp(imp(lessp(v,"maximum*"(z)),void),eq("addtolist2*"(v,"sort2*"(z)),"::"(v,"sort2*"(z)),list(pnat)))))
+ 
+dmac956 all(x447,pnat,all(x448,list(pnat),eq("::"("maximum*"("::"(x447,x448)),"delete**"("maximum*"("::"(x447,x448)),"sort2*"("::"(x447,x448)))),"sort2*"("::"(x447,x448)),list(pnat))))
+ 
+dmac957 all(l,list(pnat),all(x,pnat,eq("sort2*"("delete**"(x,l)),"delete**"(x,"sort2*"(l)),list(pnat))))
+ 
+dmac958 all(x,list(pnat),eq("dsort*"(x),"sort2*"(x),list(pnat)))
+ 
+dmac959 all(t446,u(1),all(a,list(t446),all(l,list(pnat),eq("count-list*"(a,"sort2*"(l)),"count-list*"(a,l),pnat))))
+ 
+dmac960 all(x,pnat,eq(difference(x,{"int-1"}),sub(x),pnat))
+ 
+dmac961 all(ac,pnat,all(i,pnat,eq("prog-trans-of-sigma*"(i,ac),plus(ac,"sigma*"({"int-0"},i)),pnat)))
+ 
+dmac962 all(i,pnat,eq("prog-trans-of-sigma*"(i,{"int-0"}),"sigma*"({"int-0"},i),pnat))
+ 
+dmac963 all(k,pnat,and(eq({"int-0"},"sigma*"(k,k),pnat),leq(k,k)))
+ 
+dmac964 all(i,pnat,all(k,pnat,imp(and(imp(eq(i,0,pnat),void),leq(i,k)),and(eq(plus("sigma*"(i,k),i),"sigma*"(sub(i),k),pnat),leq(sub(i),k)))))
+ 
+dmac965 all(i,pnat,all(k,pnat,imp(and(eq(i,0,pnat),leq(i,k)),eq("sigma*"(i,k),"sigma*"({"int-0"},k),pnat))))
+ 
+dmac966 all(t449,u(1),all(i,pnat,all(j,pnat,all(mem,list(t449),all(val,t449,eq("get**"(j,"set*"(i,val,mem)),if("eqp*"(j,i),val,"get**"(j,mem)),t449))))))
+ 
+dmac967 all(x,list(list(list({sexp}))),imp(eq(list_car(list(list({sexp})),list_cdr(list(list({sexp})),list_cdr(list(list({sexp})),list_cdr(list(list({sexp})),list_cdr(list(list({sexp})),x))))),{"cons-10"},list(list({sexp}))),eq("length***"(x),plus({"int-5"},"length***"(list_cdr(list(list({sexp})),list_cdr(list(list({sexp})),list_cdr(list(list({sexp})),list_cdr(list(list({sexp})),list_cdr(list(list({sexp})),x))))))),pnat)))
+ 
+dmac968 all(t451,u(1),all(x1,t451,all(x2,t451,all(x3,t451,all(x4,t451,all(x5,t451,all(x6,t451,all(x7,list(t451),eq("length***"("::"(x1,"::"(x2,"::"(x3,"::"(x4,"::"(x5,"::"(x6,x7))))))),plus({"int-6"},"length***"(x7)),pnat)))))))))
+ 
+dmac977 all(x,pnat,eq(difference(s(s(x)),{"int-2"}),x,pnat))
+ 
+dmac978 all(x,pnat,all(y,pnat,eq(quotient(plus(x,plus(x,y)),{"int-2"}),plus(x,quotient(y,{"int-2"})),pnat)))
+ 
+dmac979 all(i,pnat,eq("sigma*"({"int-0"},i),quotient(times(i,s(i)),{"int-2"}),pnat))
+ 
+dmac980 all(t455,u(1),all(t456,u(1),all(t457,u(1),all(x,t455,all(y,t456,all(z,t457,eq("h***"(x,"h***"(y,z)),"h***"(y,"h***"(x,z)),pnat)))))))
+ 
+dmac981 all(t461,u(1),all(t462,u(1),all(a,pnat,all(x,list(t461),all(z,t462,eq("h-pr*"(x,"h***"(z,a)),"h***"(z,"h-pr*"(x,a)),pnat))))))
+ 
+dmac982 all(t463,u(1),all(ac,pnat,all(l,list(t463),eq("h-ac*"(l,ac),"h-pr*"(l,ac),pnat))))
+ 
+dmac983 all(x,pnat,eq(times({"int-1"},x),x,pnat))
+ 
+dmac984 all(x,pnat,eq(times({"int-2"},x),plus(x,x),pnat))
+ 
+dmac985 all(k,pnat,eq("exp****"({"int-0"},k),if(eq(k,0,pnat),{"int-1"},{"int-0"}),pnat))
+ 
+dmac986 all(k,pnat,eq("exp****"({"int-1"},k),{"int-1"},pnat))
+ 
+dmac987 all(x,pnat,eq("exp****"(x,{"int-0"}),{"int-1"},pnat))
+ 
+dmac988 all(i,pnat,all(j,pnat,all(k,pnat,eq("exp****"(times(i,j),k),times("exp****"(i,k),"exp****"(j,k)),pnat))))
+ 
+dmac989 all(i,pnat,all(j,pnat,all(k,pnat,eq("exp****"("exp****"(i,j),k),"exp****"(i,times(j,k)),pnat))))
+ 
+dmac990 all(i,pnat,all(j,pnat,all(x,pnat,eq(remainder(plus(x,times(i,j)),j),remainder(x,j),pnat))))
+ 
+dmac991 all(i,pnat,all(j,pnat,all(x,pnat,eq(remainder(plus(x,times(j,i)),j),remainder(x,j),pnat))))
+ 
+dmac992 all(a,pnat,all(b,pnat,all(c,pnat,eq(remainder(times(b,times(a,c)),a),{"int-0"},pnat))))
+ 
+dmac993 all(x,pnat,eq(remainder({"int-1"},x),if(eq(x,{"int-1"},pnat),{"int-0"},{"int-1"}),pnat))
+ 
+dmac994 all(t464,u(1),all(x,list(t464),iff(eq("length***"(x),{"int-0"},pnat),nlistp(x))))
+ 
+dmac995 all(t465,u(1),all(l,list(t465),all(x,t465,eq("length***"("delete**"(x,l)),if(member(x,l),"length***"(list_cdr(t465,l)),"length***"(l)),pnat))))
+ 
+dmac996 all(p,pnat,all(x,pnat,all(y,pnat,eq(remainder(difference(times(p,x),times(p,y)),p),{"int-0"},pnat))))
+ 
+dmac997 all(a,pnat,all(b,pnat,all(p,pnat,imp("prime*"(p),iff(eq(remainder(times(a,b),p),{"int-0"},pnat),or(eq(remainder(a,p),{"int-0"},pnat),eq(remainder(b,p),{"int-0"},pnat)))))))
+ 
+dmac998 all(l,list(pnat),all(x,pnat,imp(member(x,l),eq(times(x,"times-list*"("delete**"(x,l))),"times-list*"(l),pnat))))
+ 
+dmac999 all(x,pnat,all(y,pnat,lessp(remainder(x,s(y)),s(y))))
+ 
+dmac1000 all(a,list(list(pnat)),all(new,pnat,all(old,pnat,all(term,pnat,eq("eval2*"("subst2*"(new,old,term),a),"eval2*"(term,"::"("::"(old,"eval2*"(new,a)),a)),pnat)))))
+ 
+dmac1001 all(board,list(u(1)),all(i,pnat,all(x,u(1),imp(and(x,legalp(i,board)),lessp("open-squares"("move*"(x,i,board)),"open-squares"(board))))))
+ 
+dmac1002 all(board,list(u(1)),all(i,pnat,all(x,u(1),imp(x,imp(lessp("open-squares"(board),"open-squares"("move*"(x,i,board))),void)))))
+ 
+dmac1003 all(t472,u(1),all(board,list(t472),all(i,pnat,all(x,t472,eq("length****"("move*"(x,i,board)),"length****"(board),pnat)))))
+ 
+dmac1005 all(board,list(u(1)),imp(and(imp(endp(board),void),lessp("length****"(board),{"int-10"})),legalp("pick-move2"(board),board)))
+ 
+dmac1006 all(board,list(u(1)),all(i,pnat,imp(and(imp(endp(board),void),{true}),eq("pick-move1"(board,i),plus(i,"pick-move2"(board)),pnat))))
+ 
+dmac1010 all(board,list(u(1)),all(i,pnat,imp(endp(board),eq("pick-move1"(board,i),{"int-0"},pnat))))
+ 
+dmac1013 all(board,list(u(1)),all(x,pnat,imp(imp(lessp(x,"length****"(board)),void),imp(legalp1(x,board),void))))
+ 
+dmac1014 all(board,list(u(1)),all(x,pnat,imp("nth**"(x,board),imp(legalp1(x,board),void))))
+ 
+dmac1015 all(board,list(u(1)),all(x,pnat,imp(and(lessp(x,"length****"(board)),imp("nth**"(x,board),void)),legalp1(x,board))))
+ 
+dmac1016 all(board,list(u(1)),all(x,pnat,imp(eq("length****"(board),{"int-9"},pnat),iff(legalp(x,board),legalp1(x,board)))))
+ 
+dmac1017 all(board,list(u(1)),all(i,pnat,all(x,pnat,imp(lessp(x,i),imp(legalp2(x,board,i),void)))))
+ 
+dmac1018 all(x,pnat,all(y,pnat,eq(sub(difference(x,y)),difference(sub(x),y),pnat)))
+ 
+dmac1019 all(board,list(u(1)),all(i,pnat,all(x,pnat,imp(and({true},imp(lessp(x,i),void)),iff(legalp1(difference(x,i),board),legalp2(x,board,i))))))
+ 
+dmac1020 all(board,list(u(1)),all(x,pnat,iff(legalp1(x,board),legalp2(x,board,{"int-0"}))))
+ 
+dmac1021 all(board,list(u(1)),all(i,pnat,all(x,pnat,iff(legalp2(x,"::"(void,board),i),or(if(eq(i,{"int-0"},pnat),eq(x,0,pnat),eq(x,i,pnat)),legalp2(x,board,s(i)))))))
+ 
+dmac1022 all(board,list(list({sexp})),all(i,pnat,all(x,pnat,iff(legalp2(x,"::"({"sym-x"},board),i),legalp2(x,board,s(i))))))
+ 
+dmac1023 all(board,list(list({sexp})),all(i,pnat,all(x,pnat,iff(legalp2(x,"::"({"sym-o"},board),i),legalp2(x,board,s(i))))))
+ 
+dmac1024 all(i,pnat,all(x,pnat,iff(legalp2(x,{"sym-nil"},i),void)))
+ 
+dmac1025 all(s0,u(1),all(s1,u(1),all(s2,u(1),all(s3,u(1),all(s4,u(1),all(s5,u(1),all(s6,u(1),all(s7,u(1),all(s8,u(1),all(x,pnat,iff(legalp(x,"::"(s0,"::"(s1,"::"(s2,"::"(s3,"::"(s4,"::"(s5,"::"(s6,"::"(s7,"::"(s8,nil)))))))))),legalp2(x,"::"(s0,"::"(s1,"::"(s2,"::"(s3,"::"(s4,"::"(s5,"::"(s6,"::"(s7,"::"(s8,nil))))))))),{"int-0"}))))))))))))
+ 
+dmac1026 all(t475,u(1),all(board,list(t475),all(i,pnat,all(x,t475,imp(imp(lessp(i,"length****"(board)),void),eq("move*"(x,i,board),board,list(t475)))))))
+ 
+dmac1027 all(t476,u(1),all(board,list(t476),all(i,pnat,all(x,t476,imp(and(eq("length****"(board),{"int-9"},pnat),and({true},and(imp(eq(i,{"int-0"},pnat),void),and(imp(eq(i,{"int-1"},pnat),void),and(imp(eq(i,{"int-2"},pnat),void),and(imp(eq(i,{"int-3"},pnat),void),and(imp(eq(i,{"int-4"},pnat),void),and(imp(eq(i,{"int-5"},pnat),void),and(imp(eq(i,{"int-6"},pnat),void),and(imp(eq(i,{"int-7"},pnat),void),imp(eq(i,{"int-8"},pnat),void))))))))))),eq("move*"(x,i,board),board,list(t476)))))))
+ 
+dmac1028 all(t477,u(1),all(board,list(t477),all(i,pnat,all(x,t477,imp(and(eq("length****"(board),{"int-9"},pnat),imp({true},void)),eq("move*"(x,i,board),"::"(x,list_cdr(t477,board)),list(t477)))))))
+ 
+dmac1029 all(board,list(u(1)),imp("legal-movep"(board,{"sym-x"},board),void))
+ 
+dmac1030 all(board,list(list({sexp})),all(i,pnat,imp("nth**"(i,board),imp("legal-movep"(board,{"sym-x"},"move*"({"sym-x"},i,board)),void))))
+ 
+dmac1031 all(board,list(list({sexp})),all(i,pnat,imp(imp(lessp(i,"length****"(board)),void),imp("legal-movep"(board,{"sym-x"},"move*"({"sym-x"},i,board)),void))))
+ 
+dmac1035 all(xmoves,list(pnat),"x-moves-honored"(xmoves,"tic-tac-toe"(xmoves)))
+ 
+dmac1036 all(board,list(u(1)),all(opening,list(pnat),all(xmoves1,list(pnat),all(xmoves2,list(pnat),iff(eq("init-game1"("length****"(opening),"tic-tac-toe1"(append(opening,xmoves1),board)),"init-game1"("length****"(opening),"tic-tac-toe1"(append(opening,xmoves2),board)),list(list(list({sexp})))),{true})))))
+ 
+dmac1037 all(opening,list(pnat),all(xmoves1,list(pnat),all(xmoves2,list(pnat),iff(eq("init-game"("length****"(opening),"tic-tac-toe"(append(opening,xmoves1))),"init-game"("length****"(opening),"tic-tac-toe"(append(opening,xmoves2))),list(list(u(1)))),{true}))))
+ 
+dmac1041 all(x,pnat,all(y,pnat,eq(plus(x,s(y)),s(plus(x,y)),pnat)))
+ 
+dmac1042 all(x,pnat,all(y,pnat,eq(plus(x,y),plus(y,x),pnat)))
+ 
+dmac1043 all(x,pnat,all(y,pnat,all(z,pnat,eq(plus(x,plus(y,z)),plus(y,plus(x,z)),pnat))))
+ 
+dmac1044 all(x,pnat,all(y,pnat,all(z,pnat,eq(plus(plus(x,y),z),plus(x,plus(y,z)),pnat))))
+ 
+dmac1045 all(x,pnat,eq(times(x,{"int-0"}),{"int-0"},pnat))
+ 
+dmac1046 all(x,pnat,all(z,pnat,imp(imp({true},void),eq(times(x,z),{"int-0"},pnat))))
+ 
+dmac1047 all(x,pnat,all(y,pnat,eq(times(x,s(y)),plus(x,times(x,y)),pnat)))
+ 
+dmac1048 all(x,pnat,all(y,pnat,all(z,pnat,eq(times(x,plus(y,z)),plus(times(x,y),times(x,z)),pnat))))
+ 
+dmac1049 all(x,pnat,all(y,pnat,eq(times(x,y),times(y,x),pnat)))
+ 
+dmac1050 all(x,pnat,all(y,pnat,all(z,pnat,eq(times(x,times(y,z)),times(y,times(x,z)),pnat))))
+ 
+dmac1051 all(x,pnat,all(y,pnat,all(z,pnat,eq(times(times(x,y),z),times(x,times(y,z)),pnat))))
+ 
+dmac1052 all(x,pnat,all(y,pnat,all(z,pnat,eq(times(plus(x,y),z),plus(times(x,z),times(y,z)),pnat))))
+ 
+dmac1053 all(x,pnat,all(y,pnat,imp(imp(lessp(y,x),void),eq(difference(x,y),{"int-0"},pnat))))
+ 
+dmac1054 all(i,pnat,all(x,pnat,eq(difference(plus(i,x),i),x,pnat)))
+ 
+dmac1055 all(i,pnat,all(x,pnat,all(y,pnat,eq(difference(plus(i,x),plus(i,y)),difference(x,y),pnat))))
+ 
+dmac1056 all(i,pnat,all(j,pnat,all(x,pnat,eq(difference(plus(i,plus(j,x)),j),plus(i,x),pnat))))
+ 
+dmac1057 all(x,pnat,all(y,pnat,iff(lessp(remainder(x,y),y),imp(eq(y,0,pnat),void))))
+ 
+dmac1058 all(x,pnat,all(y,pnat,eq(plus(remainder(x,y),times(y,quotient(x,y))),x,pnat)))
+ 
+dmac1059 all(board,list(u(1)),iff(endp(board),eq("open-squares"(board),0,pnat)))
+ 
+dmac1060 all(board,list(u(1)),all(i,pnat,all(x,u(1),imp(and(x,legalp(i,board)),eq("open-squares"("move*"(x,i,board)),sub("open-squares"(board)),pnat)))))
+ 
+dmac1061 all(x,pnat,all(y,pnat,imp(imp(lessp(x,y),void),eq(s(difference(x,y)),difference(s(x),y),pnat))))
+ 
+dmac1062 all(board,list(u(1)),imp(lessp("length****"(board),"open-squares"(board)),void))
+ 
+dmac1063 all(board,list(u(1)),all(xmoves,list(pnat),imp(eq("length****"(board),{"int-9"},pnat),eq("tic-tac-toe1"(xmoves,board),"tic-tac-toe1-a"(xmoves,board,difference({"int-10"},"open-squares"(board))),list(list(list({sexp})))))))
+ 
+dmac1064 all(xmoves,list(pnat),eq("tic-tac-toe"(xmoves),"tic-tac-toe-a"(xmoves),list(list(u(1)))))
+ 
+dmac1065 all(x,pnat,all(y,pnat,all(z,pnat,imp(and({true},lessp(x,y)),eq(remainder(plus(x,times(y,z)),y),x,pnat)))))
+ 
+dmac1066 all(y,pnat,all(z,pnat,eq(remainder(times(s(y),z),s(y)),{"int-0"},pnat)))
+ 
+dmac1067 all(x,pnat,all(y,pnat,all(z,pnat,imp(and({true},lessp(x,y)),eq(quotient(plus(x,times(y,z)),y),z,pnat)))))
+ 
+dmac1068 all(y,pnat,all(z,pnat,imp(and({true},imp(eq(y,0,pnat),void)),eq(quotient(times(y,z),y),z,pnat))))
+ 
+dmac1077 all(n,pnat,lessp(quotient(s(n),{"int-4"}),s(n)))
+ 
+dmac1083 all(t499,u(1),all(board,list(t499),all(i,pnat,imp(and(legalpn(i,"board->number"(board)),eq("length****"(board),{"int-9"},pnat)),iff(lessp(i,{"int-9"}),{true})))))
+ 
+dmac1084 all(len,pnat,all(n,pnat,eq("length****"("number->board"(n,len)),len,pnat)))
+ 
+dmac1087 all(board,pnat,all(i,pnat,all(x,pnat,imp(and({true},and(boardpn(board),or(eq(x,{"int-1"},pnat),eq(x,{"int-2"},pnat)))),boardpn(moven(x,i,board))))))
+ 
+dmac1088 all(board,pnat,all(len,pnat,imp(and({true},and(boardpn(board),imp(lessp(len,lengthn(board)),void))),eq("board->number"("number->board"(board,len)),board,pnat))))
+ 
+dmac1089 all(t501,u(1),all(board,list(t501),imp(lessp("length****"(board),lengthn("board->number"(board))),void)))
+ 
+dmac1090 all(board,pnat,all(i,pnat,all(x,pnat,imp(or(eq(x,{"int-1"},pnat),eq(x,{"int-2"},pnat)),eq(lengthn(moven(x,i,board)),if(lessp(i,lengthn(board)),lengthn(board),s(i)),pnat)))))
+ 
+dmac1096 all(t506,u(1),all(array,list(t506),all(i,pnat,all(j,pnat,all(val,t506,imp(and({true},and({true},lessp(j,"length****"(array)))),eq("nth**"(i,"put*"(val,j,array)),if(eq(i,j,pnat),val,"nth**"(i,array)),t506)))))))
+ 
+dmac1097 all(t507,u(1),all(array,list(t507),all(i,pnat,all(val,t507,imp(lessp(i,"length****"(array)),eq("length****"("put*"(val,i,array)),"length****"(array),pnat))))))
+ 
+dmac1098 all(array,list(pnat),all(i,pnat,all(j,pnat,all(val,pnat,imp(and(lessp(j,"length****"(array)),lessp(i,"length****"(array))),eq("array->lst"(i,"put*"(val,j,array)),"::"("nth**"(i,"put*"(val,j,array)),"array->lst"(s(i),"put*"(val,j,array))),list(pnat)))))))
+ 
+dmac1099 all(array,list(pnat),all(i,pnat,all(j,pnat,all(val,pnat,imp(and({true},and({true},and(lessp(j,"length****"(array)),lessp(j,i)))),eq("array->lst"(i,"put*"(val,j,array)),"array->lst"(i,array),list(pnat)))))))
+ 
+dmac1100 all(board,pnat,all(i,pnat,all(t3,list(pnat),all(xmoves,list(pnat),imp(and({true},and({true},and(eq(remainder(i,{"int-2"}),{"int-1"},pnat),and(lessp(i,{"int-10"}),eq("length****"(t3),{"int-11"},pnat))))),eq("length****"("tic-tac-toe1-c"(xmoves,board,i,t3)),{"int-11"},pnat))))))
+ 
+dmac1102 all(i,pnat,eq(remainder(s(s(i)),{"int-2"}),remainder(i,{"int-2"}),pnat))
+ 
+dmac1103 all(i,pnat,imp(and(eq(remainder(i,{"int-2"}),{"int-1"},pnat),lessp(i,{"int-9"})),iff(lessp(i,{"int-8"}),{true})))
+ 
+dmac1104 all(board,pnat,all(i,pnat,all(t3,list(pnat),all(xmoves,list(pnat),imp(and({true},and({true},and(eq(remainder(i,{"int-2"}),{"int-1"},pnat),and(lessp(i,{"int-10"}),eq("length****"(t3),{"int-11"},pnat))))),eq("tic-tac-toe1-b"(xmoves,board,i),"array->lst"(i,"tic-tac-toe1-c"(xmoves,board,i,t3)),list(pnat)))))))
+ 
+dmac1105 all(xmoves,list(pnat),eq("tic-tac-toe-b"(xmoves),"array->lst"({"int-0"},"tic-tac-toe-c"(xmoves)),list(pnat)))
+ 
+dmac1106 all(t509,u(1),all(j,pnat,all(lst,list(t509),eq(list_car(t509,"nth-cdr"(j,lst)),"nth**"(j,lst),t509))))
+ 
+dmac1107 all(t510,u(1),all(j,pnat,all(lst,list(t510),eq(list_cdr(t510,"nth-cdr"(j,lst)),"nth-cdr"(j,list_cdr(t510,lst)),list(t510)))))
+ 
+dmac1108 all(board,pnat,all(i,pnat,all(j,pnat,all(t3,list(pnat),all(xmoves,list(pnat),eq("tic-tac-toe1-c"("nth-cdr"(j,xmoves),board,i,t3),"tic-tac-toe1-d"(xmoves,j,board,i,t3),list(list({sexp}))))))))
+ 
+dmac1109 all(xmoves,list(pnat),eq("tic-tac-toe-c"(xmoves),"tic-tac-toe-d"(xmoves),list(list({sexp}))))
+ 
+dmac1113 all(x,{sexp},all(y,{sexp},imp(lessp("count*"(y),"count*"(x)),imp("occur**"(x,y),void))))
+ 
+dmac1114 all(fa,list(list({sexp})),all(fn,{sexp},lessp("count*"(list_car({sexp},list_cdr({sexp},"get***"(fn,fa)))),s("count*"(fa)))))
+ 
+dmac1115 all(fa,{sexp},all(x,{sexp},imp(lessp("count*"(fa),"count*"(x)),imp("occur-in-defns"(x,fa),void))))
+ 
+dmac1122 all(t543,u(1),all(x,list(t543),iff(eq("length*****"(x),{"int-0"},pnat),nlistp(x))))
+ 
+dmac1123 all(i,pnat,all(j,pnat,iff(eq(plus(i,j),{"int-0"},pnat),and(eq(i,0,pnat),eq(j,0,pnat)))))
+ 
+dmac1124 all(i,pnat,all(j,pnat,eq(plus(difference(i,j),j),if(leq(i,j),j,i),pnat)))
+ 
+dmac1155 all(x,list({sexp}),all(y,list({sexp}),all(z,list({sexp}),eq(tak0(x,y,z),if("zlesseqp*"(x,y),y,tak0(tak0(zsub1(x),y,z),tak0(zsub1(y),z,x),tak0(zsub1(z),x,y))),list({sexp})))))
+ 
+dmac1156 all(x,list({sexp}),all(y,list({sexp}),all(z,list({sexp}),imp(imp("zlesseqp*"(x,y),void),imp(lessp(m1(x,y,z),m1(tak0(zsub1(x),y,z),tak0(zsub1(y),z,x),tak0(zsub1(z),x,y))),void)))))
+ 
+dmac1157 all(t619,u(1),all(t620,u(1),all(t621,u(1),all(x,t619,all(y,t620,all(z,t621,imp(imp("zlesseqp*"(x,y),void),imp(lessp(m1(x,y,z),m1(zsub1(x),y,z)),void))))))))
+ 
+dmac1158 all(t622,u(1),all(t623,u(1),all(t624,u(1),all(x,t622,all(y,t623,all(z,t624,imp(imp("zlesseqp*"(x,y),void),imp(lessp(m1(x,y,z),m1(zsub1(y),z,x)),void))))))))
+ 
+dmac1159 all(t625,u(1),all(t626,u(1),all(t627,u(1),all(x,t625,all(y,t626,all(z,t627,imp(imp("zlesseqp*"(x,y),void),imp(lessp(m1(x,y,z),m1(zsub1(z),x,y)),void))))))))
+ 
+dmac1160 all(x,list({sexp}),all(y,list({sexp}),all(z,list({sexp}),imp(imp("zlesseqp*"(x,y),void),imp(lessp(m2(x,y,z),m2(tak0(zsub1(x),y,z),tak0(zsub1(y),z,x),tak0(zsub1(z),x,y))),void)))))
+ 
+dmac1161 all(x,list({sexp}),all(y,list({sexp}),all(z,list({sexp}),imp(imp("zlesseqp*"(x,y),void),imp(lessp(m2(x,y,z),m2(zsub1(x),y,z)),void)))))
+ 
+dmac1162 all(x,list({sexp}),all(y,list({sexp}),all(z,list({sexp}),imp(and(imp("zlesseqp*"(x,y),void),eq(m1(zsub1(y),z,x),m1(x,y,z),pnat)),imp(lessp(m2(x,y,z),m2(zsub1(y),z,x)),void)))))
+ 
+dmac1163 all(x,list({sexp}),all(y,list({sexp}),all(z,list({sexp}),imp(and(imp("zlesseqp*"(x,y),void),eq(m1(zsub1(z),x,y),m1(x,y,z),pnat)),imp(lessp(m2(x,y,z),m2(zsub1(z),x,y)),void)))))
+ 
+dmac1164 all(x,list({sexp}),all(y,list({sexp}),all(z,list({sexp}),imp(and(imp("zlesseqp*"(x,y),void),eq(m1(tak0(zsub1(x),y,z),tak0(zsub1(y),z,x),tak0(zsub1(z),x,y)),m1(x,y,z),pnat)),lessp(m3(tak0(zsub1(x),y,z),tak0(zsub1(y),z,x),tak0(zsub1(z),x,y)),m3(x,y,z))))))
+ 
+dmac1165 all(x,list({sexp}),all(y,list({sexp}),all(z,list({sexp}),imp(and(imp("zlesseqp*"(x,y),void),eq(m1(zsub1(x),y,z),m1(x,y,z),pnat)),lessp(m3(zsub1(x),y,z),m3(x,y,z))))))
+ 
+dmac1166 all(x,list({sexp}),all(y,list({sexp}),all(z,list({sexp}),imp(and(imp("zlesseqp*"(x,y),void),eq(m1(zsub1(y),z,x),m1(x,y,z),pnat)),lessp(m3(zsub1(y),z,x),m3(x,y,z))))))
+ 
+dmac1167 all(x,list({sexp}),all(y,list({sexp}),all(z,list({sexp}),imp(and(imp("zlesseqp*"(x,y),void),eq(m1(zsub1(z),x,y),m1(x,y,z),pnat)),lessp(m2(zsub1(z),x,y),m2(x,y,z))))))
+ 
+dmac1168 all(x,list(pnat),ordinalp("make-ordinal3"(x)))
+ 

@@ -1,0 +1,76 @@
+ +INSERT
+STRUCTURE 0 s (nat):nat
+ |
+ +INSERT
+FUNCTION plus (n1,n2:nat):nat =
+IF n1 = 0 THEN n2
+IF EX n3:nat n1 = s (n3) THEN s (plus (n3 n2))
+ |
+ +INSERT
+FUNCTION times (n1,n2:nat):nat =
+IF n1 = 0 THEN 0
+IF EX n3:nat n1 = s (n3) THEN plus (n2 times (n3 n2))
+ |
+ +INSERT
+commutative(plus)
+ |
+ +INSERT
+associative(plus)
+ |
+ +INSERT
+commutative(times)
+ |
+ +INSERT
+ALL n1,n2,n3:nat times (n3 plus (n2 n1)) = plus (times (n3 n2) times (n3 n1))
+ |
+ +INSERT
+ALL n1,n2,n3:nat times (plus (n3 n2) n1) = plus (times (n3 n1) times (n2 n1))
+ |
+ +INSERT
+associative(times)
+ |
+ +INSERT
+FUNCTION exp (n1,n2:nat):nat =
+IF n2 = 0 THEN s (0)
+IF EX n3:nat n2 = s (n3) THEN times (exp (n1 n3) n1)
+ |
+ +INSERT
+FUNCTION binom (n1,n2:nat):nat =
+IF n2 = 0 THEN s (0)
+IF EX n3:nat n1 = 0 AND n2 = s (n3) THEN 0
+IF EX n4,n5:nat n1 = s (n4) AND n2 = s (n5)
+   THEN plus (binom (n4 n2) binom (n4 n5))
+ |
+ +INSERT
+FUNCTION sum (n1,n2:nat):nat =
+IF n1 = 0 THEN binom (n2 0)
+IF EX n3:nat n1 = s (n3) THEN plus (binom (n2 n1) sum (n3 n2))
+ |
+ +INSERT
+FUNCTION difference (n1,n2:nat):nat =
+IF n2 = 0 THEN n1
+IF NOT n2 = 0 AND n1 = 0 THEN 0
+IF EX n3,n4:nat n1 = s (n4) AND n2 = s (n3) THEN difference (n4 n3)
+ |
+ +INSERT 
+ALL n1:nat difference (binom (n1 s (0)) n1) = 0
+ |
+ +INSERT
+ALL n1,n2:nat binom (n2 s (plus (n2 n1))) = 0
+ |
+ +INSERT
+ALL n1:nat binom (n1 n1) = s (0)
+ |
+ +INSERT
+ALL n1:nat sum (s (n1) 0) = s (0)
+ |
+ -INSERT
+all x,y:nat plus(binom(x y) sum(y s(x))) = plus(sum(y x) sum(y x))
+ |
+ -INSERT
+all x:nat s(sum(x s(x))) = plus(sum(x x) sum(x x))
+ |
+ -INSERT
+ALL X:NAT SUM(X X) = EXP(S(S(0)) X)
+ |
+ OK

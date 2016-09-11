@@ -1,0 +1,19 @@
+structure nil, cons(car:nat, cdr:list):list;
+
+predicate le(x,y:nat) =
+if x = 0 then true
+if x of s and y = 0 then false
+otherwise le(p(x), p(y));
+
+function min(x:list):nat =
+if x = nil then 0
+if x = cons(car(x), nil) then car(x)
+if x of cons and cdr(x) of cons and le(car(x), car(cdr(x))) then min(cons(car(x), cdr(cdr(x))))
+otherwise min(cdr(x));
+
+predicate member(x:nat, y:list) =
+if y = nil then false
+if y of cons and car(y) = x then true
+otherwise member(x, cdr(y));
+
+all x:list x = nil or member(min(x), x);

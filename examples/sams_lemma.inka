@@ -1,0 +1,38 @@
+unspec structure dummy;
+
+d-function f(dummy, dummy):dummy;
+
+d-function g(dummy, dummy):dummy;
+
+d-function nul:dummy;
+
+d-function eins:dummy;
+
+axiom all x:dummy f(x, x) = x;
+
+axiom all x:dummy g(x, x) = x;
+
+axiom all x,y:dummy f(x, g(x, y)) = x;
+
+axiom all x,y:dummy g(x, f(x, y)) = x;
+
+axiom all x,y:dummy g(x, y) = g(y, x);
+
+axiom all x,y:dummy f(x, y) = f(y, x);
+
+axiom all x,y,z:dummy f(x, f(y, z)) = f(f(x, y), z);
+
+axiom all x,y,z:dummy g(x, g(y, z)) = g(g(x, y), z);
+
+axiom all x:dummy f(x, nul) = nul;
+
+axiom all x:dummy g(x, nul) = x;
+
+axiom all x:dummy f(x, eins) = x;
+
+axiom all x:dummy g(x, eins) = eins;
+
+axiom all x,y,z:dummy f(x, z) = x impl f(z, g(x, y)) = g(x, f(y, z));
+
+all x,y,u,v:dummy f(f(y, u),v) = nul and f(x, g(u, v)) = nul
+ -> f(g(x, f(y, u)), g(x, f(y, v))) = x;

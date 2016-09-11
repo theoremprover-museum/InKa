@@ -1,0 +1,78 @@
+free structure null, suc0(N) : N;
+
+structure suc1(N) : Pos;
+
+d-function inj1(Pos):N;
+
+structure m1(Pos) : Neg;
+
+structure inj2(Pos), inj3(N) : I;
+
+d-function suc2(I) : I;
+
+d-function pre(I) : I;
+
+d-function plus(I,I):I;
+
+d-function m2(I):I;
+
+d-function inj4(Pos):I;
+
+
+
+axiom all i:I plus(inj3(null),i) = i;  % (1)
+
+axiom all x:N all i:I  plus(inj3(inj1(suc1(x))),i) = suc2(plus(inj3(x),i));  % (2)
+
+axiom all x:N all i:I  plus(m2(suc2(inj3(x))),i) = pre(plus(m2(inj3(x)),i)); % (3)
+
+axiom all x:N inj3(inj1(suc1(x))) = suc2(inj3(x)); % (4)
+
+axiom all x:Pos inj3(inj1(x)) = inj4(x); % (5)
+
+axiom all i:I pre(suc2(i)) = i; % (6)
+
+axiom m2(inj3(null)) = inj3(null); % (7)
+
+
+
+plus(m2(suc2(suc2(inj3(null)))),suc2(suc2(inj3(null)))) = inj3(null);
+
+%% In the following I assume that an outside reasoner generated the plan to 
+%% apply the reqrite rules in the following order: (3), (3), (1), (6), (6). The following
+%% illustrates how rippling/DR techniques could help to enable the application of those 
+%% rules.
+%%
+%% STEP 1:
+%% try to apply (3) on left side TOP-LEVEL: Skeleton left -> right
+%% 	move context suc2 inside with (4) from right to left : results in
+%%       plus(m2(suc2(inj3(inj1(suc1(null))))),suc2(suc2(inj3(null)))) = inj3(null)
+%% apply (3) results in 	
+%%  pre(plus(m2(inj3(inj1(suc1(null)))), suc2(suc2(inj3(null))))) = inj3(null)
+%%
+%% STEP 2:
+%% try to apply (3) on left hand side (1): 
+%%      we need to create the skeleton part .. suc2() ...
+%%       apply (4) results in 
+%%         pre(plus(m2(suc2(inj3(null))), suc2(suc2(inj3(null))))) = inj3(null)
+%% apply (3) results in 
+%%  pre(pre(plus(m2(inj3(null)), suc2(suc2(inj3(null)))))) = inj3(null)
+%% 
+%% STEP 3:
+%% try to apply (1)
+%% 	remove context m2() ...
+%%      apply (7) results in 
+%%       pre(pre(plus(inj3(null), suc2(suc2(inj3(null)))))) = inj3(null)
+%% apply (1) results in   
+%%  pre(pre(suc2(suc2(inj3(null))))) = inj3(null)
+%% 
+%% Simplify further by applying twice (6) which results in 
+%%  inj3(null)) = inj3(null));
+%% Done.
+
+
+
+
+
+
+

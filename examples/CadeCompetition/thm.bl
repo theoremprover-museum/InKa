@@ -1,0 +1,26 @@
+(
+ ;; Definitions of abbreviations
+ (
+  (noquote (:nclass #\'))
+  (letter (:or (:range #\a #\z) (:range #\A #\Z) (:cat #\' noquote #\')))
+  (quotedletter (:cat #\' noquote #\'))  
+  (space (:class #\Space #\Tab #\Newline))
+  )
+
+(     
+     ;; Terminals which are also allowed as complete tokens
+  ("=>"  impl_or_all)
+  ("#"   and)
+  ("\"   or)
+  ("<=>" eqv)
+  ("="   equal)
+  (":"   of)
+  ("u(1)" universal)
+     
+  ("(" tlparen)
+  (")" trparen)
+  ("{" curlparen)
+  ("}" currparen)
+  ("," tcomma)
+)
+

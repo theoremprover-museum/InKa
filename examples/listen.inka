@@ -1,0 +1,19 @@
+unspec structure personen;
+
+free structure nil, cons(car:personen, cdr:liste):liste;
+
+d-predicate le(liste,liste);
+
+axiom all l:liste not le(l, nil);
+
+axiom all p:personen all l:liste le(nil, cons(p, l));
+
+axiom all p1,p2:personen all l1,l2:liste le(cons(p1, l1), cons(p2, l2)) eqv le(l1, l2);
+
+all l:liste not le(l, l);
+
+all l1,l2,l3:liste le(l1, l2) and le(l2, l3) impl le(l1, l3);
+
+all el2:personen all t1,t2:liste le(t1, cons(el2,t2)) <-> t1 = nil OR le(cdr(t1),t2);
+
+all le(cons(el2, t2),t1) <-> le(t2, cdr(t1));

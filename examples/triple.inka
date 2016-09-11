@@ -1,0 +1,38 @@
+function plus(x,y:nat):nat =
+if x = 0 then y
+if x of s then s(plus(p(x), y));
+
+all x,y,z:nat plus(x, plus(y, z)) = plus(plus(x, y), z);
+
+all x:nat plus(x, 0) = x;
+
+all x,y:nat plus(x, s(y)) = s(plus(x, y));
+
+all x,y:nat plus(x, y) = plus(y, x);
+
+function times(x,y:nat):nat =
+if x = 0 then 0
+if x of s then plus(y, times(p(x), y));
+
+all x:nat times(x, 0) = 0;
+
+all x,y:nat times(x, s(y)) = plus(x, times(x, y));
+
+ALL X,Y:NAT times(x,y) = times(y, x);
+
+all x,y,z:nat times(x, plus(y,z)) = plus(times(x, y), times(x, z));
+
+all x,y,z:nat times(x, times(y, z)) = times(times(x, y), z);
+
+function sum(x:nat):nat =
+if x = 0 then 0
+if x of s then plus(x, sum(p(x)));
+
+all x:nat plus(sum(x), sum(x)) = times(s(x), x);
+
+function triple(x:nat):nat =
+if x = 0 then 0
+if x of s then plus(times(x, times(x, x)), triple(p(x)));
+
+all x:nat triple(x) = times(sum(x), sum(x));
+

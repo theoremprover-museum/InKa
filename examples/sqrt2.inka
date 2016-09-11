@@ -1,0 +1,44 @@
+function plus(x,y : nat):nat =
+if x = 0 then y
+otherwise s(plus(p(x), y));
+
+function times(x,y:nat):nat =
+if y = 0 then 0
+otherwise plus(x, times(x, p(y)));
+
+all x,y:nat plus(x, y) = plus(y, x);
+
+
+
+predicate even(x:nat) =
+if x = 0 then true
+if x = s(p(x)) then not even(p(x));
+
+all x:nat even(plus(x, x)) and not even(s(plus(x, x)));
+
+D-function primelength(nat):nat;
+
+axiom all x,y:nat primelength(times(x, y)) = plus(primelength(x), primelength(y));
+
+axiom primelength(s(s(0))) = s(0);
+
+
+all x:nat even(primelength(times(x, x)));
+
+all x:nat not even(primelength(times(s(s(0)), times(x, x))));
+
+all x,y:nat even(primelength(x)) and not even(primelength(y)) impl not y = x;
+
+
+all x,y:nat not times(s(s(0)), times(x, x)) = times(y, y);
+
+
+
+
+
+
+
+
+
+
+

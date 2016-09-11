@@ -1,0 +1,42 @@
+axiom P1 or p2 or p3 or p4
+
+axiom p5 or p6 or p7 or p8
+
+axiom p9 or p10 or p11 or p12
+
+axiom p13 or p14 or p15 or p16
+
+axiom p17 or p18 or p19 or p20
+
+axiom p1 impl (not p5 and not p9 and not p13 and not p17)
+
+axiom p5 impl (not p9 and not p13 and not p17)
+
+axiom p9 impl (not p13 and not p17)
+
+axiom p13 impl not p17
+
+axiom p2 impl (not P6 and not p10 and not p14 and not p18)
+
+axiom p6 impl (not p10 and not p14 and not p18)
+
+axiom p10 impl (not p14 and not p18)
+
+axiom p14 impl not p18
+
+axiom p3 impl (not p7 and not p11 and not p15 and not p19)
+
+axiom p7 impl (not p11 and not p15 and not p19)
+
+axiom p11 impl (not p15 and not p19)
+
+axiom p15 impl not p19
+
+axiom p4 impl (not p8 and not p12 and not p16 and not p20)
+
+axiom p8 impl (not p12 and not p16 and not p20)
+
+axiom p12 impl (not p16 and not p20)
+
+axiom p16 impl not p20
+OK

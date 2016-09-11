@@ -1,0 +1,19 @@
+ -INSERT
+structure 0 succ(pred:number):number
+ |
+ -INSERT
+structure empty add(head:number tail:list):list
+ |
+ -INSERT
+predicate element(n:number x:list)=
+if x=empty then false
+if x=add(head(x) tail(x)) and head(x)=n then true
+if x=add(head(x) tail(x)) and not head(x)=n then element(n tail(x))
+ |
+ -INSERT
+function list.difference(x,y:list):list=
+if x=empty then empty
+if x=add(head(x) tail(x)) and element(head(x) y) then list.difference(tail(x) y)
+if x=add(head(x) tail(x)) and not element(head(x) y) then add(head(x) list.difference(tail(x) y))
+ |
+ OK

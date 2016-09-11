@@ -1,0 +1,19 @@
+d-function f(nat, nat):nat;
+
+d-function g(nat, nat):nat;
+
+axiom all x,y:nat g(x, y) = g(y, x);
+
+axiom all x,y:nat f(x, y) = f(y, x);
+
+axiom all x,y,z:nat f(x, f(y, z)) = f(f(x, y), z);
+
+axiom all x,y,z:nat g(x, g(y, z)) = g(g(x, y), z);
+
+d-function h(nat):nat;
+
+d-function k(nat):nat;
+
+axiom all x,y:nat f(h(x), y) = h(f(x, y));
+
+all x,y,z:nat ex u:nat f(f(k(z), h(z)), f(x, y)) = f(k(z), f(x, f(h(y), z)));

@@ -1,0 +1,422 @@
+
+STRUCTURE nill, cons (hd:nat, tl:list):list;
+ 
+STRUCTURE (getnat:nat), consx(carx:sexpr, cdrx:sexpr):sexpr;
+ 
+STRUCTURE (get_tip:nat), nulltree, node (left:tree, top:nat, right:tree):tree;
+
+ 
+FUNCTION plus (n1,n2:nat):nat =
+IF n1 = 0 THEN n2
+IF n1 of s THEN s (plus (p(n1), n2));
+ 
+ 
+FUNCTION plus2 (n1,n2:nat):nat =
+IF n1 = 0 THEN n2
+IF n1 of s THEN plus2 (p(n1), s (n2));
+ 
+ 
+FUNCTION minus (n1,n2:nat):nat =
+IF n2 = 0 THEN n1
+IF n2 of s THEN p (minus (n1, p(n2)));
+ 
+ 
+FUNCTION minus2 (n1,n2:nat):nat =
+IF n2 = 0 THEN n1
+IF n2 of s THEN minus2 (p (n1), p(n2));
+ 
+ 
+FUNCTION times (n1,n2:nat):nat =
+IF n1 = 0 THEN 0
+IF n1 of s THEN plus (n2, times (p(n1), n2));
+ 
+ 
+FUNCTION times2a (n1,n2,n3:nat):nat =
+IF n1 = 0 THEN n3
+IF n1 of s THEN times2a (p(n1), n2, plus (n2, n3));
+ 
+FUNCTION times2 (n1,n2:nat):nat = times2a (n1, n2, 0);
+ 
+FUNCTION exp (n1,n2:nat):nat =
+IF n2 = 0 THEN s (0)
+IF n2 of s THEN times (exp (n1, p(n2)), n1);
+ 
+FUNCTION exp2a (n1,n2,n3:nat):nat =
+IF n2 = 0 THEN n3
+IF n2 of s THEN exp2a (n1, p(n2), times (n1, n3));
+ 
+FUNCTION exp2 (n1,n2:nat):nat = exp2a (n1, n2, s (0));
+ 
+FUNCTION fact (n1:nat):nat =
+IF n1 = 0 THEN s (0)
+IF n1 of s THEN times (fact (p(n1)), n1);
+ 
+ 
+FUNCTION fact2a (n1,n2:nat):nat =
+IF n1 = 0 THEN n2
+IF n1 of s THEN fact2a (p(n1), times (n1, n2));
+ 
+ 
+FUNCTION fact2 (n1:nat):nat = fact2a (n1, s (0));
+ 
+ 
+PREDICATE Lte (n1,n2:nat) =
+IF n1 = 0 THEN True
+IF n1 of s AND n2 = 0 THEN False
+IF n1 of s AND n2 of s THEN Lte (p(n1), p(n2));
+ 
+ 
+PREDICATE Gt (n1,n2:nat) =
+IF n1 = 0 THEN False
+IF n1 of s AND n2 = 0 THEN True
+IF n1 of s AND n2 of s THEN Gt (p(n1), p(n2));
+ 
+ 
+FUNCTION app (l1,l2:list):list =
+IF l1 = nill THEN l2
+IF l1 of cons THEN cons (hd(l1), app (tl(l1), l2));
+ 
+ 
+FUNCTION last (l1:list):nat =
+IF l1 = nill THEN 0
+IF l1 = cons (hd(l1), nill) THEN hd(l1)
+otherwise last (tl(l1));
+ 
+ 
+FUNCTION length (l1:list):nat =
+IF l1 = nill THEN 0
+IF l1 of cons THEN s (length (tl(l1)));
+ 
+ 
+FUNCTION rev (l1:list):list =
+IF l1 = nill THEN nill
+IF l1 of cons THEN app (rev (tl(l1)), cons (hd(l1), nill));
+ 
+ 
+FUNCTION rev2a (l1,l2:list):list =
+IF l1 = nill THEN l2
+IF l1 of cons THEN rev2a (tl(l1), cons (hd(l1), l2));
+ 
+ 
+FUNCTION rev2 (l1:list):list = rev2a (l1, nill);
+ 
+ 
+PREDICATE Ord (l1:list) =
+IF l1 = nill THEN True
+IF l1 = cons (hd(l1), nill) THEN True
+otherwise Lte (hd(l1), hd(tl(l1))) AND Ord (tl(l1));
+ 
+ 
+FUNCTION tolist (n1:nat, l1:list):list =
+IF l1 = nill THEN cons (n1, l1)
+IF l1 of cons AND Lte (n1, hd(l1))
+   THEN cons (n1, cons (hd(l1), tl(l1)))
+otherwise cons (hd(l1), tolist (n1, tl(l1)));
+ 
+ 
+FUNCTION lsort (l1:list):list =
+IF l1 = nill THEN nill
+IF l1 of cons THEN tolist (hd(l1), lsort (tl(l1)));
+ 
+ 
+FUNCTION copy (s1:sexpr):sexpr =
+IF s1 of nat THEN s1
+IF s1 of consx THEN consx (copy (carx(s1)), copy (cdrx(s1)));
+ 
+ 
+FUNCTION flat (s1:sexpr):list =
+IF s1 of nat THEN cons (getnat(s1), nill)
+IF s1 of consx THEN app (flat (carx(s1)), flat (cdrx(s1)));
+ 
+ 
+FUNCTION flat2a (s1:sexpr, l1:list):list =
+IF s1 of nat THEN cons (getnat(s1), l1)
+IF s1 of consx THEN flat2a (carx(s1), flat2a (cdrx(s1), l1));
+ 
+ 
+FUNCTION flat2 (s1:sexpr):list =
+IF s1 of nat THEN cons (getnat(s1), nill)
+IF s1 of consx THEN flat2a (carx(s1), flat2 (cdrx(s1)));
+ 
+ 
+PREDICATE Subexp (s1,s2:sexpr) =
+IF s2 of nat THEN s1 = s2
+IF s2 of consx
+   THEN (s1 = s2 OR Subexp (s1, carx(s2)) OR Subexp (s1, cdrx(s2)));
+ 
+ 
+FUNCTION subst (s1,s2,s3:sexpr):sexpr =
+IF s3 of nat AND s2 = s3 THEN s1
+IF s3 of nat AND NOT s3 = s2 THEN s3
+IF s3 of consx
+   THEN consx (subst (s1, s2, carx(s3)), subst (s1, s2, cdrx(s3)));
+ 
+ 
+FUNCTION revexp (s1:sexpr):sexpr =
+IF s1 of nat THEN s1
+IF s1 of consx THEN consx (revexp (cdrx(s1)), revexp (carx(s1)));
+ 
+ 
+FUNCTION size (s1:sexpr):nat =
+IF s1 of nat THEN s (0)
+IF s1 of consx THEN plus (size (carx(s1)), size (cdrx(s1)));
+ 
+ 
+PREDICATE Alllte (t1:tree, n1:nat) =
+IF t1 = nulltree THEN True
+IF t1 of nat THEN Lte (get_tip(t1), n1)
+IF t1 of node
+   THEN (Alllte (left(t1), n1) AND Alllte (right(t1), n1));
+ 
+ 
+PREDICATE Allgte (t1:tree, n1:nat) =
+IF t1 = nulltree THEN True
+IF EX n2:nat t1 = n2 THEN Lte (n1 n2)
+IF EX n3:nat EX t2,t3:tree t1 = node (t2 n3 t3)
+   THEN (Allgte (t2 n1) AND Allgte (t3 n1));
+ 
+ 
+PREDICATE Ordt (t1:tree) =
+IF t1 = nulltree THEN True
+IF t1 of nat THEN True
+IF t1 of node (t2 n2 t3)
+   THEN (Ordt (left(t1)) AND Ordt (right(t1)) AND Alllte (left(t1), top(t1)) AND Allgte (right(t1), top(t1)));
+ 
+ 
+FUNCTION totree (n1:nat, t1:tree):tree =
+IF t1 = nulltree THEN n1
+IF t1 of nat AND Lte (getnat(t1), n1) THEN node (t1, getnat(t1), n1)
+IF t1 of nat AND NOT Lte (getnat(t1), n1) THEN node (n1, getnat(t1), t1)
+IF t1 of node AND Lte (top(t1), n1)
+   THEN node (left(t1), top(t1), totree (n1, right(t1)))
+IF t1 of node (t4 n5 t5) AND NOT Lte (top(t1), n1)
+   THEN node (totree (n1, left(t1)), top(t1), right(t1));
+ 
+ 
+FUNCTION maketree (l1:list):tree =
+IF l1 = nill THEN nulltree
+otherwise totree (hd(l1), maketree (tl(l1)));
+ 
+ 
+FUNCTION flattree (t1:tree):list =
+IF t1 = nulltree THEN nill
+IF t1 of nat THEN cons (getnat(t1), nill)
+IF t1 of node
+   THEN app (flattree (left(t1), flattree (right(t1))));
+ 
+ 
+PREDICATE Mem (n1:nat, l1:list) =
+IF l1 = nill THEN False
+IF l1 of cons AND hd(l1) = n1 THEN True
+IF l1 of cons AND NOT hd(l1) = n1 THEN Mem (n1, tl(l1));
+ 
+ 
+PREDICATE Subset (l1, l2:list) =
+IF l1 = nill THEN True
+otherwise (Mem (hd(l1), l2) AND Subset (tl(l1), l2));
+ 
+ 
+FUNCTION inter (l1,l2:list):list =
+IF l1 = nill THEN nill
+IF l1 of cons AND Mem (hd(l1), l2)
+   THEN cons (hd(l1), inter (tl(l1), l2))
+otherwise inter (tl(l1), l2)
+ 
+ 
+FUNCTION inter2a (l1,l2,l3:list):list =
+IF l1 = nill THEN l3
+IF l1 of cons AND Mem (hd(l1), l2)
+   THEN inter2a (tl(l1), l2, cons (hd(l1), l3))
+IF l1 of cons AND NOT Mem (hd(l1), l2)
+   THEN inter2a (tl(l1), l2 l3);
+ 
+ 
+FUNCTION inter2 (l1,l2:list):list = inter2a (l1, l2, nill);
+ 
+ 
+FUNCTION union (l1,l2:list):list =
+IF l1 = nill THEN l2
+IF l1 of cons AND Mem (hd(l1), l2) THEN union (tl(l1), l2)
+otherwise  cons (hd(l1), union (tl(l1), l2));
+ 
+
+FUNCTION union2 (l1,l2:list):list =
+IF l1 = nill THEN l2
+IF l1 of cons AND Mem (hd(l1), l2) THEN union2 (tl(l1), l2)
+IF l1 of cons AND NOT Mem (tl(l1), l2)
+   THEN union2 (tl(l1), cons(hd(l1), l2));
+ 
+
+ALL n1,n2:nat plus (n1, n2) = plus (n2, n1);
+ 
+ 
+ALL n1,n2,n3:nat plus (n1, plus (n2, n3)) = plus (plus (n1, n2), n3);
+ 
+ 
+ALL n1,n2:nat p (minus (n1, n2)) = minus (p (n1), n2);
+ 
+ 
+ALL n1,n2,n3:nat minus (minus (n1, n2), n3) = minus (minus (n1, n3), n2);
+ 
+ 
+ALL n1,n2:nat minus (plus (n2, n1), n2) = n1;
+ 
+ 
+ALL n1,n2:nat times (n2, n1) = times (n1, n2);
+ 
+ 
+ALL n1,n2,n3:nat times (n2, times (n1, n3)) = times (times (n2, n1), n3);
+ 
+ 
+ALL n1,n2,n3:nat times (n1, plus (n2, n3)) = plus (times (n1, n2), times (n1, n3));
+ 
+ 
+ALL n1,n2,n3:nat exp (n1, plus (n2, n3)) = times (exp (n1, n2), exp (n1, n3));
+ 
+ 
+ALL n1,n2,n3:nat ((Lte (n1, n2) AND Lte (n2, n3)) IMPL Lte (n1, n3));
+ 
+ 
+ALL n1:nat Lte (n1, n1);
+ 
+ 
+ALL n1,n2:nat ((Lte (n1, n2) AND Lte (n2, n1)) IMPL n2 = n1);
+ 
+ 
+ALL n1,n2:nat ((NOT Lte (n2, n1) AND Lte (n1, n2)) EQV Gt (n2, n1));
+ 
+ 
+ALL l1,l2,l3:list app (l3, app (l2, l1)) = app (app (l3, l2), l1);
+ 
+ 
+ALL l1:list app (l1, app (l1, l1)) = app (app (l1, l1), l1);
+ 
+ 
+ALL K,L,J:LIST APP(K, L)=APP(K, J) IMPL L=J;
+ 
+ 
+ALL l1,l2:list length (app (l2, l1)) = length (app (l1, l2));
+ 
+ 
+ALL l1,l2:list rev (app (l1, l2)) = app (rev (l2), rev (l1));
+ 
+
+ALL l1:list length (rev (l1)) = length (l1);
+ 
+ 
+ALL l1:list rev (rev (l1)) = l1;
+ 
+ 
+ALL l1:list last (rev (l1)) = hd (l1);
+ 
+ 
+ALL L:LIST ORD(LSORT(L));
+ 
+ 
+ALL L:LIST LSORT(L)=L EQV ORD(L);
+ 
+ 
+ALL l1,l2:list ALL n1:nat (Mem (n1, l1) IMPL Mem (n1, app (l1, l2)));
+ 
+ 
+ALL l1,l2:list ALL n1:nat (Mem (n1, l1) IMPL Mem (n1, app (l2, l1)));
+ 
+ 
+ALL l1,l2:list ALL n1:nat
+    ((Mem (n1, l1) OR Mem (n1, l2)) IMPL Mem (n1, app (l2, l1)));
+ 
+ 
+ALL l1,l2:list ALL n1:nat
+    ((Mem (n1, l1) AND Mem (n1, l2)) IMPL Mem (n1, inter (l2, l1)));
+ 
+ 
+ALL l1,l2:list ALL n1:nat
+    ((Mem (n1, l1) OR Mem (n1, l2)) IMPL Mem (n1, union (l2, l1)));
+ 
+ 
+ALL l1,l2:list (Subset (l2, l1) IMPL union (l2, l1) = l1);
+ 
+ 
+ALL l1,l2:list (Subset (l2, l1) IMPL inter (l2, l1) = l2);
+ 
+ 
+ALL K:LIST SUBSET(K, K);
+ 
+ 
+ALL s1:sexpr copy (s1) = s1;
+ 
+ 
+ALL n1:nat ALL s1:sexpr subst (n1, n1, s1) = s1;
+ 
+ 
+ALL M,N:NAT ALL X:SEXPR NOT SUBEXP(N, X) IMPL SUBST(M, N, X) = X;
+ 
+ 
+ALL s1:sexpr length (flat (s1)) = size (s1);
+ 
+ 
+ALL s1:sexpr revexp (revexp (s1)) = s1;
+ 
+ 
+ALL s1:sexpr flat (revexp (s1)) = rev (flat (s1));
+ 
+ 
+ALL l1,l2:list (Ord (app (l2, l1)) IMPL Ord (l2));
+ 
+ 
+ALL K,L:LIST ORD(APP(K, L)) IMPL ORD(L);
+ 
+ 
+ALL M,N:NAT ALL X:TREE (LTE(M, N) And ALLGTE(X, M)) IMPL ALLGTE(TOTREE(N, X), M);
+ 
+ 
+ALL M,N:NAT ALL X:TREE (NOT LTE(M, N) AND ALLLTE(X, M)) IMPL ALLLTE(TOTREE(N, X), M);
+ 
+ 
+ALL n1,n2:nat plus2 (n2, n1) = plus (n2, n1);
+ 
+ 
+ALL n1,n2:nat plus2 (n2, n1) = plus2 (n1, n2);
+ 
+ 
+ALL n1,n2,n3:nat plus2 (plus2 (n3, n2), n1) = plus2 (n3, plus2 (n2, n1));
+ 
+ 
+ALL n1,n2:nat minus2 (n2, n1) = minus (n2, n1);
+ 
+ 
+ALL M,N:NAT TIMES2(M, N) = TIMES(M, N);
+ 
+ 
+ALL M,N:NAT TIMES2(M, N) = TIMES2(N, M);
+ 
+ 
+ALL M,N,P:NAT TIMES2(TIMES2(M, N), P) = TIMES2(M, TIMES2(N, P));
+ 
+ 
+ALL n1,n2:nat exp2 (n2, n1) = exp (n2, n1);
+ 
+ 
+ALL N:NAT FACT(N) = FACT2(N);
+ 
+ 
+ALL L:LIST REV(L) = REV2(L);
+ 
+ 
+ALL L:LIST REV2(REV2(L)) = L;
+ 
+ 
+ALL L,K:LIST APP(REV2(L) REV2(K)) = REV2(APP(K, L));
+ 
+ 
+ALL l1,l2:list ALL n1:nat (Mem (n1, l1) IMPL Mem (n1, union2 (l2, l1)));
+ 
+ 
+ALL l1,l2:list ALL n1:nat
+    (Mem (n1, union2 (l2, l1)) IMPL (Mem (n1, l1) OR Mem (n1, l2)));
+ 
+ 
+ALL N:NAT ALL K,L:LIST MEM(N, INTER2(K, L)) IMPL MEM(N, K);
+ 
+  
+ALL l1:list ALL s1:sexpr app (flat (s1), l1) = flat2a (s1, l1);

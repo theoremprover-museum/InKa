@@ -1,0 +1,153 @@
+unspec structure var;
+
+structure t,f:bool;
+
+structure mkvar(getvar:var), mkbool(getbool:bool), cons.if(test:if.exp, left:if.exp, right:if.exp):if.exp;
+
+structure nil, cons(avar:var, avalue:bool, arest: alist):alist;
+
+structure mkalist(getalist:alist), impos:falist;
+
+function append(x,y:alist):alist =
+if x = nil then y
+if x of cons then cons(avar(x), avalue(x), append(arest(x), y));
+
+function assignment(x:var, y:alist):bool =
+if y = nil then f
+if y of cons and x = avar(y) then avalue(y)
+otherwise assignment(x, arest(y));
+
+function tor(x, y, z:bool):bool =
+if x = t then y
+if x = f then z;
+
+function value(x:if.exp, y:alist):bool =
+if x of mkvar then assignment(getvar(x), y)
+if x of mkbool then getbool(x)
+otherwise tor(value(test(x), y), value(left(x), y), value(right(x), y));
+
+function if.depth(x:if.exp):nat =
+if x of mkvar then 0
+if x of mkbool then 0
+otherwise s(if.depth(test(x)));
+
+function normalize(x:if.exp):if.exp =
+if x of mkvar then x
+if x of mkbool then x
+if x of cons.if and test(x) of mkvar then cons.if(test(x), normalize(left(x)), normalize(right(x)))
+if x of cons.if and test(x) of mkbool then cons.if(test(x), normalize(left(x)), normalize(right(x)))
+if x of cons.if and test(x) of cons.if then
+  normalize(cons.if(test(test(x)), cons.if(left(test(x)), left(x), right(x)),
+                                  cons.if(right(test(x)), left(x), right(x))));
+
+predicate normalizedp(x:if.exp) =
+if x of mkvar then true
+if x of mkbool then true
+if x of cons.if and test(x) of cons.if then false
+otherwise normalizedp(left(x)) and normalizedp(right(x));
+
+predicate assignedp(x:var, y:alist) =
+if y of nil then false
+if y of cons and avar(y) = x then true
+otherwise assignedp(x, arest(y));
+
+function assume.true(x:var, y:alist):alist = cons(x, t, y);
+
+function assume.false(x:var, y:alist):alist = cons(x, f, y);
+
+predicate tautologyp(x:if.exp, y:alist) =
+if x of mkvar then assignment(getvar(x), y) = t
+if x of mkbool then getbool(x) = t
+otherwise {if test(x) of mkbool and getbool(test(x)) = t then tautologyp(left(x), y)
+           if test(x) of mkbool and getbool(test(x)) = f then tautologyp(right(x), y)
+           if test(x) of mkvar then 
+              {if assignedp(getvar(test(x)), y) and assignment(getvar(test(x)), y) = t then 
+                    tautologyp(left(x), y)
+               if assignedp(getvar(test(x)), y) and assignment(getvar(test(x)), y) = f then 
+                    tautologyp(right(x), y)
+               if not assignedp(getvar(test(x)), y) then 
+	            tautologyp(left(x), cons(getvar(test(x)), t, y)) and 
+                    tautologyp(right(x), cons(getvar(test(x)), f, y))}
+	    otherwise false};
+
+all v,w:var all b:bool all x:alist assignedp(v, x) impl assignedp(v, cons(w, b, x));
+
+all v,w:var all a:alist assignedp(v, a) and not assignedp(w, a) impl not v = w;
+
+all v:var all x,y:alist assignedp(v, x) impl assignment(v, append(x, y)) = assignment(v, x);
+
+all v:var all x:alist not assignedp(v, x) impl assignment(v, x) = f;
+
+all v:var all x,y:alist not assignedp(v, x) impl assignment(v, append(x, y)) = assignment(v, y);
+
+all v:var all x:alist assignment(v, x) = t impl assignedp(v, x);
+
+all v:var all w:alist all z:if.exp assignment(v, w) = f impl value(z, w) = value(z, cons(v, f, w));
+
+all v:var all w:alist all z:if.exp assignment(v, w) = t impl value(z, w) = value(z, cons(v, t, w));
+
+all x:if.exp all y,z:if.exp all w:alist
+  x = mkvar(getvar(x)) impl 
+    tor(value(x, w), value(y, w), value(z, w))
+  = tor(value(x, w), value(y, cons(getvar(x), t, w)), value(z, cons(getvar(x), f, w)));
+
+all v:bool tor(v, v, t) = t;
+
+all v:bool tor(v, t, t) = t;
+
+all x:if.exp all y,z:alist normalizedp(x) and tautologyp(x, y) impl value(x, append(y, z)) = t;
+
+function for(x,y:falist):falist =
+if x = impos then y
+otherwise x;
+
+function falsify1(x:if.exp, y:alist):falist =
+if x of mkvar and assignedp(getvar(x), y) then 
+    {if assignment(getvar(x), y) = t then impos otherwise mkalist(y)}
+if x of mkvar and not assignedp(getvar(x), y) then mkalist(cons(getvar(x), f, y))
+if x of mkbool and getbool(x) = f then mkalist(y)
+if x of mkbool and getbool(x) = t then impos
+otherwise {if test(x) of mkbool and getbool(test(x)) = t then falsify1(left(x), y)
+           if test(x) of mkbool and getbool(test(x)) = f then falsify1(right(x), y)
+           if test(x) of mkvar then 
+              {if assignedp(getvar(test(x)), y) and assignment(getvar(test(x)), y) = t then 
+                    falsify1(left(x), y)
+               if assignedp(getvar(test(x)), y) and assignment(getvar(test(x)), y) = f then 
+                    falsify1(right(x), y)
+               if not assignedp(getvar(test(x)), y) then 
+	            for(falsify1(left(x), cons(getvar(test(x)), t, y)),
+                        falsify1(right(x), cons(getvar(test(x)), f, y)))}
+	    otherwise impos};
+
+
+function falsify(x:if.exp):falist = falsify1(normalize(x), nil);
+
+all x,y:falist for(x, y) = impos impl (x = impos and y = impos);
+
+all x,y:falist not for(x, y) = impos impl (not x = impos or not y = impos);
+
+all x:if.exp all a:alist normalizedp(x) and not tautologyp(x, a) impl not falsify1(x, a) = impos;
+
+
+all x:var all y:if.exp all a:alist assignedp(x, a) and not falsify1(y, a) = impos
+             impl  assignment(x, getalist(falsify1(y, a))) = assignment(x, a);
+
+
+
+
+
+all x:if.exp all a:alist normalizedp(x) and not falsify1(x, a) = impos
+              impl value(x, getalist(falsify1(x, a))) = f;
+
+
+
+
+
+all x:if.exp all a:alist normalizedp(x) and tautologyp(x, a)
+              impl not falsify1(x, a) = impos;
+
+
+all x:if.exp all y:alist value(x, y) = value(normalize(x), y);
+
+all x:if.exp normalizedp(normalize(x));
+

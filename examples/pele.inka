@@ -1,0 +1,23 @@
+unspec structure dum;
+
+d-function nul:dum;
+
+d-function min(dum, dum):dum;
+
+d-function pl(dum, dum):dum;
+
+axiom all x:dum min(x, x) = nul;
+
+axiom all x:dum min(x, nul) = x;
+
+axiom all x:dum pl(x, nul) = x;
+
+axiom all x,y,z:dum min(x, pl(y, z)) = min(min(x, z), y);
+
+axiom all x,y,z:dum pl(x, pl(y, z)) = pl(pl(x, y), z);
+
+axiom all x,y:dum pl(x, y) = pl(y, x);
+
+axiom all x,y,z:dum min(pl(x, y), z) = pl(x, min(y, z));
+
+all a,b,c:dum min(pl(a, c), pl(b, c)) = min(a, b);

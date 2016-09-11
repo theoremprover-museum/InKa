@@ -1,0 +1,67 @@
+ +INSERT
+STRUCTURE 0 s (pred:nat):nat
+ |
+ +INSERT
+FUNCTION plus (n1,n2:nat):nat =
+IF n1 = 0 THEN n2
+IF EX n3:nat n1 = s (n3) THEN s (plus (n3 n2))
+ |
+ +INSERT
+FUNCTION double (n1:nat):nat =
+IF n1 = 0 THEN 0
+IF EX n2:nat n1 = s (n2) THEN s (s (double (n2)))
+ |
+ +INSERT
+FUNCTION times (n1,n2:nat):nat =
+IF n1 = 0 THEN 0
+IF EX n3:nat n1 = s (n3) THEN plus (n2 times (n3 n2))
+ |
+ +INSERT
+STRUCTURE nill cons (nat list):list
+ |
+ +INSERT
+FUNCTION app (l1,l2:list):list =
+IF l1 = nill THEN l2
+IF EX l3:list EX n1:nat l1 = cons (n1 l3) THEN cons (n1 app (l3 l2))
+ |
+ +INSERT
+FUNCTION rev (l1:list):list =
+IF l1 = nill THEN nill
+IF EX l2:list EX n1:nat l1 = cons (n1 l2)
+   THEN app (rev (l2) cons (n1 nill))
+ |
+ +INSERT
+FUNCTION rev.it (l1,l2:list):list =
+IF l1 = nill THEN l2
+IF EX l3:list EX n1:nat l1 = cons (n1 l3) THEN rev.it (l3 cons (n1 l2))
+ |
+ -INSERT
+ALL n1:nat times (double (n1) 0) = 0
+ |
+ -INSERT
+ALL n1,n2,n3:nat
+    plus (double (n3) times (n2 n1)) = plus (times (n2 n1) double (n3))
+ |
+ -INSERT
+ALL n1,n2,n3:nat
+    plus (plus (times (n1 n2) double (n3)) 0)
+    = plus (times (n1 n2) double (n3))
+ |
+ -INSERT
+ALL n1:nat plus (n1 plus (n1 n1)) = plus (plus (n1 n1) n1)
+ |
+ -INSERT
+ALL l1,l2,l3:list
+    app (rev (l1) app (l2 l3)) = app (app (rev (l1) l2) l3)
+ |
+ -INSERT
+ALL l1:list rev.it (l1 nill) = rev (l1)
+ |
+ -INSERT
+ALL n1,n2,n3:nat
+    plus (double (n3) plus (n2 n1)) = plus (double (n3) plus (n1 n2))
+ |
+ -INSERT
+ALL n1,n2,n3,n4:nat (NOT n2 = s (n1) OR plus (n3 n4) = plus (n4 n3))
+ |
+ OK

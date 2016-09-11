@@ -1,0 +1,83 @@
+enum structure tt,ff:bool;
+
+function p1:nat = s(0);
+function p2:nat = s(p1);
+function p5:nat = s(s(p2));
+
+structure nil, cons(car:nat, cdr:list):list;
+
+function remhead(l:list):list =
+if l = nil then nil
+otherwise cdr(l);
+
+enum structure e1, e2, ne: aelem;
+
+enum structure epsl, e1l, e2l, e1e2l, e2e1l, error:atail;
+
+structure quad(nonempty:bool, oneelem:bool, hd:aelem, tl:atail):alist;
+
+structure set_empty, set_insert(set_car:alist, set_cdr:set_l):set_l;
+
+predicate set_elem(e:alist, a:set_l) =
+if a = set_empty then false
+if a of set_insert and set_car(a) = e then true
+otherwise set_elem(e, set_cdr(a));
+
+function aremhead(l:alist):set_l =
+if nonempty(l) = ff then set_insert(quad(ff, ff, ne, epsl), set_empty)
+otherwise {if oneelem(l) = tt then set_insert(quad(ff, ff, ne, epsl), set_empty)
+otherwise {
+  if tl(l) = epsl then set_insert(quad(tt, ff, ne, epsl), 
+                       set_insert(quad(tt, tt, ne, epsl), set_empty))
+  if tl(l) = e1l then set_insert(quad(tt, ff, e1, epsl),
+                      set_insert(quad(tt, tt, e1, epsl),
+                      set_insert(quad(tt, ff, ne, e1l), set_empty)))
+  if tl(l) = e2l then set_insert(quad(tt, ff, e2, epsl),
+                      set_insert(quad(tt, tt, e2, epsl),
+                      set_insert(quad(tt, ff, ne, e2l), set_empty)))
+  if tl(l) = e1e2l then set_insert(quad(tt, ff, ne, e1e2l),
+			set_insert(quad(tt, ff, e1, e2l), set_empty))
+  if tl(l) = e2e1l then set_insert(quad(tt, ff, ne, e2e1l),
+                        set_insert(quad(tt, ff, e2, e1l), set_empty))
+  otherwise
+     set_insert(quad(tt, ff, ne, error),
+     set_insert(quad(tt, ff, e1, e1l),
+     set_insert(quad(tt, ff, e1, e1e2l),
+     set_insert(quad(tt, ff, e1, e2e1l),
+     set_insert(quad(tt, ff, e1, error),
+     set_insert(quad(tt, ff, e2, e2l),
+     set_insert(quad(tt, ff, e2, e1e2l),
+     set_insert(quad(tt, ff, e2, e2e1l),
+     set_insert(quad(tt, ff, e2, error),
+                set_empty)))))))))}};
+
+
+function alphaelem(a:nat):aelem =
+if a = p2 then e1
+otherwise {if a = p5 then e2
+           otherwise ne};
+
+function alphatail(l:list):atail =
+if l = nil then epsl
+otherwise {
+  if alphaelem(car(l)) = ne then alphatail(cdr(l))
+  if alphaelem(car(l)) = e1 and alphatail(cdr(l)) = epsl then e1l
+  if alphaelem(car(l)) = e1 and alphatail(cdr(l)) = e2l then e1e2l
+  if alphaelem(car(l)) = e2 and alphatail(cdr(l)) = epsl then e2l
+  if alphaelem(car(l)) = e2 and alphatail(cdr(l)) = e1l then e2e1l
+  otherwise error};
+
+
+function alpha(l:list):alist =
+  if l = nil then quad(ff, ff, ne, epsl)
+  if l of cons and cdr(l) = nil then quad(tt, tt, alphaelem(car(l)), epsl)
+  otherwise quad(tt, ff, alphaelem(car(l)), alphatail(cdr(l)));
+
+
+all l:list set_elem(alpha(remhead(l)), aremhead(alpha(l)));
+
+
+
+
+
+

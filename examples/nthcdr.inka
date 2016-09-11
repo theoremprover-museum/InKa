@@ -1,0 +1,31 @@
+ -INSERT
+STRUCTURE (atom) nil cons (car:sexpr cdr:sexpr):sexpr
+ |
+ -INSERT
+STRUCTURE 0 succ (pred:number):number
+ |
+ -INSERT
+FUNCTION nthcdr1 (n1:number s1:sexpr):sexpr =
+IF n1 = 0 THEN s1
+IF n1 = succ (pred (n1)) THEN nthcdr1 (pred (n1) cdr (s1))
+ |
+ -INSERT
+FUNCTION nthcdr2 (n1:number s1:sexpr):sexpr =
+IF n1 = 0 THEN s1
+IF n1 = succ (pred (n1)) THEN cdr (nthcdr2 (pred (n1) s1))
+ |
+ -INSERT
+FUNCTION nthcdr3 (n1:number s1:sexpr):sexpr =
+IF n1 = 0 THEN s1
+IF n1 = succ (pred (n1)) AND NOT s1 = cons (car (s1) cdr (s1)) THEN s1
+IF n1 = succ (pred (n1)) AND s1 = cons (car (s1) cdr (s1))
+   THEN nthcdr3 (pred (n1) cdr (s1))
+ |
+ -INSERT
+FUNCTION nthcdr4 (n1:number s1:sexpr):sexpr =
+IF n1 = 0 THEN s1
+IF n1 = succ (pred (n1)) AND NOT s1 = cons (car (s1) cdr (s1)) THEN s1
+IF n1 = succ (pred (n1)) AND s1 = cons (car (s1) cdr (s1))
+   THEN cdr (nthcdr4 (pred (n1) s1))
+ |
+ OK

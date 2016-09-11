@@ -1,0 +1,23 @@
+unspec structure ign;
+
+d-predicate P(ign);
+
+d-function f(ign):ign;
+
+d-predicate Q(ign);
+
+d-predicate I(ign, ign);
+
+d-predicate H(ign, ign);
+
+d-function a:ign;
+
+axiom all x:ign not P(x) or (P(f(x)) and H(f(x), x) and not Q(f(x))) or q(x);
+
+axiom all x,y:ign not P(x) or q(x) or (p(a) and not q(a) and (not p(y) or Q(y) or I(a, y)));
+
+axiom all x,y:ign not p(x) or not p(y) or not H(x, y) or not I(y, x);
+
+all x:ign not (p(x) or Q(x))
+
+

@@ -1,0 +1,16 @@
+d-function f(nat):nat;
+
+d-predicate Q(nat);
+
+axiom all x:nat f(f(x)) = f(x);
+
+function h(x,y:nat):nat =
+if f(x) = x then y
+otherwise s(y);
+
+all x,y:nat f(x) = x or p(h(x, y)) = h(f(x), y);
+
+function g(x,y:nat):nat =
+if y = 0 then 0
+if y of s and f(x) = x then s(g(x, p(y)))
+if y of s and not f(x) = x then g(f(x), y);

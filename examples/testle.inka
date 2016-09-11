@@ -1,0 +1,10 @@
+predicate le(x:nat,y:nat) =
+if y = 0 then false
+if y of s and x = 0 then true
+otherwise le(p(x), p(y));
+
+all x,y,z:nat (le(x,y) and le(y, z) ) impl le(x, z);
+
+
+(all x,y,z:nat (le(x,y) and le(y, z) impl le(x, z))) impl
+(all x,y,z:nat (le(x,y) and le(y, z) impl le(x, z)));

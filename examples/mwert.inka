@@ -1,0 +1,28 @@
+(all x y z (-(x<y) | -(y<z) | x<z)).
+(all x (-(x<x))).
+(all x y (x<y | y<x | x=y)).
+
+%reflexive_closure(<,=<).
+%(all x y ( (x <= y) <-> ((x<y) | (x = y)))).
+
+% 11
+(all x (add(half(x),half(x)) = x)).
+
+
+% 12 half(x)<=0 -> x<=0 
+(all x (-(0<x) | 0<half(x))).
+
+% 13 
+(all x y z (-(x<y) | (add(x,z) < add(y,z)))).
+(all x y z (-(x<y) | (add(z,x) < add(z,y)))).
+
+% 16
+(all x y (add(x,y) = add(y,x))).
+
+%17
+(all x y z ((add(x,add(y,z))=add(add(x,y),z)))).
+
+% thm: x=< half(z), y=<half(z) -> x+y=<z.
+
+a <= half(c). 
+b<=half(c).  

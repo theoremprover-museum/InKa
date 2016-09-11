@@ -1,0 +1,27 @@
+head	1.1;
+access
+	serge
+	hutter
+	inka;
+symbols;
+locks; strict;
+comment	@;;; @;
+
+
+1.1
+date	97.08.20.08.07.30;	author serge;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@(in-package :inka)
+@

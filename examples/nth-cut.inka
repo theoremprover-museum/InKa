@@ -1,0 +1,19 @@
+ -INSERT
+STRUCTURE 0 succ (pred:number):number
+ |
+ -INSERT
+STRUCTURE empty add (head:number tail:list):list
+ |
+ -INSERT
+FUNCTION cut (l1:list):list =
+IF l1 = empty THEN empty
+IF l1 = add (head (l1) tail (l1)) AND tail (l1) = empty THEN empty
+IF l1 = add (head (l1) tail (l1)) AND NOT tail (l1) = empty
+   THEN add (head (l1) cut (tail (l1)))
+ |
+ -INSERT
+FUNCTION nth.cut (n1:number l1:list):list =
+IF n1 = 0 THEN l1
+IF n1 = succ (pred (n1)) THEN nth.cut (pred (n1) cut (l1))
+ |
+ OK

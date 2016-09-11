@@ -1,0 +1,11 @@
+predicate le(x,y:nat) =
+if y = 0 then false
+otherwise {if x = 0 then true otherwise le(p(x), p(y))};
+
+predicate lt(x,y:nat) = le(x, y) or x = y;
+
+predicate ge(x,y:nat) = le(y, x);
+
+predicate gt(x,y:nat) = lt(y, x);
+
+all x,y:nat gt(x, y) <-> not le(x, y);

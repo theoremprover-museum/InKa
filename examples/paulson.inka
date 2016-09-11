@@ -1,0 +1,158 @@
+unspec structure agents;
+
+unspec structure nonces;
+
+unspec structure keys;
+
+structure amsg(get_amsg:agents), nmsg(get_nmsg:nonces), kmsg(get_kmsg:keys),
+          comp(left:message, right:message),
+          encrypt(get_key:keys, get_msg:message) :message;
+
+structure nullkey, conskey(carkeys:keys, cdrkeys:keylist):keylist;
+
+function app(x,y:keylist):keylist =
+if x = nullkey then y
+otherwise conskey(carkeys(x), app(cdrkeys(x), y));
+
+function parts(x:message):message =
+ if x = amsg(get_amsg(x)) then x
+ if x = nmsg(get_nmsg(x)) then x
+ if x = kmsg(get_kmsg(x)) then x 
+ if x = comp(left(x), right(x)) then comp(parts(left(x)), parts(right(x)))
+ if x = encrypt(get_key(x), get_msg(x))
+      then parts(get_msg(x));
+
+all x:message parts(parts(x)) = parts(x);
+
+predicate memb(x:keys, y:keylist) =
+  if y = nullkey then false
+  otherwise {if carkeys(y) = x then true otherwise memb(x, cdrkeys(y))};
+
+function decomp(x:message, k:keylist):message =
+ if x = amsg(get_amsg(x)) then x
+ if x = nmsg(get_nmsg(x)) then x
+ if x = kmsg(get_kmsg(x)) then x 
+ if x = comp(left(x), right(x)) then comp(decomp(left(x), k), decomp(right(x), k))
+ if x = encrypt(get_key(x), get_msg(x)) and memb(get_key(x), k)
+      then decomp(get_msg(x), k)
+ if x = encrypt(get_key(x), get_msg(x)) and not memb(get_key(x), k)
+      then x;
+
+all x:message all k:keylist decomp(decomp(x, k), k) = decomp(x, k);
+
+function getkeylist(x:message):keylist =
+ if x = amsg(get_amsg(x)) then nullkey
+ if x = nmsg(get_nmsg(x)) then nullkey
+ if x = kmsg(get_kmsg(x)) then conskey(get_kmsg(x), nullkey)
+ if x = comp(left(x), right(x)) then app(getkeylist(left(x)), getkeylist(right(x)))
+ if x = encrypt(get_key(x), get_msg(x)) then nullkey;
+
+
+
+function plus(x,y:nat):nat =
+  if x = 0 then y
+  if x of s then s(plus(p(x), y));
+
+all x,y,z:nat plus(x, plus(y,z)) = plus(plus(x, y), z);
+
+all x,y:nat plus(x, y) = plus(y, x);
+
+function num_enc(x:message):nat =
+  if x = comp(left(x), right(x)) then plus(num_enc(left(x)), num_enc(right(x)))
+  if x = encrypt(get_key(x),get_msg(x)) then s(num_enc(get_msg(x)))
+  otherwise 0;
+
+function num_dec(x:message, k:keylist):nat =
+  if x = comp(left(x), right(x)) then plus(num_dec(left(x), k), num_dec(right(x), k))
+  if x = encrypt(get_key(x),get_msg(x)) and memb(get_key(x), k) then s(num_dec(get_msg(x), k))
+  otherwise 0;
+
+function minus(x,y:nat):nat =
+  if x = 0 then 0
+  if x of s and y = 0 then x
+  otherwise minus(p(x), p(y));
+
+predicate le(x,y:nat) =
+if x = 0 then true
+if x of s and y = 0 then false
+otherwise le(p(x), p(y));
+
+all x,y:nat plus(x, y) = 0 eqv (x = 0 and y = 0);
+
+all x:message all k:keylist (not x = decomp(x, k) impl not num_enc(x) = 0);
+
+all x:message all k:keylist (not x = decomp(x, k) impl not num_dec(x, k) = 0);
+
+all u,v,x,y:nat (le(x, u) and le(y, v)) impl le(plus(x, y), plus(u, v));
+
+all x:message all k:keylist le(num_dec(x, k), num_enc(x));
+
+all u,v,x,y:nat le(x, u) and le(y, v) impl 
+           minus(plus(u, v), plus(x, y)) = plus(minus(u, x), minus(v, y));
+
+all x:message all k:keylist num_enc(decomp(x, k)) = minus(num_enc(x), num_dec(x, k));
+
+function analz(x:message):message =
+  if x = decomp(x, getkeylist(x)) then x
+  otherwise analz(decomp(x, getkeylist(x)));
+
+all x:message all k:keylist parts(decomp(x, k)) = parts(x);
+ 
+all x:message analz(analz(x)) = analz(x);
+
+all x:message parts(analz(x)) = parts(x);
+
+predicate subterm(x, y:message) =
+  if x = y then true
+  otherwise {if y = comp(left(y), right(y)) then subterm(x, left(y)) or subterm(x, right(y))
+             otherwise false};
+
+
+predicate is.synth(x, y:message, k:keylist) =
+ if x = amsg(get_amsg(x)) then subterm(x, y)
+ if x = nmsg(get_nmsg(x)) then subterm(x, y)
+ if x = kmsg(get_kmsg(x)) then subterm(x, y)
+ if x = comp(left(x), right(x)) then is.synth(left(x), y, k) and is.synth(right(x), y, k)
+ if x = encrypt(get_key(x), get_msg(x)) then 
+      subterm(x, y) 
+      or (memb(get_key(x), k) and is.synth(get_msg(x), y, k));
+
+
+predicate synth(x, y:message) = is.synth(x, y, getkeylist(y));
+
+all k:keys all x,y:keylist memb(k, app(x, y)) eqv (memb(k, x) or memb(k, y));
+
+all x:message all k:keys all kl:keylist memb(k, getkeylist(x)) impl memb(k, getkeylist(decomp(x, kl)));
+
+all x:message all k:keys
+   memb(k, getkeylist(x)) impl memb(k, getkeylist(analz(x)));
+
+
+all x,y:message all u,v:keylist
+  (all k:keys memb(k, u) impl memb(k, v)) impl
+     is.synth(decomp(x, u), y, v) impl is.synth(x, y, v);
+
+
+all x:message
+ is.synth(decomp(x, getkeylist(x)), analz(x), getkeylist(analz(x))) 
+ impl is.synth(x, analz(x), getkeylist(analz(x)));
+
+
+all x,y,z:message subterm(x, y) impl subterm(x, comp(y, z));
+
+all x,y,z:message all kl:keylist is.synth(x, y, kl) impl is.synth(x, comp(y, z), kl);
+
+all x,y,z:message subterm(x, y) impl subterm(x, comp(z, y));
+
+all x,y,z:message all kl:keylist is.synth(x, y, kl) impl is.synth(x, comp(z, y), kl);
+
+axiom all x:message all kl:keylist is.synth(x, x, kl);
+
+all x:message is.synth(x, analz(x), getkeylist(analz(x)));
+
+
+
+
+
+
+

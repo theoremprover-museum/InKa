@@ -1,0 +1,40 @@
+ -INSERT
+STRUCTURE 0 succ (pred:number):number
+ |
+ -INSERT
+STRUCTURE empty add (head:number tail:list):list
+ |
+ -INSERT
+PREDICATE Gt (n1,n2:number) =
+IF n1 = 0 THEN False
+IF n1 = succ (pred (n1)) AND n2 = 0 THEN True
+IF n1 = succ (pred (n1)) AND n2 = succ (pred (n2))
+   THEN Gt (pred (n1) pred (n2))
+ |
+ -INSERT
+FUNCTION minimum (l1:list):number =
+IF l1 = empty THEN 0
+IF l1 = add (head (l1) tail (l1)) AND tail (l1) = empty THEN head (l1)
+IF l1 = add (head (l1) tail (l1))
+   AND NOT tail (l1) = empty
+   AND NOT Gt (head (l1) head (tail (l1)))
+   THEN minimum (add (head (l1) tail (tail (l1))))
+IF l1 = add (head (l1) tail (l1))
+   AND NOT tail (l1) = empty
+   AND Gt (head (l1) head (tail (l1)))
+   THEN minimum (tail (l1))
+ |
+ -INSERT
+FUNCTION delete (n1:number l1:list):list =
+IF l1 = empty THEN empty
+IF l1 = add (head (l1) tail (l1)) AND n1 = head (l1) THEN tail (l1)
+IF l1 = add (head (l1) tail (l1)) AND NOT n1 = head (l1)
+   THEN add (head (l1) delete (n1 tail (l1)))
+ |
+ -INSERT
+FUNCTION select.sort (l1:list):list =
+IF l1 = empty THEN empty
+IF l1 = add (head (l1) tail (l1))
+   THEN add (minimum (l1) select.sort (delete (minimum (l1) l1)))
+ |
+ OK

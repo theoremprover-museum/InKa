@@ -1,0 +1,18 @@
+structure 0, s(nat):nat
+
+structure empty, cons (nat, list):list
+
+function plus(x,y:nat):nat =
+if x of 0 then y
+if x of s then s(plus(s_1(x) y))
+
+function plus(x,y:list):list =
+if x of empty then y
+if x of cons then cons(cons_1(x) plus(cons_2(x) y))
+
+function count(x:list):nat =
+if x of empty then 0
+if x of cons then s(count(cons_2(x)))
+
+axiom all x,y:list count(plus(x y)) = plus(count(x) count(y))
+OK

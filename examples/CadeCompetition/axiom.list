@@ -1,0 +1,256 @@
+function plus(x,y:nat):nat =
+if x = 0 then y
+if x = s(p(x)) then s(plus(p(x), y));
+
+
+function double(i:nat):nat =
+if i = 0 then 0
+if i = s(p(i)) then s(s(double(p(i))));
+
+
+function half(i:nat):nat =
+if i = 0 then 0
+if i = s(0) then 0
+if i = s(s(p(p(i)))) then s(half(p(p(i))));
+
+
+function fact(x:nat):nat =
+if x = 0 then s(0)
+if x = s(p(x)) then times(x, fact(p(x)));
+
+
+function difference(i,j:nat):nat = 
+if i = 0 then 0
+if i = s(p(i)) and j = 0 then i
+if i = s(p(i)) and j = s(p(j)) then difference(p(i), p(j));
+
+function sub(x:nat):nat = p(x);
+
+function times(i,j:nat):nat = 
+if i = 0 then 0
+if i = s(p(i)) then plus(j,times(p(i),j));
+
+
+function exp(i,j:nat):nat =
+if j = 0 then s(0)
+if j = s(p(j)) then times(i,exp(i,p(j)));
+
+
+function exp***(i,j:nat):nat =
+if j = 0 then s(0)
+if j = s(p(j)) then times(exp***(i,p(j)), i);
+
+
+function exp****(i,j:nat):nat =
+if j = 0 then s(0)
+if j = s(p(j)) then times(i,exp****(i,p(j)));
+
+
+function exp-fn(r0,r1,r2,r3,0)
+if r4 = 0 then r1
+if r4 = s(p(r4)) then exp-fn(0, times(r3,r1), times(r3,r1), r3, p(r4))
+
+function fib(x:nat):nat  = 
+if x = 0 then 0
+if x = s(0) then s(0)
+if x = s(s(p(p(x)))) then plus(fib(p(n)), fib(p(p(n))));
+
+
+function fn2(x, y:nat):nat = plus(x,y);
+
+
+function foldl-fn(x:list, r:nat):nat
+if x = nil then r
+if x = cons(car(x), cdr(x)) then foldl-fn(cdr(x),fn2(r,car(x)))
+
+
+predicate lessp(x, y:nat) =
+if y = 0 then false
+if y = s(p(y)) and x = 0 then true
+if y = s(p(y)) and x = s(p(x)) then lessp(p(x), p(y));
+
+
+predicate leq(x, y:nat) = not lessp(y, x);
+
+
+function remainder(i,j:nat) =
+if j = 0 then i
+if j = s(p(j)) and lessp(i, j) then i
+if j = s(p(j)) and not lessp(i,j) then remainder(difference(i,j),j);
+
+function quotient(i,j):nat = 
+if j = 0 then 0
+if j = s(p(j)) and lessp(i,j) then 0
+if j = s(p(j)) and not lessp(i,j) then s(quotient(difference(i,j), j));
+
+
+predicate divides(x,y:nat) = remainder(y,x) = 0;
+
+predicate divides*'(x,y:nat) = remainder(y,x) = 0;
+
+
+predicate odd(x:nat) =
+if x = 0 then false
+if x = s(0) then true
+if x = s(s(p(p(x)))) then odd(p(p(x)));
+
+
+predicate even1(x:nat) =
+if x = 0 then true
+if x = s(p(x)) then odd(p(x));
+
+predicate even(x:nat) = (0 = remainder(x,s(s(0))));
+
+
+function positives(n:nat):list = 
+if n = 0 then nil
+if n = s(p(n)) then cons(n, positives(p(n)));
+
+function gcd(x,y:nat):nat = 
+if x = 0 then y
+if x = s(p(x)) and y = 0 then x
+if x = s(p(x)) and y = s(p(y)) and lessp(x, y) then gcd(x,difference(y, x))
+if x = s(p(x)) and y = s(p(y)) and not lessp(x, y) then gcd(difference(x, y), y)ll
+
+
+axiom rt(0) = 0;
+axiom times(s(rt(x)),s(rt(x)))=s(x) impl rt(s(x))=s(rt(x);
+axiom not times(s(rt(x)),s(rt(x)))=s(x) impl rt(s(x))=rt(x);
+
+
+function ncar(x:nat):nat = difference(x,times(rt(x),rt(x)));
+
+function ncdr(x:nat):nat = difference(rt(x),ncar(x));
+
+function ncadr(x:nat):nat = ncar(ncdr(x));
+
+function ncaddr(x:nat):nat = ncar(ncdr(ncdr(x)));
+
+
+function pr-apply(fn:nat,arg:nat):nat =
+ if ncar(fn) = 0 then 0
+ if ncar(fn) = s(0) then arg
+ if ncar(fn) = s(s(0)) then s(arg)
+ if ncar(fn) = s(s(s(0))) then rt(arg)
+ if ncar(fn) = s(s(s(s(0)))) and arg = 0 then 0
+ if ncar(fn) = s(s(s(s(0)))) and arg = s(p(arg)) then pr-apply(ncdr(fn), pr-apply(fn, p(arg)))
+ if ncar(fn) = s(s(s(s(s(0))))) then plus(pr-apply(ncadr(fn),arg), pr-apply(ncaddr(fn),arg))
+ if ncar(fn) = s(s(s(s(s(s(0)))))) then difference(pr-apply(ncadr(fn),arg), pr-apply(ncaddr(fn),arg))
+ if ncar(fn) = s(s(s(s(s(s(s(0))))))) then times(pr-apply(ncadr(fn),arg), pr-apply(ncaddr(fn),arg))
+ if ncar(fn) = s(s(s(s(s(s(s(s(0)))))))) then pr-apply(ncadr(fn), pr-apply(ncaddr(fn),arg))
+ if ncar(fn) = s(s(s(s(s(s(s(s(s(p(p(p(p(p(p(p(p(p(x)))))))))))))))))) then 0;
+
+
+function reflections(n,a,p:nat):list 
+if n = 0 then nil
+if n = s(p(n)) and lessp(quotient(p, s(s(0))),remainder(times(a,n),p)) then cons(difference(p,remainder(times(a,n),p)), reflections(p(n),a,p))
+if n = s(p(n)) and not lessp(quotient(p, s(s(0))),remainder(times(a,n),p)) then cons(remainder(times(a,n),p), reflections(p(n),a,p));
+
+
+function max2(fn, i:nat) =
+if i = 0 then pr-apply(fn,0)
+if i = s(p(i)) then max(pr-apply(fn,i), max2(fn,p(i)));
+
+
+predicate prime(x:nat) = 
+not x = 0 and not x = s(0) and prime1(x,sub(x));
+
+predicate prime1(x, y:nat) =
+if y = 0 then false
+if y = s(0) then true
+if y = s(s(p(p(x)))) then not divides(y,x) and prime1(x, p(y));
+
+
+
+function length(x:list):nat =
+if x = nil then 0
+if x = cons(car(x), cdr(x)) then s(length(cdr(x)));
+
+function append(x,y:list):list =
+if x = nil then y
+if x = cons(car(x), cdr(x)) then cons(car(x), append(cdr(x), y));
+
+
+predicate member(x:elem, y:list) =
+if y = nil then false
+if y = cons(car(y), cdr(y)) and car(y) = x then true
+if y = cons(car(y), cdr(y)) and not car(y) = x then member(x, cdr(y));
+
+
+function reverse*(x:list):list =
+if x = nil then nil
+if x = cons(car(x), cdr(x)) then append(reverse*(cdr(x)), cons(car(x), nil));
+
+function reverse-loop*(x,ans:list):list =
+if x = nil then ans
+if x = cons(car(x), cdr(x)) then reverse-loop*(cdr(x), cons(car(x),ans));
+
+function delete(x:elem, y:list):list =
+if y = nil then nil
+if y = cons(car(y), cdr(y)) and car(y) = x then cdr(y)
+if y = cons(car(y), cdr(y)) and not car(y) = x then cons(car(y), delete(x, cdr(y)));
+
+
+function bagint(x, y):list =
+if x = nil then nil
+if x = cons(car(x), cdr(x)) and member(car(x), y) then cons(car(x), bagint(cdr(x), delete(car(x), y)))
+if x = cons(car(x), cdr(x)) and not member(car(x), y) then bagint(cdr(x), y);
+
+
+predicate subbagp(x,y:list) =
+if x = nil then true
+if x = cons(car(x), cdr(x)) and member(car(x), y) then subbagp(cdr(x), delete(car(x), y))
+if x = cons(car(x), cdr(x)) and not member(car(x), y) then false;
+
+function s*(n:nat, m, p):list =
+if n = 0 then nil
+if n = s(p(n)) then cons(remainder(times(m, n),p), s*(p(n), m, p));
+
+function times-list(x:list):nat =
+if x = nil then s(0)
+if x = cons(car(x), cdr(x)) then times(car(x), times-listcdr(x));
+
+
+predicate residue(a,p) = (not divides(p,a) and member(remainder(a,p),squares(p,p)));
+
+
+function squares(n,p:nat):nat 
+if n = 0 then 0
+if n = s(p(n)) then cons(remainder(times(n,n),p), squares(p(n), p));
+
+function inverse(j,p:nat):nat = 
+if p = s(s(0)) then remainder(j, s(s(0)))
+if not p = s(s(0)) then remainder(exp(j,difference(p, s(s(0)))),p);
+
+
+function sigma(m,n:nat):nat = 
+if lessp(m,n) then plus(n,sigma(m,sub(n)))
+if not lessp(m, n) then 0;
+
+
+predicate all-non-zerop(x:list) = 
+if x = nil then true
+if x = cons(car(x), cdr(x)) then not car(x) = 0 and all-non-zerop(cdr(x));
+
+
+function complement(j,a,p:nat):nat = remainder(times(inverse(j,p),a),p);
+
+
+function comp-list(i:nat, a, p):list = 
+if i = 0 then nil
+if i = s(p(i)) and member(i, comp-list(p(i),a,p)) then comp-list(p(i),a,p)
+if i = s(p(i)) and not member(i, comp-list(p(i),a,p)) then cons(complement(i,a,p), comp-list(p(i),a, p));
+
+predicate perm(a, b:list) =
+if a = nil then b = nil
+if a = cons(car(a), cdr(a)) and member(car(a), b) then perm(cdr(a),delete(car(a), b))
+if a = cons(car(a), cdr(a)) and not member(car(a), b) then false;
+
+
+function reflect(x,p:nat) = difference(p,x);
+
+
+function reflect-list(n, a p):list = 
+if n = 0 then nil
+if lessp(quotient(p, s(s(0))),remainder(times(a,n),p)) then cons(reflect(remainder(times(a, n),p),p), reflect-list'(p(n),a,p))
+if not lessp(quotient(p, s(s(0))),remainder(times(a,n),p)) then cons(remainder(times(a,n),p), reflect-list(p(n),a,p));

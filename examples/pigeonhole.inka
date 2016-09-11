@@ -1,0 +1,51 @@
+d-predicate p1;
+
+d-predicate p2;
+
+d-predicate p3;
+
+d-predicate p4;
+
+d-predicate p5;
+
+d-predicate p6;
+
+d-predicate p7;
+
+d-predicate p8;
+
+d-predicate p9;
+
+d-predicate p10;
+
+d-predicate p11;
+
+d-predicate p12;
+
+axiom P1 or p2 or p3;
+
+axiom p4 or p5 or p6;
+
+axiom p7 or p8 or p9;
+
+axiom p10 or p11 or p12;
+
+axiom p1 impl (not p4 and not p7 and not p10);
+
+axiom p4 impl (not p7 and not p10);
+
+axiom p7 impl not p10;
+
+axiom p2 impl (not P5 and not p8 and not p11);
+
+axiom p5 impl  (not p8 and not p11);
+
+axiom p8 impl not p11;
+
+axiom p3 impl (not p6 and not p9 and not p12);
+
+axiom p6 impl (not p9 and not p12);
+
+not p9 impl not p12
+
+

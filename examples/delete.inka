@@ -1,0 +1,13 @@
+ -INSERT
+STRUCTURE 0 succ (pred:number):number
+ |
+ -INSERT
+structure empty add(head:number tail:list):list
+ |
+ -INSERT
+function delete(n:number x:list):list=
+if x=empty then empty
+if x=add(head(x) tail(x)) and head(x)=n then tail(x)
+if x=add(head(x) tail(x)) and not head(x)=n then add(head(x) delete(n tail(x)))
+ |
+ OK

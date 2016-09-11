@@ -1,0 +1,82 @@
+ -INSERT
+STRUCTURE 0 succ (pred:number):number
+ |
+ -INSERT
+FUNCTION minus1 (n1,n2:number):number =
+IF n2 = 0 THEN n1
+IF n2 = succ (pred (n2)) THEN minus1 (pred (n1) pred (n2))
+ |
+ -INSERT
+PREDICATE Lt (n1,n2:number) =
+IF n2 = 0 THEN False
+IF n1 = 0 AND NOT n2 = 0 THEN True
+IF n1 = succ (pred (n1)) AND n2 = succ (pred (n2))
+   THEN Lt (pred (n1) pred (n2))
+ |
+ -INSERT
+FUNCTION quotient1 (n1,n2:number):number =
+IF n2 = 0 THEN n1
+IF Lt (n1 n2) THEN 0
+IF NOT Lt (n1 n2) AND n2 = succ (pred (n2))
+   THEN succ (quotient1 (minus1 (pred (n1) pred (n2)) n2))
+ |
+ -INSERT
+FUNCTION minus2 (n1,n2:number):number =
+IF n2 = 0 THEN n1
+IF n2 = succ (pred (n2)) THEN pred (minus2 (n1 pred (n2)))
+ |
+ -INSERT
+FUNCTION quotient2 (n1,n2:number):number =
+IF n2 = 0 THEN n1
+IF Lt (n1 n2) THEN 0
+IF NOT Lt (n1 n2) AND n2 = succ (pred (n2))
+   THEN succ (quotient2 (minus2 (pred (n1) pred (n2)) n2))
+ |
+ -INSERT
+FUNCTION minus3 (n1,n2:number):number =
+IF n1 = 0 THEN n1
+IF n1 = succ (pred (n1)) AND n2 = 0 THEN n1
+IF n1 = succ (pred (n1)) AND n2 = succ (pred (n2))
+   THEN minus3 (pred (n1) pred (n2))
+ |
+ -INSERT
+FUNCTION quotient3 (n1,n2:number):number =
+IF n2 = 0 THEN n1
+IF Lt (n1 n2) THEN 0
+IF NOT Lt (n1 n2) AND n2 = succ (pred (n2))
+   THEN succ (quotient3 (minus3 (pred (n1) pred (n2)) n2))
+ |
+ -INSERT
+FUNCTION minus4 (n1,n2:number):number =
+IF n1 = 0 THEN n1
+IF n1 = succ (pred (n1)) AND n2 = 0 THEN n1
+IF n1 = succ (pred (n1)) AND n2 = succ (pred (n2))
+   THEN pred (minus4 (n1 pred (n2)))
+ |
+ -INSERT
+FUNCTION quotient4 (n1,n2:number):number =
+IF n2 = 0 THEN n1
+IF Lt (n1 n2) THEN 0
+IF NOT Lt (n1 n2) AND n2 = succ (pred (n2))
+   THEN succ (quotient4 (minus4 (pred (n1) pred (n2)) n2))
+ |
+ -INSERT
+PREDICATE Gt (n1,n2:number) =
+IF n1 = 0 THEN False
+IF n1 = succ (pred (n1)) AND n2 = 0 THEN True
+IF n1 = succ (pred (n1)) AND n2 = succ (pred (n2))
+   THEN Gt (pred (n1) pred (n2))
+ |
+ -INSERT
+FUNCTION minus5 (n1,n2:number):number =
+IF NOT Gt (n1 n2) THEN 0
+IF Gt (n1 n2) and n1=succ(pred(n1)) THEN succ (minus5 (pred (n1) n2))
+ |
+ -INSERT
+FUNCTION quotient5 (n1,n2:number):number =
+IF n2 = 0 THEN n1
+IF Lt (n1 n2) THEN 0
+IF NOT Lt (n1 n2) AND n2 = succ (pred (n2))
+   THEN succ (quotient5 (minus5 (pred (n1) pred (n2)) n2))
+ |
+ OK

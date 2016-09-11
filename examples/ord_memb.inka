@@ -1,0 +1,12 @@
+structure nil, cons(car:int, cdr:list):list;
+
+predicate ord(x:list) =
+if x = nil then true
+if x = cons(car(x), nil) then true
+if x of cons and cdr(x) of cons then ord(cdr(x)) and <=(car(x), car(cdr(x)));
+
+predicate mem(x:int, y:list) =
+if y = nil then false
+if y of cons then mem(x, cdr(y)) or x = car(y);
+
+all x,y:int ex z:list all e:int ((e = x or e = y) eqv mem(e, z)) and ord(z);

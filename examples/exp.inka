@@ -1,0 +1,87 @@
+ -INSERT
+STRUCTURE 0 succ (pred:number):number
+ |
+ -INSERT
+PREDICATE Even (n1:number) =
+IF n1 = 0 THEN True
+IF n1 = succ (0) THEN False
+IF n1 = succ (pred (n1)) AND NOT pred (n1) = 0 THEN Even (pred (pred (n1)))
+ |
+ -INSERT
+FUNCTION half1 (n1:number):number =
+IF n1 = 0 THEN 0
+IF NOT Even (n1) THEN half1 (pred (n1))
+IF n1 = succ (pred (n1)) AND Even (n1) THEN succ (half1 (pred (n1)))
+ |
+ -INSERT
+FUNCTION plus (n1,n2:number):number =
+IF n2 = 0 THEN n1
+IF n2 = succ (pred (n2)) THEN succ (plus (n1 pred (n2)))
+ |
+ -INSERT
+FUNCTION times1 (n1,n2:number):number =
+IF n1 = 0 THEN 0
+IF n1 = succ (pred (n1)) AND Even (n1) THEN times1 (half1 (n1) plus (n2 n2))
+IF NOT Even (n1) THEN plus (times1 (half1 (n1) plus (n2 n2)) n2)
+ |
+ -INSERT
+function exp1(x,y:number):number=
+if y=0 then succ(0)
+if y=succ(pred(y)) and even(y) then exp1(times1(x x) half1(y))
+if not even(y) then times1(x exp1(times1(x x) half1(y)))
+ |
+ -INSERT
+FUNCTION half2 (n1:number):number =
+IF n1 = 0 THEN 0
+IF n1 = succ (pred (n1)) AND pred (n1) = 0 THEN 0
+IF n1 = succ (pred (n1)) AND NOT pred (n1) = 0
+   THEN succ (half2 (pred (pred (n1))))
+ |
+ -INSERT
+function times2(x,y:number):number=
+if x=0 then 0
+if x=succ(pred(x)) and even(x) then times2(half2(x) plus(y y))
+if not even(x) then plus(times2(half2(x) plus(y y)) y)
+ |
+ -INSERT
+function exp2(x,y:number):number=
+if y=0 then succ(0)
+if y=succ(pred(y)) and even(y) then exp2(times2(x x) half2(y))
+if not even(y) then times2(x exp2(times2(x x) half2(y)))
+ |
+ -INSERT
+FUNCTION minus1 (n1,n2:number):number =
+IF n2 = 0 THEN n1
+IF n2 = succ (pred (n2)) THEN minus1 (pred (n1) pred (n2))
+ |
+ -INSERT
+PREDICATE Lt (n1,n2:number) =
+IF n2 = 0 THEN False
+IF n1 = 0 AND NOT n2 = 0 THEN True
+IF n1 = succ (pred (n1)) AND n2 = succ (pred (n2))
+   THEN Lt (pred (n1) pred (n2))
+ |
+ -INSERT
+FUNCTION quotient1 (n1,n2:number):number =
+IF n2 = 0 THEN n1
+IF Lt (n1 n2) THEN 0
+IF NOT Lt (n1 n2) AND n2 = succ (pred (n2))
+   THEN succ (quotient1 (minus1 (pred (n1) pred (n2)) n2))
+ |
+ -INSERT
+FUNCTION half3.1 (n1:number):number =
+IF True THEN quotient1 (n1 succ (succ (0)))
+ |
+ -INSERT
+function times3(x,y:number):number=
+if x=0 then 0
+if x=succ(pred(x)) and even(x) then times3(half3(x) plus(y y))
+if not even(x) then plus(times3(half3(x) plus(y y)) y
+ |
+ -INSERT
+function exp3(x,y:number):number=
+if y=0 then succ(0)
+if y=succ(pred(y)) and even(y) then exp3(times3(x x) half3(y))
+if not even(y) then times3(x exp3(times3(x x) half3(y)))
+ |
+ OK

@@ -1,0 +1,48 @@
+ +INSERT
+STRUCTURE 0 s (nat):nat
+ |
+ +INSERT
+FUNCTION plus (n1,n2:nat):nat =
+IF n1 = 0 THEN n2
+IF EX n3:nat n1 = s (n3) THEN s (plus (n3 n2))
+ |
+ +INSERT
+FUNCTION times (n1,n2:nat):nat =
+IF n1 = 0 THEN 0
+IF EX n3:nat n1 = s (n3) THEN plus (n2 times (n3 n2))
+ |
+ +INSERT
+commutative(plus)
+ |
+ +INSERT
+associative(plus)
+ |
+ +INSERT
+commutative(times)
+ |
+ +INSERT
+ALL n1,n2,n3:nat times (n3 plus (n2 n1)) = plus (times (n3 n2) times (n3 n1))
+ |
+ +INSERT
+ALL n1,n2,n3:nat times (plus (n3 n2) n1) = plus (times (n3 n1) times (n2 n1))
+ |
+ +INSERT
+associative(times)
+ |
+ +INSERT
+FUNCTION sum (n1:nat):nat =
+IF n1 = 0 THEN 0
+IF EX n2:nat n1 = s (n2) THEN plus (n1 sum (n2))
+ |
+ +INSERT
+FUNCTION exp (n1,n2:nat):nat =
+IF n2 = 0 THEN s (0)
+IF EX n3:nat n2 = s (n3) THEN times (exp (n1 n3) n1)
+ |
+ +INSERT
+ALL n1,n2,n3:nat exp (n3 plus (n2 n1)) = times (exp (n3 n2) exp (n3 n1))
+ |
+ -INSERT
+ALL X,Y,Z:NAT EXP(X TIMES(Y Z)) = EXP(EXP(X Y) Z)
+ |
+ OK

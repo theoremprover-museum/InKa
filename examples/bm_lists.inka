@@ -1,0 +1,125 @@
+structure nil, cons(car:nat, cdr:list):list;
+
+function plus(x,y:nat):nat =
+if x = 0 then y
+otherwise s(plus(p(x), y));
+
+function mi(x,y:nat):nat =
+if y = 0 then x
+if y of s and x = 0 then 0
+otherwise s(mi(p(x), p(y)));
+
+all x,y,z:nat plus(plus(x, y),z) = plus(x, plus(y, z));
+
+all x:nat plus(x, 0) = x;
+
+all x,y:nat plus(x, s(y)) = s(plus(x, y));
+
+all x,y:nat plus(x, y) = plus(y, x);
+
+function append(x,y:list):list =
+if x = nil then y
+if x of cons then cons(car(x), append(cdr(x), y));
+
+function reverse(x:list):list =
+if x = nil then nil
+if x of cons then append(reverse(cdr(x)), cons(car(x), nil));
+
+all x,y,z:list append(x, append(y, z)) = append(append(x, y), z);
+
+all x:list append(x, nil) = x;
+
+all x,y:list reverse(append(x, y)) = append(reverse(y), reverse(x));
+
+predicate member(x:nat, y:list) =
+if y = nil then false
+if y of cons and x = car(y) then true
+otherwise member(x, cdr(y));
+
+all x:nat all y,z:list member(x, y) impl member(x, append(y, z));
+
+all x:nat all y,z:list member(x, y) impl member(x, append(z, y)); falsche Induktionsvariable ! ;
+
+all x:nat all y:list member(x, y) impl member(x, reverse(y)); 
+
+function length(x:list):nat =
+if x = nil then 0
+otherwise s(length(cdr(x)));
+
+all x,y:list length(append(x, y)) = plus(length(x), length(y));
+
+all x:list length(x) = length(reverse(x));  
+
+function intersection(x,y:list):list =
+if x = nil then nil
+otherwise {if member(car(x), y) then cons(car(x), intersection(cdr(x), y))
+           otherwise intersection(cdr(x), y)};
+
+all x:nat all y,z:list member(x, y) and member(x, z) impl member(x, intersection(y, z)); 
+
+function union(x,y:list):list =
+if x = nil then y
+otherwise {if member(car(x), y) then union(cdr(x), y)
+           otherwise cons(car(x), union(cdr(x), y))};
+
+all x:nat all y,z:list member(x,y) or member(x, z) impl member(x, union(y, z)); falsches IS;
+
+predicate subsetp(x,y:list) =
+if x = nil then true
+otherwise {if member(car(x), y) then subsetp(cdr(x), y)
+           otherwise false};
+
+all x,y:list subsetp(x, y) impl union(x, y) = y;
+
+all x,y:list subsetp(x, y) impl intersection(x, y) = x;
+
+function nth(x:list, n:nat):list =
+if n = 0 then x
+otherwise nth(cdr(x), p(n));
+
+all x:list all n:nat not nth(x, n) = nil impl member(car (nth(x, n)), x);  falsche iS;
+
+all x:nat all y,z:list length(append(y, cons(x, z))) = s(length(append(y, z)));
+
+all x,y:list length(append(x, y)) = length(append(y, x));
+
+all x:nat nth(nil, x) = nil;
+
+all x:list all  y,z:nat nth(x, plus(y, z)) = nth(nth(x, y), z);
+
+all x,y,z:list all n:nat subsetp(x, y) impl subsetp(x, append(y, z)); 
+zu schwaches Verfahren zum Nachweis der Bedingungen;
+
+function last(x:list):list =
+if x = nil then nil
+if x of cons and cdr(x) of nil then x
+otherwise last(cdr(x));
+
+all x, y:list all n:nat not append(x, cons(n, y)) = nil;
+
+all x,y:list not y = nil impl last(append(x, y)) = last(y); falsche IH, fehlende Fallunterscheid.;
+
+all  x:list not x = nil impl last(reverse(x)) = cons(car(x), nil); interessanter Ripplingfall !;
+
+function count.list(x:nat, y:list):nat =
+if y = nil then 0
+if y of cons and car(y) = x then s(count.list(x, cdr(y)))
+otherwise count.list(x, cdr(y));
+
+function reverse.loop(x,y:list):list =
+if x = nil then y
+otherwise reverse.loop(cdr(x), cons(car(x), y));
+
+all x,y:list reverse.loop(x, y) = append(reverse(x), y);
+
+all x:list reverse(x) = reverse.loop(x, nil);
+
+all x,y:list reverse.loop(append(y, x), nil) = append(reverse.loop(x, nil), reverse.loop(y, nil)); 
+
+all x:list reverse.loop(reverse.loop(x, nil), nil) = x;
+
+
+
+
+
+

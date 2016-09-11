@@ -1,0 +1,16 @@
+structure nil, cons(car:nat, cdr:list):list;
+
+structure empty, mk(left:tree, right:tree):tree;
+
+function acc(taf:list, tr:tree):tree =
+if taf = nil then tr
+if taf of cons and tr = empty then empty
+otherwise {if car(taf) = 0 then acc(cdr(taf), left(tr))
+           if car(taf) of s then acc(cdr(taf), right(tr))};
+
+predicate member(tr1:tree, tr2:tree) =
+if tr2 = empty then tr1 = empty
+otherwise {if tr1 = empty then false
+           if tr1 of mk then tr1 = tr2 or member(tr1, left(tr2)) or member(tr1, right(tr2))};
+
+all t1,t2:tree ex taf:list member(t1, t2) impl acc(taf, t2) = t1;

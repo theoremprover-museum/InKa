@@ -1,0 +1,77 @@
+function minus(x,y:nat):nat =
+if x = 0 then 0
+if x of s and y = 0 then x
+if x of s and y of s then minus(p(x), p(y));
+
+axiom all  x,y:nat minus(x,s(y)) = p(minus(x, y));
+
+function test-minus(x,y:nat):nat =
+if minus(x, y) = 0 then 0
+if not minus(x, y) = 0 then s(test-minus(x, s(y)));
+
+function test-minus2(x,y:nat):nat =
+if minus(x, s(y)) = 0 then 0
+if not minus(x, s(y)) = 0 then s(test-minus2(x, s(s(y))));
+
+
+function double(x:int):int =
+if abs(x) = 0 then x
+otherwise succ(succ(double(make_int(sign(x), p(abs(x))))));
+
+structure make_tree(nat), cons(car:tree, cdr:tree):tree;
+
+function flatten(x:tree):tree =
+if x of make_tree then x
+otherwise {if car(x) of make_tree then cons(car(x), flatten(cdr(x)))
+           otherwise flatten(cons(car(car(x)), cons(cdr(car(x)), cdr(x))))};
+
+
+function flatten2(x:tree):tree =
+if x of make_tree then x
+otherwise {if cdr(x) of make_tree then cons(flatten2(car(x)), cdr(x))
+           otherwise flatten2(cons(cons(car(x), car(cdr(x))), cdr(cdr(x))))};
+
+structure empty, push(top:tree, pop:stack):stack;
+
+function count(n:nat, st:stack):nat =
+if st of empty then n
+otherwise {if top(st) of make_tree then count(n, pop(st))
+           otherwise count(s(n), push(car(top(st)), push(cdr(top(st)), pop(st))))};
+
+structure base(getnat:nat), cons-if(cond:formula, left:formula, right:formula):formula;
+
+function normalize(x:formula):formula =
+if x of base then x
+otherwise {if cond(x) of base then cons-if(cond(x), normalize(left(x)), normalize(right(x)))
+           otherwise normalize(cons-if(cond(cond(x)),
+                                       cons-if(left(cond(x)), left(x), right(x)),
+                                       cons-if(right(cond(x)), left(x), right(x))))};
+
+
+non-free structure emp, insert(element:nat, subset:set1):set1 with
+d-predicate elem(nat, set1) with
+   axiom all x:nat not elem(x, emp)
+   axiom all x,y:nat all A:set1 elem(x, insert(y, A)) <-> (x = y or elem(x, A))
+end
+axiom all A,B:set1 A = B <->
+   (all x:nat elem(x, A) <-> elem(x, B))
+end;
+
+
+d-function length(set1):nat with
+   axiom length(emp) = 0
+   axiom all x:nat all A:set1 elem(x, A) -> length(insert(x, A)) = length(A)
+   axiom all x:nat all A:set1 (not elem(x, A)) -> length(insert(x, A)) = s(length(A))
+end;
+
+
+length(insert(0, emp)) = s(0);
+
+axiom all x:set1 x of insert -> length(subset(x)) = p(length(x));
+
+axiom all x:nat all A:set1 not empty = insert(x, A);
+
+function union(x, y:set1):set1 =
+if x of emp then y
+otherwise insert(element(x), union(subset(x), y));
+

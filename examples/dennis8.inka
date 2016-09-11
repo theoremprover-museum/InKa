@@ -1,0 +1,46 @@
+
+enum structure a, b, c : elem;
+
+enum structure n, a1, b1, aa, bb, ab, ba : alist;
+
+structure nil, cons(car:elem, cdr:list):list;
+
+function app(x:elem, y:list):list =
+if y = nil then cons(x, nil)
+otherwise cons(car(y), app(x, cdr(y)));
+
+function alpha(x:list):alist =
+if x = nil then n
+if x = cons(car(x), cdr(x)) then
+ { if car(x) = a and alpha(cdr(x)) = n then a1
+   if car(x) = a and alpha(cdr(x)) = a1 then aa
+   if car(x) = a and alpha(cdr(x)) = b1 then ab
+   if car(x) = a and alpha(cdr(x)) = aa then aa
+   if car(x) = a and alpha(cdr(x)) = bb then ab
+   if car(x) = a and alpha(cdr(x)) = ab then aa
+   if car(x) = a and alpha(cdr(x)) = ba then ab
+   if car(x) = b and alpha(cdr(x)) = n then b1
+   if car(x) = b and alpha(cdr(x)) = a1 then ba
+   if car(x) = b and alpha(cdr(x)) = b1 then bb
+   if car(x) = b and alpha(cdr(x)) = aa then ba
+   if car(x) = b and alpha(cdr(x)) = bb then bb
+   if car(x) = b and alpha(cdr(x)) = ab then ba
+   if car(x) = b and alpha(cdr(x)) = ba then bb
+   if car(x) = c then alpha(cdr(x)) };
+
+
+function aapp(x:elem, y:alist):alist =
+if x = a then
+ { if y = n then a1
+   if y = a1 then aa
+   if y = b1 then ba
+   otherwise y }
+if x = b then 
+ { if y = n then b1
+   if y = a1 then ab
+   if y = b1 then bb
+   otherwise y }
+if x = c then y;
+
+
+all x:elem all y:list alpha(app(x, y)) = aapp(x, alpha(y));

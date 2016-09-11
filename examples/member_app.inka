@@ -1,0 +1,19 @@
+structure nil, cons(car:nat, cdr:list):list;
+
+function app(x,y:list):list =
+if x = nil then y
+if x of cons then cons(car(x), app(cdr(x), y));
+
+predicate member(x:nat, y:list) =
+if y = nil then false
+if y of cons and x = car(y) then true
+if y of cons and not x = car(y) then member(x, cdr(y));
+
+function delete(x:nat, y:list):list =
+if y = nil then y
+if y of cons and x = car(y) then cdr(y)
+if y of cons and not x = car(y) then cons(car(y), delete(x, cdr(y)));
+
+all x:nat all y:list delete(x, y) = y impl not member(x, y);
+
+all x:nat all y:list ex u,v:list member(x, y) impl y = app(u, cons(x, v));

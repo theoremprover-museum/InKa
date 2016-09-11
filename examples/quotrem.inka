@@ -1,0 +1,14 @@
+function plus(x,y:nat):nat =
+if x = 0 then y
+if x of s then s(plus(p(x), y));
+
+function times(x,y:nat):nat =
+if x = 0 then 0
+if x of s then plus(y, times(p(x), y));
+
+predicate less(x,y:nat) =
+if y = 0 then false
+if y of s and x = 0 then true
+if x of s and y of s then less(p(x), p(y));
+
+all x,y:nat ex u,v:nat not y = 0 impl (plus(times(u, y), v) = x and less(v, y));

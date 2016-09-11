@@ -1,0 +1,7 @@
+structure unlimit, limit(get_lim:int):lint;
+
+d-predicate le(int,lint);
+
+axiom all x:int all y:lint le(x,y) eqv (y = unlimit or (y = limit(get_lim(y)) and <=(x, get_lim(y))));
+
+all x,y:int all z:lint (<=(x, y) and le(y, z)) impl  le(x, z);

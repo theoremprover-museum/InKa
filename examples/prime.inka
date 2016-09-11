@@ -1,0 +1,71 @@
+ +INSERT
+STRUCTURE 0 s (nat):nat
+ |
+ +INSERT
+FUNCTION difference (n1,n2:nat):nat =
+IF n2 = 0 THEN n1
+IF NOT n2 = 0 AND n1 = 0 THEN 0
+IF EX n3,n4:nat n1 = s (n3) AND n2 = s (n4) THEN difference (n3 n4)
+ |
+ +INSERT
+PREDICATE Less (n1,n2:nat) =
+IF n2 = 0 THEN False
+IF NOT n2 = 0 AND n1 = 0 THEN True
+IF EX n3,n4:nat n1 = s (n3) AND n2 = s (n4) THEN Less (n3 n4)
+ |
+ +INSERT
+PREDICATE Lesseq (n1,n2:nat) =
+IF n1 = n2 THEN True
+IF NOT n1 = n2 THEN Less (n1 n2)
+ |
+ +INSERT
+FUNCTION rest (n1,n2:nat):nat =
+IF Less (n1 n2) THEN n1
+IF NOT Less (n1 n2) AND n2 = 0 THEN 0
+IF NOT Less (n1 n2) AND NOT n2 = 0 THEN rest (difference (n1 n2) n2)
+ |
+ +INSERT
+FUNCTION gcd (n1,n2:nat):nat =
+IF n1 = 0 THEN n2
+IF NOT n1 = 0 AND n2 = 0 THEN n1
+IF EX n3,n4:nat n1 = s (n3) AND n2 = s (n4) AND Less (n1 n2)
+   THEN gcd (n1 difference (n2 n1))
+IF EX n5,n6:nat n1 = s (n5) AND n2 = s (n6) AND NOT Less (n1 n2)
+   THEN gcd (difference (n1 n2) n2)
+ |
+ +INSERT
+PREDICATE Divides (n1,n2:nat) = rest (n2 n1) = 0
+ |
+ +INSERT
+ALL n1:nat NOT Less (n1 n1)
+ |
+ +INSERT
+ALL n1:nat difference (n1 n1) = 0
+ |
+ +INSERT
+FUNCTION plus (n1,n2:nat):nat =
+IF n1 = 0 THEN n2
+IF EX n3:nat n1 = s (n3) THEN s (plus (n3 n2))
+ |
+ +INSERT
+ALL n1,n2,n3:nat
+    (Less (n1 n2)
+     IMPL plus (difference (n2 n1) n3) = difference (plus (n2 n3) n1))
+ |
+ +INSERT
+ALL n1,n2,n3:nat (NOT Less (n1 n2) IMPL NOT Less (plus (n1 n3) n2))
+ |
+ +INSERT
+ALL n1,n2,n3:nat
+    ((rest (n1 n3) = 0 AND rest (n2 n3) = 0) IMPL rest (plus (n1 n2) n3) = 0)
+ |
+ -INSERT
+all x,y:nat x=y impl rest(x y) = 0
+ |
+ -INSERT
+   all x,y:nat rest(x gcd(x y)) = 0 AND rest(y gcd(x y)) = 0
+ |
+ -INSERT
+   all x,y,z:nat rest(x z)=0 and rest(y z)=0 impl lesseq(z gcd(x y))
+ |
+ OK

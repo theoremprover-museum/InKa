@@ -1,0 +1,36 @@
+unspec structure dummy;
+
+d-function m(dummy, dummy):dummy;
+
+d-function j(dummy, dummy):dummy;
+
+axiom all x,y:dummy m(x,y) = m(y,x);
+
+axiom all x,y:dummy j(x,y) = j(y,x);
+
+axiom all x,y,z:dummy m(x,m(y,z)) = m(m(x,y),z);
+
+axiom all x,y,z:dummy j(x,j(y,z)) = j(j(x,y),z);
+
+axiom all x,y:dummy m(x,j(x,y)) = x;
+
+axiom all x,y:dummy j(x,m(x,y)) = x;
+
+
+all x,y:dummy  m(x,x) = x;
+
+all x,y:dummy j(x,x) = x;
+
+all x,y:dummy m(x,y) = x -> j(x,y) = y;
+
+Im folgenden sei x < y eine Abk rzung f r m(x,y) = x.
+
+Zu beweisen sei: Distributivit t folgt aus jeder der folgenden Annahmen:
+5. all x,y:dummy m(x,j(y,z)) < j(m(x,y),m(x,z)).
+6. all x,y:dummy m(j(x,y),j(x,z)) < j(x,m(y,z))
+7. all x,y:dummy j(m(x,y),m(y,z),m(z,x)) = m(j(x,y),j(y,z),j(z,x)).
+8. all x,y:dummy m(j(x,y),m(j(y,z),j(z,x))) < j(m(x,y),j(m(y,z),m(z,x)))
+
+Als letztes:
+9. In einem distributiven Verband gilt:
+   all x,y:dummy m(x,y)  = m(x,z) & j(x,y) = j(x,z) -> z = y.

@@ -1,0 +1,67 @@
+generic element_type;
+
+non-free structure empty, add(element:element_type, subset:set):set {
+   d-predicate in(element_type, set) {
+      axiom all x:element_type not in(x, empty)
+      axiom all A:set all x,y:element_type in(x, add(y, A)) eqv (x=y or in(x, A))
+      }
+   axiom all A,B:set A=B eqv (all x:element_type in(x, A) eqv in(x, B))
+   };
+
+axiom all A,B:set all x:element_type
+   A=add(x, B) impl A=add(element(A), subset(A));
+
+axiom subset(empty)=empty;
+	  
+axiom all A:set A=add(element(A), subset(A)) impl not A=subset(A);
+	
+a-predicate delta-subset(A:set)=
+   A=add(element(A), subset(A));
+
+axiom all A:set all x:element_type
+   (not A=empty) or (not A=add(element(A), subset(A))) or (not x=element(A));
+
+a-predicate member(x:element_type, A:set)=
+   if A of empty then false
+   if A of add and x=element(A) then true
+   otherwise member(x, subset(A));
+
+a-function delete(x:element_type, A:set):set=
+   if A of empty then empty
+   if A of add and x=element(A) then subset(A)
+   otherwise add(element(A), delete(x, subset(A)));
+
+a-predicate delta-delete-2(x:element_type, A:set)= 
+   member(x, A);
+
+a-function +(A,B:set):set=
+   if A of empty then B
+   otherwise +(subset(A), add(element(A), B));
+
+axiom all A,B:set
+   (not A=empty) or (not A=add(element(A), subset(A))) or (not member(element(A), B));
+
+a-function *(A,B:set):set=
+   if A of empty then empty
+   if A of add and member(element(A), B) then add(element(A), *(subset(A), B))
+   otherwise *(subset(A), B));
+
+a-function \(A,B:set):set=
+   if A of empty then empty
+   if A of add and member(element(A), B) then \(subset(A), B))
+   otherwise add(element(A), \(subset(A), B));
+
+a-function -(A,B:set):set=
+   ((A \ B) + (B \ A));
+
+a-predicate is_subset(A,B:set)=
+   all x:element_type member(x, A) impl member(x, B);
+
+a-predicate is_superset(A,B:set)=
+   all x:element_type member(x, B) impl member(x, A);
+
+
+   
+
+
+

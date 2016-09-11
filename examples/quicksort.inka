@@ -1,0 +1,156 @@
+ +INSERT
+STRUCTURE 0 succ (pred:number):number
+ |
+ +INSERT
+STRUCTURE empty add (head:number tail:list):list
+ |
+ +INSERT
+PREDICATE Lt (n1,n2:number) =
+IF n2 = 0 THEN False
+IF n1 = 0 AND NOT n2 = 0 THEN True
+IF n1 = succ (pred (n1)) AND n2 = succ (pred (n2))
+   THEN Lt (pred (n1) pred (n2))
+ |
+ +INSERT
+FUNCTION larger (n1:number l1:list):list =
+IF l1 = empty THEN empty
+IF l1 = add (head (l1) tail (l1)) AND Lt (n1 head (l1))
+   THEN add (head (l1) larger (n1 tail (l1)))
+IF l1 = add (head (l1) tail (l1)) AND NOT Lt (n1 head (l1))
+   THEN larger (n1 tail (l1))
+ |
+ +INSERT
+FUNCTION smaller (n1:number l1:list):list =
+IF l1 = empty THEN empty
+IF l1 = add (head (l1) tail (l1)) AND Lt (n1 head (l1))
+   THEN smaller (n1 tail (l1))
+IF l1 = add (head (l1) tail (l1)) AND NOT Lt (n1 head (l1))
+   THEN add (head (l1) smaller (n1 tail (l1)))
+ |
+ +INSERT
+FUNCTION append (l1,l2:list):list =
+IF l1 = empty THEN l2
+IF l1 = add (head (l1) tail (l1))
+   THEN add (head (l1) append (tail (l1) l2))
+ |
+ +INSERT
+FUNCTION quicksort (l1:list):list =
+IF l1 = empty THEN empty
+IF l1 = add (head (l1) tail (l1))
+   THEN append (quicksort (smaller (head (l1) tail (l1)))
+                add (head (l1) quicksort (larger (head (l1) tail (l1)))))
+ |
+ +INSERT
+PREDICATE Sorted (l1:list) =
+IF l1 = empty THEN True
+IF l1 = add (head (l1) empty) THEN True
+IF l1 = add (head (l1) tail (l1))
+   AND tail (l1) = add (head (tail (l1)) tail (tail (l1)))
+   THEN (NOT Lt (head (tail (l1)) head (l1)) AND Sorted (tail (l1)))
+ |
+ +INSERT
+FUNCTION last (l1:list):number =
+IF l1 = empty THEN 0
+IF l1 = add (head (l1) empty) THEN head (l1)
+IF l1 = add (head (l1) tail (l1))
+   AND tail (l1) = add (head (tail (l1)) tail (tail (l1)))
+   THEN last (tail (l1))
+ |
+ +INSERT
+ALL l1,l2:list
+    (((NOT l1 = empty IMPL NOT Lt (head (l1) last (l2)))
+      AND Sorted (l2)
+      AND Sorted (l1))
+     IMPL Sorted (append (l2 l1)))
+ |
+ +INSERT
+PREDICATE Member (n1:number l1:list) =
+IF l1 = empty THEN False
+IF l1 = add (head (l1) tail (l1)) AND n1 = head (l1) THEN True
+IF l1 = add (head (l1) tail (l1)) AND NOT n1 = head (l1)
+   THEN Member (n1 tail (l1))
+ |
+ +INSERT
+ALL n1,n2,n3:number ((Lt (n3 n2) AND Lt (n2 n1)) IMPL Lt (n3 n1))
+ |
+ +INSERT
+ALL l1:list ALL n1,n2:number (Member (n1 smaller (n2 l1))
+                              IMPL NOT Lt (n2 n1))
+ |
+ +INSERT
+ALL l1:list ALL n1,n2:number (Member (n2 larger (n1 l1)) IMPL Lt (n1 n2))
+ |
+ +INSERT
+ALL l1:list ALL n1,n2,n3:number
+    ((Member (n1 smaller (n3 l1)) AND Member (n2 larger (n3 l1)))
+     IMPL NOT Lt (n2 n1))
+ |
+ +INSERT
+AXIOM ALL l1:list ALL n1:number
+          (Member (n1 l1) IMPL Member (n1 quicksort (l1)))
+ |
+ +INSERT
+AXIOM ALL l1:list ALL n1:number
+          (Member (n1 quicksort (l1)) IMPL Member (n1 l1))
+ |
+ +INSERT
+ALL l1:list ALL n1,n2,n3:number
+    ((Member (n3 quicksort (smaller (n1 l1)))
+      AND Member (n2 quicksort (larger (n1 l1))))
+     IMPL NOT Lt (n2 n3))
+ |
+ +INSERT
+AXIOM ALL l1:list (NOT l1 = empty IMPL Member (last (l1) l1))
+ |
+ +INSERT
+ALL l1:list (NOT l1 = empty IMPL Member (head (l1) l1))
+ |
+ +INSERT
+ALL l1:list ALL n1:number
+    ((NOT quicksort (smaller (n1 l1)) = empty
+      AND NOT quicksort (larger (n1 l1)) = empty)
+     IMPL NOT Lt (head (quicksort (larger (n1 l1)))
+                  last (quicksort (smaller (n1 l1)))))
+ |
+ +INSERT
+ALL l1,l2:list
+    (NOT Sorted (append (l2 l1))
+     IMPL (NOT Sorted (l2)
+           OR NOT Sorted (l1)
+           OR (NOT l2 = empty
+               AND NOT l1 = empty
+               AND Lt (head (l1) last (l2)))))
+ |
+ -INSERT
+ALL l:list all n:number lt(n head(l)) and not sorted(add(n l)) impl not sorted(l)
+ |
+ -INSERT
+ALL n1,n2,n3:number ((Lt (n3 n2) AND Lt (n2 n1)) IMPL Lt (n3 n1))
+ |
+ -INSERT
+ALL l1:list ALL n1:number
+    (NOT larger (n1 l1) = empty IMPL Lt (n1 head (larger (n1 l1))))
+ |
+ -INSERT
+ALL l1:list ALL n1:number
+    (NOT larger (n1 l1) = empty
+     IMPL NOT Lt (head (larger (n1 l1)) last (smaller (n1 l1))))
+ |
+ -INSERT
+all l:list sorted(quicksort(l))
+ |
+ -INSERT
+ALL l1,l2:list
+    ((NOT l1 = empty AND Sorted (append (l2 l1)))
+     IMPL NOT Lt (head (l1) last (l2)))
+ |
+ -INSERT
+ALL l1,l2:list (Sorted (append (l2 l1)) IMPL Sorted (l2))
+ |
+ -INSERT
+ALL l1,l2:list (Sorted (append (l1 l2)) IMPL Sorted (l2))
+ |
+ -INSERT
+ALL L1,L2:LIST (SORTED(APPEND(L1 L2)) AND NOT L2 = EMPTY) IMPL NOT LT(HEAD(L2) LAST(L1))
+ |
+ OK

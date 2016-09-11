@@ -1,0 +1,76 @@
+ +INSERT
+STRUCTURE 0 s (nat):nat
+ |
+ +INSERT
+STRUCTURE empty cons (nat list):list
+ |
+ +INSERT
+PREDICATE Ge (n1,n2:nat) =
+IF n2 = 0 THEN True
+IF NOT n2 = 0 AND n1 = 0 THEN False
+IF EX n3,n4:nat n1 = s (n3) AND n2 = s (n4) THEN Ge (n3 n4)
+ |
+ +INSERT
+FUNCTION max (l1:list):nat =
+IF l1 = empty THEN 0
+IF EX n1:nat l1 = cons (n1 empty) THEN n1
+IF EX l2,l3:list EX n2,n3:nat
+   l1 = cons (n2 l2) AND l2 = cons (n3 l3) AND Ge (n2 n3)
+   THEN max (cons (n2 l3))
+IF EX l4,l5:list EX n4,n5:nat
+   l1 = cons (n4 l4) AND l4 = cons (n5 l5) AND NOT Ge (n4 n5)
+   THEN max (cons (n5 l5))
+ |
+ +INSERT
+FUNCTION delete (n1:nat l1:list):list =
+IF l1 = empty THEN empty
+IF EX l2:list EX n2:nat l1 = cons (n2 l2) AND n2 = n1 THEN l2
+IF EX l3:list EX n3:nat l1 = cons (n3 l3) AND NOT n3 = n1
+   THEN cons (n3 delete (n1 l3))
+ |
+ +INSERT
+FUNCTION add (n1:nat l1:list):list =
+IF l1 = empty THEN cons (n1 empty)
+IF EX l2:list EX n2:nat l1 = cons (n2 l2) AND Ge (n1 n2) THEN cons (n1 l1)
+IF EX l3:list EX n3:nat l1 = cons (n3 l3) AND NOT Ge (n1 n3)
+   THEN cons (n3 add (n1 l3))
+ |
+ +INSERT
+FUNCTION sorts (l1:list):list =
+IF l1 = empty THEN empty
+IF EX l2:list EX n1:nat l1 = cons (n1 l2) THEN add (n1 sorts (l2))
+ |
+ +INSERT
+ALL n1:nat Ge (n1 n1)
+ |
+ +INSERT
+ALL l1:list ALL n1:nat delete (n1 add (n1 l1)) = l1
+ |
+ +INSERT
+ALL n1,n2:nat ((Ge (n1 n2) AND Ge (n2 n1)) IMPL n2 = n1)
+ |
+ +INSERT
+ALL n1,n2:nat (Ge (n1 n2) OR Ge (n2 n1))
+ |
+ +INSERT
+ALL n1,n2,n3:nat ((Ge (n2 n1) AND Ge (n3 n2)) IMPL Ge (n3 n1))
+ |
+ -INSERT
+ALL X:LIST ALL Y,Z:NAT NOT Y = Z IMPL DELETE(Y ADD(Z SORTS(X))) = ADD(Z DELETE(Y SORTS(X)))
+ |
+ -INSERT
+all x:list not x=empty impl sorts(x) = cons(max(x) delete(max(x) sorts(x)))
+ |
+ -INSERT
+all x,y:nat all z:list add(x add(y z)) = add(y add(x z))
+ |
+ -INSERT
+all x:nat all y:list sorts(delete(x y)) = delete(x sorts(y))
+ |
+ -INSERT
+all x,y:list all z:nat sorts(x) = cons(z y) impl max(x) = z
+ |
+ -INSERT
+all x:list sorts(sorts(x)) = sorts(x)
+ |
+ OK

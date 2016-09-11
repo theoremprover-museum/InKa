@@ -1,0 +1,17 @@
+axiom in(jhn boy)
+
+axiom all x not in(x boy) or in(x hun)
+
+axiom all v,w,x,y,z ex g  not hp(x v y) or (in(g y) and not hp(g w z))  or hp(x f(v w) z)
+
+axiom all x in(x han) impl hp(x 5 fin)
+
+axiom all x in(x hun)  impl hp(x 2 arm)
+
+axiom all x in(x arm) impl hp(x 1 han)
+
+not hp(jhn f(2 1) han) impl hp(jhn f(f(2 1) 5) fin)
+
+
+
+OK

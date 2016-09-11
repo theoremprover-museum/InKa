@@ -1,0 +1,11 @@
+.MAKE_VERSION:	VERSION-1.0
+.BUILT_LAST_MAKE_RUN:
+inka:	/opt/tcl-tk/include/tk.h /opt/tcl-tk/include/tcl.h /opt/gcc/lib/gcc-lib/sparc-sun-solaris2.5/2.7.2/include/stdio.h /usr/include/sys/feature_tests.h /opt/X11/include/X11/Xlib.h /opt/gcc/lib/gcc-lib/sparc-sun-solaris2.5/2.7.2/include/sys/types.h /opt/gcc/lib/gcc-lib/sparc-sun-solaris2.5/2.7.2/include/sys/isa_defs.h /usr/include/sys/machtypes.h /usr/include/sys/select.h /usr/include/sys/time.h /opt/gcc/lib/gcc-lib/sparc-sun-solaris2.5/2.7.2/include/time.h
+.BUILT_LAST_MAKE_RUN:
+inka:	/usr/include/sys/siginfo.h /usr/include/sys/machsig.h /opt/X11/include/X11/X.h /opt/X11/include/X11/Xfuncproto.h /opt/X11/include/X11/Xosdefs.h /opt/gcc/lib/gcc-lib/sparc-sun-solaris2.5/2.7.2/include/stddef.h /usr/lib/libmp.so.1 /usr/lib/libintl.so.1 /usr/lib/libw.so.1 /usr/openwin/lib/libXext.so.0 /opt/gcc/lib/gcc-lib/sparc-sun-solaris2.5/2.7.2/libgcc.a /usr/lib/libm.so /usr/lib/libc.so /usr/lib/libposix4.so /usr/lib/libdl.so /usr/lib/libnsl.so /usr/lib/libsocket.so
+.BUILT_LAST_MAKE_RUN:
+inka:	/usr/ccs/lib/libgen.a /opt/tcl-tk/lib/libtcl.a /opt/tcl-tk/lib/libtk.a /usr/openwin/lib/libX11.so /usr/openwin/lib/libXt.so 
+	/opt/gcc/bin/gcc -I/opt/tcl-tk/include -I/opt/X11/include -D_NO_PROTO -DSUNOS -DSPARC -DVERMAJOR=5 -DVERMINOR=3 -DGADGET_BUG -DRELEASE  -g -L/opt/tcl-tk/lib  -L/usr/openwin/lib -L/usr/ccs/lib -L/opt/gcc/lib/gcc-lib/sparc-sun-solaris2.5/2.7.2 -o inka inka.c -lXt -lX11 -ltk -ltcl -lgen -lsocket -lnsl -ldl -lposix4 -lc -lm 
+inka.o:	/opt/tcl-tk/include/tk.h /opt/tcl-tk/include/tcl.h /opt/gcc/lib/gcc-lib/sparc-sun-solaris2.5/2.7.2/include/stdio.h /usr/include/sys/feature_tests.h /opt/X11/include/X11/Xlib.h /opt/gcc/lib/gcc-lib/sparc-sun-solaris2.5/2.7.2/include/sys/types.h /opt/gcc/lib/gcc-lib/sparc-sun-solaris2.5/2.7.2/include/sys/isa_defs.h /usr/include/sys/machtypes.h /usr/include/sys/select.h /usr/include/sys/time.h /opt/gcc/lib/gcc-lib/sparc-sun-solaris2.5/2.7.2/include/time.h
+inka.o:	/usr/include/sys/siginfo.h /usr/include/sys/machsig.h /opt/X11/include/X11/X.h /opt/X11/include/X11/Xfuncproto.h /opt/X11/include/X11/Xosdefs.h /opt/gcc/lib/gcc-lib/sparc-sun-solaris2.5/2.7.2/include/stddef.h 
+	/opt/gcc/bin/gcc -I/opt/tcl-tk/include -I/opt/X11/include -D_NO_PROTO -DSUNOS -DSPARC -DVERMAJOR=5 -DVERMINOR=3 -DGADGET_BUG -DRELEASE  -g  -c  inka.c

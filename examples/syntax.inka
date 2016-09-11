@@ -1,0 +1,445 @@
+ +INSERT
+STRUCTURE 0 s (nat):nat
+ |
+ +INSERT
+STRUCTURE (nterm,term):zeichen
+ |
+ +INSERT
+STRUCTURE eps cons (zeichen wort):wort
+ |
+ +INSERT
+;Produktionen der Form: A ::= z
+ |
+ +INSERT
+STRUCTURE make.prod (nterm wort):prod
+ |
+ +INSERT
+STRUCTURE empty collect (prod prod.list):prod.list
+ |
+ +INSERT
+STRUCTURE leer build (wort satz):satz
+ |
+ +INSERT
+FUNCTION append (w1,w2:wort):wort =
+IF w1 = eps THEN w2
+IF EX w3:wort EX z1:zeichen w1 = cons (z1 w3) THEN cons (z1 append (w3 w2))
+ |
+ +INSERT
+;Lemma 1
+ |
+ +INSERT
+ALL w1:wort append (w1 eps) = w1
+ |
+ +INSERT
+associative(append)
+ |
+ +INSERT
+;wendet, wenn das erste Zeichen von Wort und die rechte Seite der Produktion uebereinstimmen, die Produktion an
+ |
+ +INSERT
+FUNCTION ersetze (w1:wort p1:prod):wort =
+IF w1 = eps THEN w1
+IF EX n1:nterm EX w2,w3:wort w1 = cons (n1 w2) AND p1 = make.prod (n1 w3)
+   THEN append (w3 w2)
+IF EX n2:nterm EX w4,w5:wort EX z1:zeichen
+   w1 = cons (z1 w4) AND p1 = make.prod (n2 w5) AND NOT z1 = n2
+   THEN w1
+ |
+ +INSERT
+;ueberprueft, ob w2 von w1 in einem Schritt mit der Produktion p1 ableitbar ist.
+ |
+ +INSERT
+PREDICATE Ded1 (w1,w2:wort p1:prod) =
+IF w1 = eps THEN w2 = eps
+IF w2 = eps AND NOT w1 = eps THEN w2 = ersetze (w1 p1)
+IF EX t1:term EX w3,w4:wort w1 = cons (t1 w3) AND w2 = cons (t1 w4)
+   THEN Ded1 (w3 w4 p1)
+IF EX t2:term EX w5,w6:wort EX z1:zeichen
+   w1 = cons (t2 w5) AND w2 = cons (z1 w6) AND NOT t2 = z1
+   THEN False
+IF EX n1:nterm EX w7,w8:wort w1 = cons (n1 w7) AND w2 = cons (n1 w8)
+   THEN (ersetze (w1 p1) = w2 OR Ded1 (w7 w8 p1))
+IF EX n2:nterm EX w9,w10:wort EX z2:zeichen
+   w1 = cons (n2 w9) AND w2 = cons (z2 w10) AND NOT z2 = n2
+   THEN ersetze (w1 p1) = w2
+ |
+ +INSERT
+;prueft, ob w2 von w1 in einem Schritt mit einer der Produktionen pr1 aus p1:prod.list ableitbar ist
+ |
+ +INSERT
+PREDICATE Ded2 (w1,w2:wort p1:prod.list) =
+IF p1 = empty THEN w1 = w2
+IF EX pr1:prod EX p2:prod.list p1 = collect (pr1 p2)
+   THEN (Ded2 (w1 w2 p2) OR Ded1 (w1 w2 pr1))
+ |
+ +INSERT
+FUNCTION append.satz (s1,s2:satz):satz =
+IF s1 = leer THEN s2
+IF EX s3:satz EX w1:wort s1 = build (w1 s3)
+   THEN build (w1 append.satz (s3 s2))
+ |
+ +INSERT
+associative(append.satz)
+ |
+ +INSERT
+;Lemma 2
+ |
+ +INSERT
+ALL s1:satz append.satz (s1 leer) = s1
+ |
+ +INSERT
+;prueft, ob das Wort w1 im Satz s1 enthalten ist
+ |
+ +INSERT
+PREDICATE Compare (w1:wort s1:satz) =
+IF s1 = leer THEN False
+IF EX s2:satz EX w2:wort s1 = build (w2 s2) AND NOT w1 = w2
+   THEN Compare (w1 s2)
+IF EX s3:satz EX w3:wort s1 = build (w3 s3) AND w1 = w3 THEN True
+ |
+ +INSERT
+;haengt vor jedes Wort aus dem Satz s1 das Zeichen z1
+ |
+ +INSERT
+FUNCTION repare (z1:zeichen s1:satz):satz =
+IF s1 = leer THEN build (cons (z1 eps) leer)
+IF EX w1:wort s1 = build (w1 leer) THEN build (cons (z1 w1) leer)
+IF EX s2:satz EX w2:wort s1 = build (w2 s2) AND NOT s2 = leer
+   THEN build (cons (z1 w2) repare (z1 s2))
+ |
+ +INSERT
+;Lemma 3
+ |
+ +INSERT
+ALL s1:satz ALL w1:wort ALL z1:zeichen
+    (Compare (w1 s1) IMPL Compare (cons (z1 w1) repare (z1 s1)))
+ |
+ +INSERT
+;schreibt alle moeglichen Ableitungen von w1 mit der Produktion p1, die in einem Schritt
+;erreicht werden koennen, in einen Satz
+ |
+ +INSERT
+FUNCTION alle.dir.abl (w1:wort p1:prod):satz =
+IF w1 = eps THEN leer
+IF EX t1:term EX w2:wort w1 = cons (t1 w2)
+   THEN repare (t1 alle.dir.abl (w2 p1))
+IF EX n1,n2:nterm EX w3,w4:wort
+   w1 = cons (n1 w3) AND p1 = make.prod (n2 w4) AND NOT n1 = n2
+   THEN repare (n1 alle.dir.abl (w3 p1))
+IF EX n3,n4:nterm EX w5,w6:wort
+   w1 = cons (n3 w5) AND p1 = make.prod (n4 w6) AND n3 = n4
+   THEN build (append (w6 w5) repare (n3 alle.dir.abl (w5 p1)))
+ |
+ +INSERT
+;Lemma 4
+ |
+ +INSERT
+ALL s1,s2:satz ALL w1:wort
+    (Compare (w1 append.satz (s2 s1))
+     IMPL (Compare (w1 s1) OR Compare (w1 s2)))
+ |
+ +INSERT
+;Lemma 5 (koennte man sich evtl. sparen)
+ |
+ +INSERT
+ALL p1:prod ALL w1:wort ALL z1:zeichen
+    (w1 = eps IMPL Compare (cons (z1 w1) repare (z1 alle.dir.abl (eps p1))))
+ |
+ +INSERT
+;schreibt alle moeglichen Ableitungen von w1 mit jeder Produktionen aus p1,
+;die in einem Schritt moeglich sind, in einen Satz
+ |
+ +INSERT
+FUNCTION moegl.abl (w1:wort p1:prod.list):satz =
+IF p1 = empty THEN leer
+IF EX pr1:prod EX p2:prod.list p1 = collect (pr1 p2)
+   THEN append.satz (alle.dir.abl (w1 pr1) moegl.abl (w1 p2))
+ |
+ +INSERT
+;prueft, ob w1 von einem der Worte aus s1 mit den Produktionen aus p1 in einem Schritt
+;ableitbar ist. (Erklaerung, warum s1 ein Satz ist und nicht nur ein Wort, folgt aus
+;DEDUCTION und DED3)
+ |
+ +INSERT
+PREDICATE Direct (w1:wort s1:satz p1:prod.list) =
+IF s1 = leer THEN False
+IF EX s2:satz EX w2:wort s1 = build (w2 s2)
+   THEN (Compare (w1 moegl.abl (w2 p1)) OR Direct (w1 s2 p1))
+ |
+ +INSERT
+;schreibt alle, in einem Schritt moeglichen, Ableitungen der Woerter aus s1 mit den
+;Produktionen aus p1 in einen Satz. (Ruft fuer jedes w aus s1 moegl.Abl auf.)
+ |
+ +INSERT
+FUNCTION alle.abl (s1:satz p1:prod.list):satz =
+IF s1 = leer THEN leer
+IF EX s2:satz EX w1:wort s1 = build (w1 s2)
+   THEN append.satz (moegl.abl (w1 p1) alle.abl (s2 p1))
+ |
+ +INSERT
+;prueft, ob w1 in max n1 Schritten aus einem der Woerter aus s1 mit den Produktionen aus
+;p1 ableitbar ist. Begrenzung auf n1 Schritte, da sonst keine Terminierung nachweisbar ist.
+ |
+ +INSERT
+PREDICATE Ded3 (w1:wort s1:satz p1:prod.list n1:nat) =
+IF n1 = 0 THEN Compare (w1 s1)
+IF NOT n1 = 0 AND Direct (w1 s1 p1) THEN True
+IF EX n2:nat n1 = s (n2) AND NOT Direct (w1 s1 p1)
+   THEN Ded3 (w1 alle.abl (s1 p1) p1 n2)
+ |
+ +INSERT
+;prueft, ob w1 von w2 mit den Produktionen aus p1 in n1 Schritten ableitbar ist.
+ |
+ +INSERT
+PREDICATE Deduction (w1,w2:wort p1:prod.list n1:nat) =
+Ded3 (w1 build (w2 leer) p1 n1)
+ |
+ +INSERT
+;Lemma 6
+ |
+ +INSERT
+ALL s1,s2:satz ALL w1:wort
+    (Compare (w1 s1) IMPL Compare (w1 append.satz (s1 s2)))
+ |
+ +INSERT
+;Lemma 7
+ |
+ +INSERT
+ALL s1,s2:satz ALL w1:wort
+    (Compare (w1 s1) IMPL Compare (w1 append.satz (s2 s1)))
+ |
+ +INSERT
+FUNCTION plus (n1,n2:nat):nat =
+IF n2 = 0 THEN n1
+IF EX n3:nat n2 = s (n3) THEN s (plus (n1 n3))
+ |
+ +INSERT
+;Lemma 8
+ |
+ +INSERT
+ALL n1:nat ALL p1:prod.list ALL w1,w2:wort
+    (Deduction (w2 w1 p1 s (n1))
+     IMPL (Direct (w2 build (w1 leer) p1)
+           OR Ded3 (w2 alle.abl (build (w1 leer) p1) p1 n1)))
+ |
+ +INSERT
+ ;Lemma 9
+ |
+ +INSERT
+ALL p1:prod.list ALL w1,w2:wort
+    (Deduction (w1 w2 p1 s (0)) IMPL Compare (w1 moegl.abl (w2 p1)))
+ |
+ +INSERT
+;Lemma 10
+ |
+ +INSERT
+ALL p1:prod ALL w1:wort Ded1 (w1 w1 p1)
+ |
+ +INSERT
+;Lemma 11
+ |
+ +INSERT
+ALL p1:prod.list ALL w1:wort Ded2 (w1 w1 p1)
+ |
+ +INSERT
+;Lemma 12 (koennte ebenfalls weggelassen werden, entspricht der Funktionsdef.)
+ |
+ +INSERT
+ALL p1:prod.list ALL w1,w2:wort
+    (Direct (w2 build (w1 leer) p1) IMPL Compare (w2 moegl.abl (w1 p1)))
+ |
+ +INSERT
+;Lemma 13
+ |
+ +INSERT
+ALL p1:prod ALL w1:wort (NOT w1 = eps IMPL Compare (w1 alle.dir.abl (w1 p1)))
+ |
+ +INSERT
+;Lemma 14
+ |
+ +INSERT
+ALL p1:prod.list ALL w1:wort
+    ((NOT p1 = empty AND NOT w1 = eps) IMPL Compare (w1 moegl.abl (w1 p1)))
+ |
+ +INSERT
+;Lemma 15
+ |
+ +INSERT
+ALL p1:prod.list ALL s1:satz ALL w1:wort
+    ((NOT p1 = empty AND NOT w1 = eps)
+     IMPL Compare (w1 alle.abl (build (w1 s1) p1)))
+ |
+ +INSERT
+;Lemma 16
+ |
+ +INSERT
+ALL p1:prod ALL w1,w2,w3:wort
+    (Ded1 (w3 w2 p1) IMPL Ded1 (append (w1 w3) append (w1 w2) p1))
+ |
+ +INSERT
+;Lemma 17
+ |
+ +INSERT
+ALL p1:prod.list ALL w1,w2,w3:wort
+    (Ded2 (w1 w2 p1) IMPL Ded2 (append (w3 w1) append (w3 w2) p1))
+ |
+ +INSERT
+;Axiom 1 (eps=append(w1 w2) and not eps =append(w1 append(w2 epa)) Widerspruch wird nicht erkannt)
+ |
+ +INSERT
+ALL p1:prod ALL w1,w2,w3:wort
+          (Ded1 (w1 w2 p1) IMPL Ded1 (append (w1 w3) append (w2 w3) p1))
+ |
+ +INSERT
+;Lemma 18
+ |
+ +INSERT
+ALL p1:prod.list ALL w1,w2,w3:wort
+    (Ded2 (w3 w2 p1) IMPL Ded2 (append (w3 w1) append (w2 w1) p1))
+ |
+ +INSERT
+;Lemma 19
+ |
+ +INSERT
+ALL s1:satz ALL w1:wort ALL z1,z2:zeichen
+    (NOT w1 = eps
+     IMPL (Compare (cons (z1 w1) repare (z2 s1)) IMPL Compare (w1 s1)))
+ |
+ +INSERT
+;in dieser Notation von Lemma 19 wird in 19.1 Fall1 der Widerspruch zur Voraussetzung nicht erkannt.
+;ALL s1:satz ALL w1:wort ALL z1:zeichen
+;    (NOT cons_2(w1) = eps
+;     IMPL (Compare (w1 repare(z1 s1)) impl Compare (cons_2( w1) s1)))
+ |
+ +INSERT
+;Axiom 2 (Fehler tritt in Fall 1.2.3 auf. Muesste eigentlich mit Lemma 19 zu loesen sein.)
+ |
+ +INSERT
+ALL p1:prod ALL w1,w2:wort
+          ((NOT w1 = eps AND Ded1 (w1 w2 p1))
+           IMPL Compare (w2 alle.dir.abl (w1 p1)))
+ |
+ +INSERT
+;Lemma 20
+ |
+ +INSERT
+ALL p1:prod.list ALL w1,w2:wort
+    ((Ded2 (w2 w1 p1) AND NOT w2 = eps AND NOT p1 = empty)
+     IMPL Compare (w1 moegl.abl (w2 p1)))
+ |
+ +INSERT
+;Lemma 21
+ |
+ +INSERT
+ALL w1,w2:wort
+    (NOT w2 = eps IMPL cons_2 (append (w2 w1)) = append (cons_2 (w2) w1))
+ |
+ +INSERT
+;Lemma 22
+ |
+ +INSERT
+ALL p1:prod ALL w1,w2,w3:wort
+    (NOT w3 = eps
+     IMPL (ersetze (w3 p1) = w2
+           IMPL ersetze (append (w3 w1) p1) = append (w2 w1)))
+ |
+ +INSERT
+;Lemma 23
+ |
+ +INSERT
+ALL w1,w2:wort ((w1 = eps AND w2 = eps) EQV append (w2 w1) = eps)
+ |
+ +INSERT
+PREDICATE Terminal (w1:wort) =
+IF w1 = eps THEN True
+IF EX n1:nterm EX w2:wort w1 = cons (n1 w2) THEN False
+IF EX t1:term EX w3:wort w1 = cons (t1 w3) THEN Terminal (w3)
+ |
+ +INSERT
+PREDICATE Linkslinear (p1:prod) = Terminal (cons_2 (make.prod_2 (p1)))
+ |
+ +INSERT
+PREDICATE Linkslinear.List (p1:prod.list) =
+IF p1 = empty THEN True
+IF EX pr1:prod EX p2:prod.list p1 = collect (pr1 p2)
+   THEN (Linkslinear.List (p2) AND Linkslinear (pr1))
+ |
+ +INSERT
+STRUCTURE (nterm) q:zustaende
+ |
+ +INSERT
+STRUCTURE conc (zustaende wort):left.side
+ |
+ +INSERT
+STRUCTURE make.c.prod (wort nterm),make.q.prod (left.side nterm):c.prod
+ |
+ +INSERT
+STRUCTURE c.empty c.collect (c.prod c.prod.list):c.prod.list
+ |
+ +INSERT
+FUNCTION trans.linkslinear (p1:prod.list):
+c.prod.list =
+IF p1 = empty THEN c.empty
+IF EX n1:nterm EX pr1:prod EX p2:prod.list EX w1:
+wort
+   p1 = collect (pr1 p2)
+   AND pr1 = make.prod (n1 eps)
+   THEN trans.linkslinear (p2)
+IF EX n2,n3:nterm EX pr2:prod EX p3:prod.list EX
+w2,w3:wort
+   p1 = collect (pr2 p3)
+   AND pr2 = make.prod (n2 w2)
+   AND w2 = cons (n3 w3)
+   THEN c.collect (make.c.prod (w2 n2)
+                   trans.linkslinear (p3))
+IF EX n4:nterm EX pr3:prod EX p4:prod.list EX t1:
+term EX w4,w5:wort
+   p1 = collect (pr3 p4)
+   AND pr3 = make.prod (n4 w4)
+   AND w4 = cons (t1 w5)
+   THEN c.collect (make.q.prod (conc (q w4) n4)
+                   trans.linkslinear (p4))
+ |
+ +INSERT
+FUNCTION trans (p1:prod.list):c.prod.list =
+IF NOT Linkslinear.List (p1) THEN c.empty
+IF Linkslinear.List (p1)
+   THEN trans.linkslinear (p1)
+ |
+ -INSERT
+ALL p1:prod ALL s1:satz ALL w1,w2:wort
+          ((Ded1 (w1 w2 p1) AND Compare (w1 s1) and not w1=eps)
+           IMPL Compare (w2 alle.abl (s1 collect (p1 empty))))
+ |
+ -INSERT
+all v,w:wort all p:prod not v=eps impl ersetze(append(v w) p) = append(ersetze(v p) w)
+all v,w:wort all p:prod ersetze(w p)=w impl ersetze(append(v w) p) = append(ersetze(v p) w)
+ |
+ -INSERT
+ALL p1:prod ALL w1,w2,w3:wort
+          (Compare (w1 alle.dir.abl (w2 p1))
+           IMPL Compare (append (w1 w3) alle.dir.abl (append (w2 w3) p1)))
+ |
+ -INSERT
+all p:prod.list all w,v,z:wort
+compare(w moegl.abl(v p)) impl compare(append(w z) moegl.abl(append(v z) p))
+ |
+ -INSERT
+;muesste mit Lemma4 und Lemma 16 und dem Satz, der auf der Symbolics laeuft (s.o.) zu beweisen sein
+ |
+ -INSERT
+all v,w:wort all s:satz all p:prod.list
+compare(w s) and ded2(w v p) impl compare(v alle.abl(s p))
+ |
+ -INSERT
+ALL p1:prod.list ALL w1,w2,w3:wort
+    (Ded2 (w3 w2 p1) IMPL Ded2 (append (w3 w1) append (w2 w1) p1))
+ |
+ -INSERT
+all n,m:nat all p:prod.list all u,v,w:wort deduction(u v p n) and deduction(v w p m) impl
+deduction(u w p plus(n m))
+ |
+ -INSERT
+all u,v,w:wort all p:prod.list all n:nat deduction(u v p n) impl deduction(append(u w) append(v w) p n)
+ |
+ OK

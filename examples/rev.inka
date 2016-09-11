@@ -1,0 +1,16 @@
+structure nil, cons(car:nat, cdr:list):list;
+
+function app(x,y:list):list =
+if x = nil then y
+if x of cons then cons(car(x), app(cdr(x), y));
+
+function rev(x:list):list =
+if x = nil then nil
+otherwise app(rev(cdr(x)), cons(car(x), nil));
+
+function len(x:list):nat =
+if x = nil then 0
+otherwise s(len(cdr(x)));
+
+all x:list len(x) = len(rev(x));
+

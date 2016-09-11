@@ -1,0 +1,39 @@
+unspec structure dummy;
+
+d-function pl(dummy, dummy):dummy;
+
+d-function mi(dummy, dummy):dummy;
+
+axiom all x,y:dummy pl(x, y) = pl(y, x);
+
+axiom all x,y,z:dummy pl(x, pl(y, z)) = pl(pl(x, y), z);
+
+axiom all x,y:dummy mi(pl(x, y), y) = x;
+
+axiom all x,y,z:dummy pl(mi(x, y), z) = mi(pl(x, z), y);
+
+axiom all x,y,z:dummy mi(pl(x, y), z) = pl(mi(x, z), y);
+
+
+all x,y:dummy pl(mi(x, y), y) = x;
+
+all x,y,z:dummy pl(x, mi(y, z)) = mi(pl(x, y), z);
+
+all x,y,z:dummy pl(mi(x, y), z) = pl(x, mi(z, y));
+
+all x,y,z:dummy mi(mi(x, z), mi(y, z)) = mi(x, y);
+
+all x,y,z:dummy mi(pl(x, z), pl(y, z)) = mi(x, y);
+
+all x,y,z:dummy pl(x, mi(y, z)) = pl(mi(x, z), y);
+
+all x,y,z:dummy mi(pl(x, y), z) = pl(x, mi(y, z));
+
+axiom all x,y,z:dummy mi(mi(x, y), z) = mi(mi(x, z), y);
+
+all x,y,z:dummy mi(x, pl(y, z)) = mi(mi(x, z), y);
+
+all x,y,z:dummy pl(x, mi(y, z)) = mi(x, mi(z, y));
+
+
+

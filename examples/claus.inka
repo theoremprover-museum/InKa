@@ -1,0 +1,82 @@
+a-function plus(x,y:nat):nat =
+if x of 0 then 0
+if x of s then s(plus(p(x), y))
+;
+
+a-predicate le(x,y:nat) =
+if y of 0 then false
+if y of s and x of 0 then true
+if y of s and x of s then le(p(x), p(y))
+;
+
+a-predicate lt(x,y:nat) = (le(x,y) or x = y)
+;
+
+structure nil, cons(car:nat, cdr:list):list
+;
+
+d-predicate eq(list, list)
+;
+
+d-predicate elem(nat, list) with
+axiom all x:nat not elem(x, nil)
+axiom all x,y:nat all A:list elem(x, cons(y, A)) <-> (x = y or elem(x, A))
+end;
+
+d-predicate gamma-theta(nat, list) with
+axiom all x:nat all A:list gamma-theta(x, A) <-> not elem(x, A)
+end;
+
+axiom all A,B:list eq(A, B) <-> (all x:nat elem(x, A) <-> elem(x, B));
+
+axiom all x:list eq(x, x);
+
+axiom all x,y:list eq(x, y) -> eq(y, x);
+
+axiom all x,y,z:list (eq(x, y) and eq(y, z)) -> eq(x, z);
+
+axiom all x,y:nat all A,B:list (x = y and eq(A,B)) -> eq(cons(x, A), cons(y, 
+B));
+
+axiom all x,y:nat all A,B:list (x = y and eq(A,B)) -> (gamma-theta(x, A) <-> 
+gamma-theta(y, B));
+
+axiom all x,y:nat all A,B:list (x = y and eq(A,B)) -> (elem(x, A) <-> elem(y, 
+B));
+
+a-function tsize(x:list):nat =
+if x of nil then 0
+otherwise s(tsize(cdr(x)));
+
+d-function msize(list):nat with
+axiom all x,y:list eq(x,y) -> lt(msize(x), tsize(y))
+axiom all x:list ex y:list eq(x,y) and tsize(y) = msize(x)
+axiom all x,y:list eq(x,y) -> msize(x) = msize(y)
+end;
+
+function msize2(x:list):nat =
+if x of nil then 0
+if x of cons and elem(car(x), cdr(x)) then  msize2(cdr(x))
+otherwise s(msize2(cdr(x)));
+
+predicate sub(x,y:list) =
+if x of nil then true
+if x of cons and elem(car(x), y) then sub(cdr(x), y)
+otherwise false;
+
+all x,y:list eq(x,y) -> (sub(x,y) and sub(y, x));
+
+
+
+
+all x:list msize(x) = msize2(x);
+
+
+
+
+all x:nat all A:list lt(msize(A), msize(cons(x, A)));
+
+all x:nat all A:list le(msize(A), msize(cons(x, A))) <-> gamma-theta(x, A);
+
+all x:nat all A:list msize(cons(x, A)) = s(msize(A)) <-> gamma-theta(x, A);
+

@@ -1,0 +1,754 @@
+head	1.1;
+access
+	serge
+	hutter
+	inka;
+symbols;
+locks; strict;
+comment	@;;; @;
+
+
+1.1
+date	97.08.20.08.07.30;	author serge;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@;;; -*- Package: KK-LISP; Mode: LISP; Syntax: Common-Lisp -*-
+
+
+;; 21.09.90   mp   ignore-input-until-definition       call to listen removed  
+;; 21.09.90   mp   patch-check-for-definitions         call to listen removed
+;; 21.09.90   mp   parse-file                          call to listen removed
+;; 21.09.90   mp   skip-comment                        call to listen removed
+;; 21.09.90   mp   skip-definition-body                call to listen removed
+;; 21.09.90   mp   patch-parse-modification-lines      call to listen removed
+;; 21.09.90   mp   parse-definition                    call to listen removed
+;; 21.09.90   mp   patch-copy-until-end-of-definition  call to listen removed
+;; 17.01.91   de   ---                                 added unpatch functions
+;; 03.04.91   mp   inka.generate.patch.file            added possibility to specify directories
+;; 03.04.91   mp   skip-definition-body                added case #\\
+;; 12.07.91   de   ---                                 added date functions
+
+(in-package :inka)
+
+(defvar fi*defstruct.renamings nil)
+
+;; =================
+;; Protocol facility
+;; =================
+
+(defun protocol.inka ()
+
+  ;; Effect:  a documentation file for the whole INKA system is generated
+  ;; Value:   undefined
+
+  (with-open-file (output (inka-filename "all" 'protocol) :direction :output)
+		  (format output "\\documentstyle[a4,makeidx]{report}~%")
+		  (format output "\\title{INKA Module Interface Function Documentation}~%")
+		  (format output "\\author{}~%")
+		  (format output "\\maketitle~%")
+		  (format output "\\makeindex~%")
+		  (format output "\\begin{document}~%")
+		  (format output "\\leftmargini10mm~%")
+		  (format output "\\leftmarginii5mm~%")
+		  (format output "\\tableofcontents~%")
+		  (format output "\\newpage~%")
+		  (format output "\\renewcommand{\\arraystretch}{1.5}~%")
+		  (mapc #'(lambda (file)
+			    (format output "\\input{~A}~%" file)
+			    (protocol.file (inka-filename file 'source)
+					   (inka-filename file 'protocol)))
+			*inka-files*)
+		  (format output "%\\input{idm}~%")
+		  (format output "\\printindex~%")
+		  (format output "\\end{document}~%"))
+  (start-latex)
+  nil)
+
+
+
+(defun start-latex ()
+
+  (run-program (namestring (make-pathname :directory (pathname-directory *inka-pathname*) :name "start_latex"))
+	       :output (make-pathname :directory (pathname-directory *inka-pathname*) :name "latex_errors")
+	       :error-output (make-pathname :directory (pathname-directory *inka-pathname*) :name "pr_errors")
+	       :if-output-exists :overwrite
+	       :if-error-output-exists :overwrite
+	       :wait nil
+	       :arguments nil))
+
+  
+(defun protocol.file (input.file output.file)
+
+  ;; Input:   two filenames
+  ;; Effect:  for each definition in input.file the documentation is printed to output.file
+  ;; Value:   undefined
+
+  (setq fi*defstruct.renamings nil)
+  (with-open-file (output output.file :direction :output)
+		  (format output "%\\documentstyle[a4,makeidx]{report}~%")
+		  (format output "%\\begin{document}~%")
+		  (format output "%\\leftmargini10mm~%")
+		  (format output "%\\leftmarginii5mm~%")
+		  (format output "%\\renewcommand{\\arraystretch}{1.5}~%")
+		  (let ((all.definitions (parse-file input.file)) not.documented)
+		    (format output "\\chapter{Description of ~A}~%~%" (substitute #\- #\_ (pathname-name input.file)))
+		    (format output "\\section{Summary of all interface-functions}~%~%")
+		    (format output "\\begin{description}~%")
+		    (mapc #'(lambda (definition)
+			      (cond ((member (fourth definition) '(macro function))
+				     (protocol-function definition output)
+				     (cond ((and definition (null (third definition)))
+					    (push (car definition) not.documented))))
+				    (t (protocol-defstruct definition output))))
+			  all.definitions)
+		    (format output "\\end{description}~%~%")
+		;   (cond (not.documented
+		;	      (format output "\\section{Warnings}~%")
+		;	      (format output "\\noindent The following functions are not documented: \\\\~%")
+		;	      (format output "\\begin{itemize}~%")
+		;	      (format output "~{\\item \\verb$~A$~%~}" (nreverse not.documented))
+		;	      (format output "\\end{itemize}~%")))
+		    (format output "%\\end{document}~%")
+		    nil)))
+
+
+(defun protocol-function (definition output)
+
+  (let ((position (position #\= (string (car definition)))) text params)
+    (cond ((and (not (and position (< position 5)))
+		(not (position #\@@ (string (car definition)))))
+	   (format output "\\item[]\\verb$~A$ " (car definition))
+	   (format output "\\index{\\verb$~A$} " (car definition))
+	   (cond ((second definition)
+		  (setq params (protocol.arglist (format nil "~A" (second definition))))
+		  (format output "\\quad \\\\~% a ~A with parameters: ~{~A~}"
+			  (cond ((eq 'macro (fourth definition)) "macro") (t "function"))
+			  params))
+		 (T (format output ": a ~A with no parameters.~%"
+			    (cond ((eq 'macro (fourth definition)) "macro") (t "function")))))
+	   (cond ((null (third definition))
+		  (format output "\\\\This function is not documented !~%"))
+		 (t (format output "\\leftmarginii13mm~%\\begin{description}~%")
+		    (cond ((setq text (getf (third definition) 'input))
+			   (format output "\\item[Input:] ~{~A~%~}" text)))
+		    (cond ((setq text (getf (third definition) 'effect))
+			   (format output "\\item[Effect:] ~{~A~%~}" text)))
+		    (cond ((setq text (getf (third definition) 'value))
+			   (format output "\\item[Value:] ~{~A~%~}" text)))
+		    (cond ((setq text (getf (third definition) 'values))
+			   (format output "\\item[Values:] ~{~A~%~}" text)))
+		    (cond ((setq text (getf (third definition) 'note))
+			   (format output "\\item[Note:] ~{~A~%~}" text)))
+		    (format output "\\end{description}~%\\leftmarginii5mm")))))))
+
+
+(defun protocol.arglist (string &optional follow.line)
+
+  (let (pos)
+    (cond ((> (length string) 58)
+	   (setq pos (position #\space string :start 0 :end 58 :from-end t))
+	   (cond ((neq pos 0)
+		  (cons (format nil "\\\\~%\\verb$ ~A $" (subseq string 0 pos))
+			(protocol.arglist (subseq string (1+ pos) (length string)) t)))))
+	  ((and (null follow.line) (> (length string) 35))
+	   (list (format nil "\\\\~%\\verb$ ~A $~%" string)))
+	  (follow.line (list (format nil "\\\\~%\\verb$ ~A $~%" string)))
+	  (t (list (format nil "~%\\verb$ ~A $~%" string))))))
+
+
+(defun protocol-defstruct (definition output)
+
+  (let* ((name (cond ((cdr (assoc (car (second definition)) fi*defstruct.renamings :test 'equal)))
+		     (t (car (second definition)))))
+	 (position (position #\- (string name)))
+	 entry)
+    (cond ((and position (< position 5))
+	   (cond ((setq entry (second (assoc :include (cdr (second definition)))))
+		  (setq entry (cond ((cdr (assoc entry fi*defstruct.renamings :test 'equal)))
+				    (t entry)))
+		  (format output "\\item []\\verb$~A$ is an extension of \\verb$~A$.~%" name entry))
+		 (t (format output "\\item[]\\verb$~A$ is a structure.~%" name)))
+	   (cond ((third definition)
+		  (format output "\\\\~%\\noindent ")
+		  (mapc #'(lambda (entry) (format output "~A~%" entry)) (third definition))))
+	   (cond ((fourth definition)
+		  (format output "\\leftmarginii15mm~%")
+		  (format output "{~%~%\\noindent \\bf The datastructure has the following slots:} ~%\\begin{description}~%")
+		  (mapc #'(lambda (slot)
+			    (format output "\\item [] \\verb$~A: $~%" (car slot))
+			    (mapc #'(lambda (text) (format output "~A~%" text)) (cdr slot)))
+			(fourth definition))
+		  (format output "\\end{description}~%")
+		  (format output "\\leftmarginii5mm~%"))
+		 (t (format output "\\\\~%")))))))
+
+
+(defun parse-file (file)
+
+  ;; Input:   a file variable
+  ;; Effect:  the documentation headers of each function are extracted
+  ;; Value:   the extracted definitions
+  
+  (let (all.definitions type)
+    (with-open-file (input file)
+		    (while (setq type (ignore-input-until-definition input))
+		      (setq all.definitions
+			    (classify-definitions (cond ((eq type 'defstruct) (parse-defstruct input))
+							(t (parse-definition input type)))
+						  all.definitions))))
+    (nreverse all.definitions)))
+
+
+(defun ignore-input-until-definition (input)
+
+  ;; Input:   a file variable
+  ;; Effect:  all input is skipped until start of definition is reached
+  ;; Value:   the type of the definition, i.e. defsubst, defmacro or defun or NIL if EOT is encountered.
+  
+  (let ((brackets 0) (definition nil) type char)
+    (while (and (not definition) (setq char (read-char input nil nil)))
+      (cond ((eql char #\;) (read-line input))
+	    ((eql char #\") (skip-comment input))
+	    ((eql char #\\) (read-char input))
+	    ((eql char #\() (incf brackets)
+	     (cond ((and (eql brackets 1) (alpha-char-p (peek-char t input))
+                         (member (setq type (read input)) '(defstruct defmacro defun)))
+		    (setq definition t))))
+	    ((eql char #\)) (decf brackets))))
+    type))
+
+
+(defun classify-definitions (definition all.definitions)
+  (push definition all.definitions))
+
+
+(defun skip-comment (input)
+
+  ;; Effect:  skips strings (!) in input
+  
+  (let (char)
+    (while (progn (setq char (read-char input nil nil))
+		  (cond ((eql char #\\) (read-char input nil nil) t)
+			(t (not (eql char #\"))))))))
+
+
+(defun parse-defstruct (input)
+
+  (let ((params (read input)) global.comment slot slot.comment all.slots new.name)
+    (while (eql (peek-char t input) #\;)
+      (setq global.comment (nconc global.comment (list (parse-comment.line input)))))
+    (while (not (eql (peek-char t input) #\)))
+      (setq slot (read input))
+      (setq slot.comment nil)
+      (while (eql (peek-char t input) #\;)
+	 (setq slot.comment (nconc slot.comment (list (parse-comment.line input)))))
+      (setq all.slots (nconc all.slots (list (cons slot slot.comment)))))
+    (read-char input nil nil)
+    (cond ((setq new.name (second (assoc :conc-name (cdr params))))
+	   (push (cons (car params) new.name) fi*defstruct.renamings)))
+    (list 'defstruct params global.comment all.slots)))
+
+
+(defun parse-definition (input type)
+
+  ;; Input:  a file variable and a specifier for the type of definition to come
+  ;; Effect: the documentation of this definition is parsed
+  ;; Value:  a 4-tupel (symbol arguments comment type)
+  
+  (let ((symbol (read input)) arguments comment)
+    (cond ((eql (peek-char t input) #\( )
+	   (setq arguments (read input))
+	   (setq comment (parse-comment input))
+	   (skip-definition-body input)
+	   (list symbol arguments comment 
+		 (case type
+		       (defun 'function)
+		       (defmacro 'macro)
+		       (defsubst 'structure)))))))
+
+
+
+(defun parse-comment (input)
+
+  ;; Effect: the documentation header of a definition is parsed and stored in different
+  ;;         slots
+  ;; Value:  a property list with all documentation stored
+  
+  (let (comment (type 'effect) text pos)
+    (while (eql (peek-char t input) #\;)
+      (setq text (parse-comment.line input))
+      (cond ((some #'(lambda (string new.type) 
+		       (cond ((and (setq pos (search string text :test 'char-equal)) (< pos 3))
+			      (setq type new.type)
+			      (setq text (parse-comment.string (string-left-trim ": " (subseq text (+ pos (length string)))))))))
+		   '("edited" "input" "effect" "value" "values" "note" "remark")
+		   '(edit input effect value values note note))))
+      (setf (getf comment type) (nconc (getf comment type) (list text))))
+    comment))
+
+
+(defun parse-comment.line (input)
+
+  (parse-comment.string (string-left-trim '(#\; #\space #\tab) (read-line input))))
+
+
+(defun parse-comment.string (comment)
+  (cond ((and (> (length comment) 0)
+	      (eq (aref comment 0) #\.))
+	 (format nil "\\verb$~A$\\newline" (string-left-trim "." comment)))
+	(t comment)))
+
+
+(defun skip-definition-body (input)
+
+  ;; Effect: the body of a definition is skipped
+  ;; Value:  undefined
+  
+  (let ((brackets 1) char)
+    (while (and (not (eql brackets 0)) (setq char (read-char input nil nil)))
+      (cond ((eql char #\;) (read-line input))
+            ((eql char #\") (skip-comment input))
+	    ((eql char #\\) (read-char input))
+            ((eql char #\() (incf brackets))
+            ((eql char #\)) (decf brackets))))))
+
+
+;; ========================
+;; Generation of patchfiles
+;; ========================
+
+(defun inka.generate.patch.file ()
+  
+  ;; Effect: a patchfile is generated, i.e. all modifications to the INKA-system stated in
+  ;;         modification lines are extracted and written to the file "patch"
+  ;; Value:  undefined
+  
+  (let (directory date)
+    (with-open-file
+	(output (inka-filename 'patch 'patch) :direction :output)
+      ;; output is written to $basedir/NEWPATCHES/patch.lisp
+      (format t "~%Specify directory to be patched: ")
+      (setq directory (read-line))
+       (cond ((equal directory "") (setq directory nil)))
+      (format t "~%Please input selection-date: ")
+      (setq date (read-date-from-string (read-line)))
+      (mapc #'(lambda (file)
+		(with-open-file
+		    (input (inka-filename file 'source directory) :direction :input)
+		  ;; input is from $basedir/<directory>/<file>.lisp
+		  ;; <directory> defaults to inka
+		  (format t "~%patching ~a" file)
+		  (read-line input)
+		  (let ((changed.defs (patch-parse-modification-lines input date)))
+		    (cond (changed.defs
+			   (let ((text (format nil "Patches of the ~A module" file)))
+			     (format output "~%~%;;; ~A~%;;; ~A~%" text 
+				     (subseq "============================================================="
+					     0 (length text)))
+			     (patch-check-for-definitions changed.defs input output)))
+			  (t (format output ";;; ~A-module: no changes made.~%" file))))))
+	    *inka-files*))))
+
+
+(defun patch-parse-modification-lines (input date)
+
+  ;; Effect: the modification-lines at the beginning of a file are parsed
+  ;; Value : a list of all modified definitions of that file
+  
+  (let (definitions string)
+    (while (member (read-char input nil nil) '(#\SPACE #\Newline)))
+    (setq string (string-trim '(#\space) (read-line input)))
+    (while (eq (position #\; string) 0)
+      (cond ((string-not-equal string "")
+             (multiple-value-bind (symbol entry) (patch-parse-modification-line string)
+	       (setq string (string-trim '(#\space) (read-line input)))  ;; read possible continuation line
+               (while (and (string-not-equal string "") (not (datep (read-date-from-string string))))
+	         (setf (third entry) (format nil "~A~%~A" (third entry) string))
+ 	         (setq string (string-trim '(#\space) (read-line input))))
+	       (cond ((and (neq (compare-date (read-date-from-string (first entry)) date) 'less)
+			   (valid-author (second entry)))
+		      (setf (getf definitions symbol) entry)))))))
+    definitions))
+
+(defun patch-parse-modification-line (string)
+
+  ;; Effect: a single modification line is parsed
+  ;; Value : function-name and list (date author modification-line)
+  
+  (let ((string0 (string-trim '(#\; #\space) string))
+	(position.start 0)
+	(position.end 0)
+	date author name comment)
+    (while (member (char string0 position.end) '(#\space #\. #\0 #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9))
+      (incf position.end))
+    (setq date (string-trim '(#\space) (subseq string0 position.start position.end)))
+    (setq position.start position.end)
+    (setq author (read-from-string string0 nil nil :start position.start))
+    (while (equal (char string0 position.start) #\space) (incf position.start))
+    (while (neq (char string0 position.start) #\space) (incf position.start))
+    (setq name (read-from-string string0 nil nil :start position.start))
+    (while (equal (char string0 position.start) #\space) (incf position.start))
+    (while (neq (char string0 position.start) #\space) (incf position.start))
+    (while (equal (char string0 position.start) #\space) (incf position.start))
+    (setq comment (subseq string0 position.start))
+    (values name (list date author string))))
+
+  
+(defun read-date-from-string (string)
+
+  ;; Effect: a date at the beginning of string is parsed
+  ;; Value : nil or list (day month year)
+
+  (let* ((string (remove #\:(string-trim '(#\;) (substitute #\. #\, string))))
+	 (dot1 (position #\. string))
+	 (dot2 (position #\. (remove #\. string :count 1)))
+	 day month year)
+    (cond ((and dot1 dot2)
+	   (setq day (read-from-string (subseq string 0 dot1) nil nil))
+	   (setq month (read-from-string (subseq string (1+ dot1) (incf dot2)) nil nil))
+	   (setq year (read-from-string string nil nil :start (1+ dot2)))))
+    (cond ((and (numberp day) (numberp month) (numberp year))
+           (cond ((> year 1900) (setq year (- year 1900))))
+           (list day month year)))))
+
+
+(defun compare-date (date1 date2)
+  
+  ;; Effect: date1 and date2 are compared
+  ;; Value : 'more, 'less, 'equal
+  
+  (cond ((some #'(lambda(x y)
+		   (cond ((= x y) nil)
+			 ((> x y) 'more)
+			 (t 'less)))
+	       (reverse date1) (reverse date2)))
+	(t 'equal)))
+
+
+(defun datep (date)
+
+  ;;Value : true if its argument a date, otherwise false
+
+  (let ((day (first date))
+	(month (second date))
+	(year (third date)))
+    (cond ((and (numberp day) (numberp month) (numberp year))
+           (cond ((and (and (> day 0) (< day 32))
+		       (and (> month 0) (< month 13))
+		       (and (> year 80) (< year 100)))))))))
+
+
+(defun valid-author (author)
+
+  ;; Value : T, if author works at (inka-location), NIL else.
+
+  (cond ((equal (inka-location) "darmstadt")
+	 (member author '(de mp cw)))
+	((equal (inka-location) "karlsruhe")
+	 (member author '(dh cs)))))
+
+
+(defun patch-check-for-definitions (definitions input output)
+
+  ;; Effect: the code of the modified definition is written to output
+  ;; Value:  undefined
+  
+  (let (type symbol entry)
+    (while (and definitions (setq type (ignore-input-until-definition input)))      
+      (setq symbol (read input))
+      (cond ((setq entry (getf definitions symbol))
+	     (format output "~A~%~%" (third entry))
+	     (format output "(~A ~A " type symbol)
+	     (patch-copy-until-end-of-definition input output)
+	     (remf definitions symbol))
+	    (t (skip-definition-body input))))
+    (cond (definitions
+	      (format output
+		      "~%~%;;; Following functions/macros are changed but their definitions were not found:~%~%")
+	      ;; notify user
+	      (format T
+		      "~%~%;;; Following functions/macros are changed but their definitions were not found:~%~%")
+	      (smapl #'(lambda (tail)
+			 (format output "~%~a" (third (second tail)))
+			 (format T "~a~%" (third (second tail))))
+		     #'cddr
+		     definitions)
+	    (format output "~%~%")))))
+
+(defun patch-copy-until-end-of-definition (input output)
+
+  ;; Effect: Input is copied to output until end of definition is reached.
+  ;; Value:  undefined
+  
+  (let ((bracket.level 1) string-ignore comment-ignore char-ignore char)
+    (while (and (neq bracket.level 0) (setq char (read-char input)))
+      (write-char char output)
+      (cond (string-ignore (cond ((eq char #\" ) (setq string-ignore nil))))
+	    (comment-ignore (cond ((eq char #\newline) (setq comment-ignore nil))))
+	    (char-ignore (setq char-ignore nil))
+	    ((eq char #\" ) (setq string-ignore t))
+	    ((eq char #\; ) (setq comment-ignore t))
+	    ((eq char #\\ ) (setq char-ignore t))
+	    ((eq char #\( ) (incf bracket.level))
+	    ((eq char #\) ) (decf bracket.level))))
+    (format output "~%~%")))
+
+;; ========================
+;; Evaluation of patchfiles
+;; ========================
+
+(defun inka.evaluate.patch.file ()
+
+  ;;Effect: the patch-file is evaluated
+  ;;Value : undefined
+
+  (let (changed.module directory definitions)
+    (format t "~%Specify directory to be patched: ")
+    (setq directory (read-line))
+    (cond ((equal directory "") (setq directory nil)))
+
+    (setq changed.module (patch-evaluate-read-patch directory))
+    (mapc #'(lambda (file)
+	      (setq definitions (cdr (assoc (read-from-string file) changed.module)))
+	      (cond ((eq (car definitions) nil) (format t "~%~A-module: no change made~%" file))
+		    (t (format t "~%changed definitions of ~A-module:~%" file)
+		       (patch-check-modul-for-definition file definitions directory))))
+	  *inka-files*)))
+
+
+(defun patch-evaluate-read-patch (directory)
+
+  ;; Effect: the changed modules and their changed definitions are founded
+  ;; Value : associationslist with module-name and list of changed definitions
+
+  (let (definitions)
+    (with-open-file (input (inka-filename 'patch 'source directory) :direction :input)
+      ;; input is from $basedir/<directory>/patch.lisp, directory defaults to "inka"
+      (while (multiple-value-bind (key changes) (parse-comment-line input)
+	       (case key
+		 (module    
+		  (setq definitions (cons (list changes) definitions)))
+		 (function  
+		  (setq definitions (cons (append (car definitions)
+						  (list (list changes (read-def input))))
+					  (cdr definitions))))
+		 (comment   
+		  (setq definitions (cons (append (car definitions)
+						  (list (list changes)))
+					  (cdr definitions))))
+		 (no.changes
+		  (setq definitions (cons (list changes nil) definitions)))
+		 (t nil)))))
+    definitions))
+
+
+(defun parse-comment-line (input)
+
+  ;; Effect: the comment-lines of patch-file are parsed
+  ;; Value : 'module and module-name for a changed module is begining
+  ;;         'no.changes and module-name for module is not changed
+  ;;         'function and comment-line for a new function is begining
+  ;;         'comment and comment-line for a changed definition is not founded
+  ;;         nil and nil for eof is reached
+
+  (let (line)
+    (while (equal (setq line (read-line input nil nil)) ""))
+    (cond  ((equal line nil) (values nil nil))          
+           ((equal (subseq line 4 11) "Patches")
+ 	    (read-line input)
+	    (values 'module (read-from-string (subseq line 19))))
+	   ((equal (subseq line 4 8) "the ")
+	    (values 'function (generate-modification-line line input)))
+	   ((and (position #\- line)
+		 (equal (read-from-string (delete #\: (subseq line (+ 1 (position #\- line))))) 'module))
+	    (values 'no.changes (read-from-string (subseq line 4 (position #\- line)))))
+	   (t (values 'comment line)))))
+
+(defun generate-modification-line (line input)
+  (let (d a f c dummy comment (pos 8))
+    (setq line (remove #\: line))
+    (setq dummy (string (read-from-string (subseq line pos))))
+    (setq pos (+ 8 (length dummy)))
+    (setq f (string (read-from-string (subseq line pos))))
+    (setq pos (+ pos (length f)))
+    (setq a (string (read-from-string (subseq line (+ pos 13)))))
+    (setq pos (+ pos 17 (length a)))
+    (setq d (subseq line pos (+ pos 8)))
+    (setq c (subseq line (+ pos 9)))
+    (setq comment (format nil ";;; ~a ~a ~a ~a" d a f c))
+    (while (string-not-equal (setq line (read-line input)) "")
+      (setq comment (format nil "~A~%~A" comment line)))
+    comment))
+
+
+(defun read-def (input)
+
+  ;; Effect: A function is copied into list
+  ;; Value : List
+
+  (let ((brackets 1) string func)
+  (while (neq (read-char input) #\())
+  (while (> brackets 0)
+      (setq string (read-line input nil nil))
+      (setq brackets (+ brackets (parse-brackets-of-string string)))
+      (setq func (append func (list string))))
+    func))
+
+
+(defun patch-check-modul-for-definition (file defs directory)
+
+  ;; Effect: the changed definitions are written in file
+  ;; Value : undefinied
+
+  (let (expr)
+    (with-open-file (input (inka-filename file 'source directory) :direction :input)
+      ;; input is from $basedir/<directory>/<file>.lisp, directory defaults to "inka"
+      (with-open-file (output (inka-filename file 'patch) :direction :output)
+	;; output is to $basedir/NEWPATCHES/<file>.lisp
+        (setq defs (copy-comment input output defs))
+        (while (copy-until-function input output)
+	  (multiple-value-bind (type name string) (parse-func-line input)
+          (cond ((setq expr (member-of-def type name defs))
+		 (setq defs (remove expr defs))
+		 (format t "    ~A~%" name)
+                 (write-def expr output)
+                 (my-skip-def-body input (parse-brackets-of-string string)))
+		(t (write-line string output)
+		   (my-patch-copy-until-end-of-def input output (parse-brackets-of-string string))))))
+        (mapc #'(lambda (expr)
+		  (cond ((eql expr nil) nil) 
+			(t (write-string (format nil "~%~%~%(") output) (write-def expr output))))
+	      defs)))))
+
+
+(defun copy-comment (input output defs)
+
+  ;;Effect: all comment-lines of changed definitions are copied 
+  ;;Value : list of definitions without comment-lines
+
+  (write-line (read-line input) output)
+  (while (equal (peek-char nil input) #\newline)
+    (write-line (read-line input) output))
+  (while (equal (peek-char nil input) #\;)
+    (write-line (read-line input) output))
+  (setq defs (mapcar #'(lambda (item) (write-line (car item) output) (cadr item)) defs))
+  (cond ((neq (peek-char nil input) #\newline) (write-char #\newline output)))
+  defs)
+
+
+(defun copy-until-function (input output)
+
+  ;;Effect: input is copied to output until the next function is reached
+  ;;Value : nil for eof is reached
+
+  (let (definition char)
+    (while (and (not definition) (setq char (read-char input nil nil)))
+           (write-char char output)
+           (cond ((eql char #\;) (write-line (read-line input) output))
+                 ((eql char #\") (while (neq #\" (write-char (read-char input) output))))
+                 ((eql char #\\) (write-char (read-char input) output))
+                 ((eql char #\() (setq definition t))))
+    char))
+
+
+(defun parse-func-line (input)
+
+  ;; Effect: the head of next function is parsed
+  ;; Value : function-type, function-name and first line of function
+
+  (let* ((string (string-trim '(#\space) (read-line input)))
+	 (type (read-from-string string))
+	 (rest (subseq string (position #\space string)))
+	 name)
+    (cond ((member type '(defsubst defmacro defun))
+	   (setq name (read-from-string rest)))
+	  (t (setq name nil)))
+    (values type name string)))
+
+
+(defun member-of-def (func-type func-name defs)
+
+  ;; Effect: searching for function in changed definitions
+  ;; Value : changed definition or nil
+
+  (let (func-string)
+    (setq func-string (string-trim '(#\space) (caar defs)))
+    (cond ((eq defs nil) nil)
+	  ((and (equal func-type (read-from-string func-string))
+		(equal func-name (read-from-string func-string nil nil
+						   :start (position #\space func-string))))
+	   (car defs))
+	  (t (member-of-def func-type func-name (cdr defs))))))
+
+
+(defun my-skip-def-body (input brackets)
+
+  ;; Effect: skip the body of current function
+  ;; Value : undefined
+
+  (while (>= brackets 0)
+    (setq brackets (+ brackets (parse-brackets-of-string (read-line input))))))
+
+
+(defun my-patch-copy-until-end-of-def (input output brackets)
+
+  ;; Effect: input is copied to output until end of definition is reached
+  ;; Value : undefined
+
+  (while (>= brackets 0)
+    (setq brackets (+ brackets (parse-brackets-of-string (write-line (read-line input) output))))))
+
+
+(defun write-def (expr output)
+
+  ;; Effect: expr is written to output
+  ;; Value : undefined
+
+  (mapc #'(lambda (line) (write-line line output)) expr))
+
+
+(defun parse-brackets-of-string (string)
+
+  ;; Effect: Count brackets of string
+  ;; Value : Number of brackets
+
+  (let ((brackets 0) (pos -1) char string-end)
+    (while (not string-end)
+      (setq char (find-if #'comment-eq string :start (incf pos)))
+      (setq pos (position char string :start pos))
+      (cond ((equal char #\() (incf brackets))
+	    ((equal char #\)) (decf brackets))
+	    ((equal char #\;) (setq string-end t))
+	    ((equal char #\\) (incf pos))
+	    ((equal char #\") (setq pos (position #\" string :start (incf pos)))
+	     (setq string-end (equal pos nil)))
+	    (t (setq string-end t))))
+    brackets))
+
+
+(defun comment-eq (item)
+
+  ;;Effect: Searching for especially characters
+  ;;Value : Character
+
+  (cond ((equal item #\() #\()
+	((equal item #\)) #\))
+	((equal item #\\) #\\)
+        ((equal item #\") #\")
+	((equal item #\;) #\;)
+	(t nil)))
+
+
+
+@

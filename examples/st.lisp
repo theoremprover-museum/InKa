@@ -1,0 +1,46 @@
+(ALL II_FIELDINTERFACE.AXIS_W:axestatus.axes_status
+ (ALL II_FIELDINTERFACE.AXIS_Z:axestatus.axes_status
+  (ALL II_FIELDINTERFACE.AXIS_Y:axestatus.axes_status
+  (ALL II_FIELDINTERFACE.AXIS_X:axestatus.axes_status
+  (ALL II_FIELDINTERFACE.INTERPOLATOR_QUEUE : basicqueue.queue
+  (ALL II_FIELDINTERFACE.AXISMOTION_W : motion.axes_motion
+  (ALL II_FIELDINTERFACE.AXISMOTION_Z : motion.axes_motion
+  (ALL II_FIELDINTERFACE.AXISMOTION_Y : motion.axes_motion
+  (ALL II_FIELDINTERFACE.AXISMOTION_X : motion.axes_motion
+  (ALL II_FIELDINTERFACE.EMERGENCY_FLAG : yesno.yes_no
+   (((II_FIELDINTERFACE.INTERPOLATOR_QUEUE =/= basicqueue.nil 
+            OR II_FIELDINTERFACE.EMERGENCY_FLAG = yesno.yes )
+     AND II_FIELDINTERFACE.EMERGENCY_FLAG =/= yesno.yes )
+     and (NOT (abstractcommand.name(extendedqueue.read(II_FIELDINTERFACE.INTERPOLATOR_QUEUE)) 
+               = commandname.move and
+          (II_FIELDINTERFACE.AXISMOTION_X = motion.moving or
+II_FIELDINTERFACE.AXISMOTION_Y = motion.moving or
+II_FIELDINTERFACE.AXISMOTION_Z = motion.moving or
+II_FIELDINTERFACE.AXISMOTION_W = motion.moving )))
+IMPL 
+(abstractcommand.name(extendedqueue.read(II_FIELDINTERFACE.INTERPOLATOR_QUEUE)) = commandname.move 
+ and (II_FIELDINTERFACE.AXIS_X = axestatus.enabled or
+ 	II_FIELDINTERFACE.AXIS_Y = axestatus.enabled or
+ 	II_FIELDINTERFACE.AXIS_Z = axestatus.enabled or
+	 II_FIELDINTERFACE.AXIS_W = axestatus.enabled )
+)))))))))))
+
+
+ (ALL II_FIELDINTERFACE.AXIS_W 
+	(ALL II_FIELDINTERFACE.AXIS_Z 
+	(ALL II_FIELDINTERFACE.AXIS_Y (ALL II_FIELDINTERFACE.AXIS_X (ALL 
+II_FIELDINTERFACE.INTERPOLATOR_QUEUE (ALL II_FIELDINTERFACE.AXISMOTION_W (ALL 
+II_FIELDINTERFACE.AXISMOTION_Z (ALL II_FIELDINTERFACE.AXISMOTION_Y (ALL 
+II_FIELDINTERFACE.AXISMOTION_X (ALL II_FIELDINTERFACE.EMERGENCY_FLAG (IMPL 
+(AND (AND (OR II_FIELDINTERFACE.INTERPOLATOR_QUEUE =/= basicqueue.nil 
+II_FIELDINTERFACE.EMERGENCY_FLAG = yesno.yes ) II_FIELDINTERFACE.EMERGENCY_FLAG
+ =/= yesno.yes ) (NOT (AND abstractcommand.name(extendedqueue.read(II_FIELDINTE
+RFACE.INTERPOLATOR_QUEUE)) = commandname.move (OR (OR (OR 
+II_FIELDINTERFACE.AXISMOTION_X = motion.moving II_FIELDINTERFACE.AXISMOTION_Y 
+= motion.moving ) II_FIELDINTERFACE.AXISMOTION_Z = motion.moving ) 
+II_FIELDINTERFACE.AXISMOTION_W = motion.moving ) ) ) ) (AND 
+abstractcommand.name(extendedqueue.read(II_FIELDINTERFACE.INTERPOLATOR_QUEUE)) 
+= commandname.move (OR (OR (OR II_FIELDINTERFACE.AXIS_X = axestatus.enabled 
+II_FIELDINTERFACE.AXIS_Y = axestatus.enabled ) II_FIELDINTERFACE.AXIS_Z = 
+axestatus.enabled ) II_FIELDINTERFACE.AXIS_W = axestatus.enabled ) ) 
+)))))))))))

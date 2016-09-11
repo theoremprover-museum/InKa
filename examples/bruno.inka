@@ -1,0 +1,17 @@
+free structure e1,e2: element;
+
+free structure nil, cons(first:element, rest:list): list;
+
+free structure nil2, cons2(first2:element, rest2:list2):list2;
+
+function conv(l:list2):list = IF l = nil2 THEN nil OTHERWISE cons(first2(l),conv(rest2(l))) ;
+
+function search(l:list):element = IF l = nil THEN e1 
+                                  OTHERWISE {IF first(l) = e1 THEN e2 OTHERWISE search(rest(l))};
+
+function search2(l:list2):element = IF search(conv(l)) = e1 THEN e2 OTHERWISE e1;
+
+function search3(l:list2):element = IF l = nil2 THEN e2
+                                    OTHERWISE {IF first2(l) = e1 THEN e1 OTHERWISE search3(rest2(l))};
+
+all l:list2 search2(l) = search3(l)

@@ -1,0 +1,45 @@
+enum structure red, black: card;
+
+structure nil, add(head:card, tail:list):list;
+
+function append(k,l:list):list =
+if k = nil then l
+otherwise add(head(k), append(tail(k), l));
+
+predicate Opp_c(k,l:list) =
+if k = nil and l = nil then true
+if not k = nil and l = nil then false
+if k = nil and not l = nil then false
+otherwise head(k) = head(l);
+
+predicate Alt_c(l: list) =
+if l = nil then true
+if not l = nil and tail(l) = nil then true
+otherwise Alt_c(tail(l)) and Opp_c(l, tail(l));
+
+predicate Even_length(l:list) =
+if l = nil then true
+if not l = nil and tail(l) = nil then false
+otherwise Even_length(tail(tail(l)));
+
+predicate Shuffle_p(k,l,m:list) =
+if k = nil then l = m
+if not k = nil and l = nil then k = m
+if not k = nil and not l = nil and m = nil then false
+otherwise Shuffle_p(tail(k), l, tail(m)) or Shuffle_p(k, tail(l), tail(m));
+
+predicate Paired_c(l:list) =
+if l = nil then true
+if not l = nil and tail(l) = nil then false
+otherwise Opp_c(l, tail(l)) and Paired_c(tail(tail(l)));
+
+
+all x,y,z:list Opp_c(x, y) and Alt_c(append(x,y)) and 
+               Even_length(append(x, y))and Shuffle_p(x,y,z) impl
+               Paired_c(z);
+
+all x,y,z:list not Opp_c(x, y) and Alt_c(append(x,y)) and 
+               Even_length(append(x, y))and Shuffle_p(x,y,z) impl
+               Paired_c(append(tail(z), add(head(z), nil)));
+
+

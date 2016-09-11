@@ -1,0 +1,64 @@
+ -INSERT
+STRUCTURE (atom) nil cons (car:sexpr cdr:sexpr):sexpr
+ |
+ -INSERT
+STRUCTURE 0 succ (pred:number):number
+ |
+ -INSERT
+STRUCTURE empty add (head:number tail:list):list
+ |
+ -INSERT
+FUNCTION nthcdr1 (n1:number s1:sexpr):sexpr =
+IF n1 = 0 THEN s1
+IF n1 = succ (pred (n1)) THEN nthcdr1 (pred (n1) cdr (s1))
+ |
+ -INSERT
+FUNCTION select1 (l1:list s1:sexpr):sexpr =
+IF l1 = empty THEN s1
+IF l1 = add (head (l1) tail (l1)) AND NOT s1 = cons (car (s1) cdr (s1))
+   THEN s1
+IF l1 = add (head (l1) tail (l1)) AND s1 = cons (car (s1) cdr (s1))
+   THEN select1 (tail (l1) nthcdr1 (succ (head (l1)) s1))
+ |
+ -INSERT
+FUNCTION nthcdr2 (n1:number s1:sexpr):sexpr =
+IF n1 = 0 THEN s1
+IF n1 = succ (pred (n1)) THEN cdr (nthcdr2 (pred (n1) s1))
+ |
+ -INSERT
+FUNCTION nthcdr3 (n1:number s1:sexpr):sexpr =
+IF n1 = 0 THEN s1
+IF n1 = succ (pred (n1)) AND NOT s1 = cons (car (s1) cdr (s1)) THEN s1
+IF n1 = succ (pred (n1)) AND s1 = cons (car (s1) cdr (s1))
+   THEN nthcdr3 (pred (n1) cdr (s1))
+ |
+ -INSERT
+FUNCTION select3 (l1:list s1:sexpr):sexpr =
+IF l1 = empty THEN s1
+IF l1 = add (head (l1) tail (l1)) AND NOT s1 = cons (car (s1) cdr (s1))
+   THEN s1
+IF l1 = add (head (l1) tail (l1)) AND s1 = cons (car (s1) cdr (s1))
+   THEN select3 (tail (l1) nthcdr3 (succ (head (l1)) s1))
+ |
+ -INSERT
+FUNCTION nthcdr4 (n1:number s1:sexpr):sexpr =
+IF n1 = 0 THEN s1
+IF n1 = succ (pred (n1)) AND NOT s1 = cons (car (s1) cdr (s1)) THEN s1
+IF n1 = succ (pred (n1)) AND s1 = cons (car (s1) cdr (s1))
+   THEN cdr (nthcdr4 (pred (n1) s1))
+ |
+ -INSERT
+function select4(k:list x:sexpr):sexpr=
+if k=empty then x
+if k=add(head(k) tail(k)) and not x=cons(car(x) cdr(x)) then x
+if k=add(head(k) tail(k)) and x=cons(car(x) cdr(x)) then
+select4(tail(k) nthcdr4(succ(head(k)) x))
+ |
+ -INSERT
+function select2(k:list x:sexpr):sexpr=
+if k=empty then x
+if k=add(head(k) tail(k)) and not x=cons(car(x) cdr(x)) then x
+if k=add(head(k) tail(k)) and x=cons(car(x) cdr(x)) then
+select2(tail(k) nthcdr2(succ(head(k)) x))
+ |
+ OK

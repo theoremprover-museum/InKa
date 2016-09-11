@@ -1,0 +1,58 @@
+ -INSERT
+STRUCTURE 0 succ (pred:number):number
+ |
+ -INSERT
+STRUCTURE empty add (head:number tail:list):list
+ |
+ -INSERT
+FUNCTION append (l1,l2:list):list =
+IF l1 = empty THEN l2
+IF l1 = add (head (l1) tail (l1)) THEN add (head (l1) append (tail (l1) l2))
+ |
+ -INSERT
+FUNCTION last (l1:list):number =
+IF l1 = empty THEN 0
+IF l1 = add (head (l1) tail (l1)) AND tail (l1) = empty THEN head (l1)
+IF l1 = add (head (l1) tail (l1)) AND NOT tail (l1) = empty
+   THEN last (tail (l1))
+ |
+ -INSERT
+FUNCTION addend (n1:number l1:list):list =
+IF l1 = empty THEN add (n1 l1)
+IF l1 = add (head (l1) tail (l1)) AND tail (l1) = empty
+   THEN add (head (l1) add (n1 tail (l1)))
+IF l1 = add (head (l1) tail (l1)) AND NOT tail (l1) = empty
+   THEN add (head (l1) addend (n1 tail (l1)))
+ |
+ -INSERT
+PREDICATE Lt (n1,n2:number) =
+IF n2 = 0 THEN False
+IF n1 = 0 AND n2 = succ (pred (n2)) THEN True
+IF n1 = succ (pred (n1)) AND n2 = succ (pred (n2))
+   THEN Lt (pred (n1) pred (n2))
+ |
+ -INSERT
+FUNCTION cut (l1:list):list =
+IF l1 = empty THEN empty
+IF l1 = add (head (l1) tail (l1)) AND tail (l1) = empty THEN empty
+IF l1 = add (head (l1) tail (l1)) AND NOT tail (l1) = empty
+   THEN add (head (l1) cut (tail (l1)))
+ |
+ -INSERT
+FUNCTION partition (n1:number l1,l2,l3:list):list =
+IF l1 = empty THEN append (l2 l3)
+IF l1 = add (head (l1) tail (l1)) AND Lt (head (l1) n1)
+   THEN partition (n1 tail (l1) addend (head (l1) l2) l3)
+IF l1 = add (head (l1) tail (l1))
+   AND NOT Lt (head (l1) n1)
+   AND Lt (n1 last (l1))
+   THEN partition (n1 cut (l1) l2 add (last (l1) l3))
+IF l1 = add (head (l1) tail (l1))
+   AND NOT Lt (head (l1) n1)
+   AND NOT Lt (n1 last (l1))
+   THEN partition (n1
+                   cut (tail (l1))
+                   addend (last (l1) l2)
+                   add (head (l1) l3))
+ |
+ OK

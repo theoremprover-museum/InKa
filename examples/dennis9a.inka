@@ -1,0 +1,140 @@
+enum structure tt, ff : bool;
+
+function p2:nat = s(s(0));
+function p5:nat = s(s(s(p2)));
+
+structure nil, cons(car:nat, cdr:list):list;
+
+function prefix(l1,l2:list):bool = 
+if l1 = nil then tt
+otherwise 
+{if l2 = nil then ff
+ otherwise
+ {if car(l1) = car(l2) then prefix(cdr(l1), cdr(l2))
+  otherwise ff
+}};
+
+
+enum structure e1, e2, ne : aelem;
+
+enum structure epsl, e1l, e2l, e1e2l, e2e1l, error : atail;
+
+structure quad(nonempty:bool, oneelem:bool, hd:aelem, tl:atail) : alist;
+
+function isemptylist(l:alist):bool = 
+if nonempty(l) = ff then tt
+otherwise ff;
+
+function isepslist(l:alist):bool = 
+if tl(l) = epsl then tt
+otherwise ff;
+
+function ise1list(l:alist):bool = 
+if tl(l) = e1l then tt
+otherwise ff;
+
+function ise2list(l:alist):bool = 
+if tl(l) = e2l then tt
+otherwise ff;
+
+function ise1e2list(l:alist):bool = 
+if tl(l) = e1e2l then tt
+otherwise ff;
+
+function ise2e1list(l:alist):bool = 
+if tl(l) = e2e1l then tt
+otherwise ff;
+
+function iserrorlist(l:alist):bool = 
+if tl(l) = error then tt 
+otherwise ff;
+
+function aprefix(l1:alist, l2:alist):bool = 
+if isemptylist(l1) = tt then tt
+otherwise 
+{if tl(l2) = error then tt
+ otherwise
+ {if tl(l1) = epsl AND nonempty(l2) = tt AND oneelem(l1) = tt then
+tt
+  otherwise
+  {if tl(l1) = epsl AND nonempty(l2) = tt AND oneelem(l2) = ff then
+tt 
+   otherwise
+   {if tl(l1) = e1l AND tl(l2) = e1l AND oneelem(l1) = tt then
+tt 
+    otherwise
+    {if tl(l1) = e1l  AND tl(l2) = e1l AND oneelem(l2) = ff
+then tt
+     otherwise
+     {if tl(l1) = e1l AND tl(l2) = e1e2l then tt
+      otherwise
+      {if tl(l1) = e2l AND tl(l2) = e2l AND oneelem(l1) = tt
+then tt
+       otherwise
+       {if tl(l1) = e2l AND tl(l2) = e2l AND oneelem(l2) = ff
+then tt
+        otherwise
+        {if tl(l1) = e2l AND tl(l2) = e2e1l then tt
+         otherwise
+         {if tl(l1) = e1e2l AND tl(l2) = e1e2l then tt
+          otherwise 
+          {if tl(l1) = e2e1l AND tl(l2) = e2e1l then tt
+           otherwise ff
+}}}}}}}}}}};
+
+
+function alphaelem(a:nat):aelem = 
+if a = p2 then e1
+otherwise { if a = p5 then e2
+              otherwise ne} ;
+
+
+function check_nonempty(l:list):bool =
+if l = nil then ff
+otherwise tt;
+
+function check_oneel(l:list):bool =
+if l = nil then ff
+if NOT l = nil AND cdr(l) = nil then tt
+           otherwise ff;
+
+
+function combine(x:aelem, y:atail):atail =
+
+ if x = ne then y
+ if x = e1 and y = epsl then e1l
+ if x = e1 and y = e2l then e1e2l
+ if x = e2 and y = epsl then e2l
+ if x = e2 and y = e1l then e2e1l
+ otherwise error;
+
+function alphatail(l:list):atail =
+if l = nil then epsl
+otherwise  combine(alphaelem(car(l)), alphatail(cdr(l)));
+
+
+function alpha(l:list):alist =
+quad(check_nonempty(l), check_oneel(l), alphaelem(car(l)),
+alphatail(l));
+
+all x,w,u,v:aelem all y,z:atail
+     aprefix(quad(tt, ff, u, y), quad(tt, ff, v, z)) = tt ->
+     aprefix(quad(tt, ff, w, combine(x, y)),
+             quad(tt, ff, w, combine(x, z))) = tt;
+
+all u:aelem all v:atail
+     aprefix(quad(tt, tt, u, combine(u, epsl)), 
+             quad(tt, ff, u, combine(u, v))) = tt ;
+
+
+all y,z:list all x:aelem
+prefix(y, z) = tt ->
+aprefix(quad(tt, ff, x, alphatail(y)), quad(tt, ff, x, alphatail(z))) = tt;
+
+
+all l1,l2:list all n:nat 
+prefix(l1,l2) = tt -> aprefix(alpha(l1),alpha(l2)) = tt;
+
+
+
+

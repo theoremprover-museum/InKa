@@ -1,0 +1,67 @@
+%%%%%%%%%%% FIFO's %%%%%%%%%%%%%%%%%%%%
+
+structure nil, cons(car:nat, cdr:list):list;
+
+function next(A:list):nat = 
+if A of nil then car(A)
+if A of cons and cdr(A) of nil then car(A)
+otherwise next(cdr(A));
+
+function rest(A:list):list = 
+if A of nil then nil
+if A of cons and cdr(A) of nil then nil
+otherwise cons(car(A), rest(cdr(A)));
+
+predicate member(x:nat, A:list) =
+if A of nil then false
+if A of cons and x = car(A) then true
+otherwise member(x, cdr(A));
+
+function append(x,y:list):list =
+if x of nil then y
+if x of cons then cons(car(x), append(cdr(x), y));
+
+function reverse(A:list):list =
+if A of nil then A
+if A of cons then append(reverse(cdr(A)), cons(car(A), nil));
+
+
+all A:list (not A = nil) -> member(next(A),A);
+
+all A,B:list append(A,B) = nil <-> (A = nil and B = nil);
+
+all A:list append(A, nil) = A;
+
+all A,B:list (not B = nil) -> rest(append(A,B)) = append(A, rest(B));
+
+all x:nat all A:list rest(reverse(cons(x, A))) = reverse(A);
+
+predicate prior(x,y:nat, A:list) =
+if A of nil then false
+if A of cons and car(A) = x then member(y, cdr(A))
+otherwise prior(x,y,cdr(A));
+
+all x:nat all A:list member(x, A) -> (ex B,C:list A = append(B, cons(x, C)));
+
+all x:nat all A,B:list member(x, append(A,B)) <-> (member(x, A) or member(x, B));
+
+all x:nat all A:list (ex B,C:list A = append(B, cons(x, C))) -> member(x, A);
+
+all x:nat all A:list member(x, A) <-> (ex B,C:list A = append(B, cons(x, C)));
+
+
+all x:nat all y,y1,y2:list ex u,v,w:list y = append(y1, cons(x, y2)) ->
+ cons(x, y) = append(u, cons(x, append(v, cons(x, w))));
+
+all x,y:nat all A:list prior(x,y,A) ->
+(ex B,C,D:list member(x, A) and member(y, A) and A = append(B, cons(x, append(C, cons(y, D)))));
+
+all x,y:nat all A:list 
+(ex B,C,D:list member(x, A) and member(y, A) and A = append(B, cons(x, append(C, cons(y, D)))))
+-> prior(x,y,A);
+
+all x,y:nat all A:list prior(x,y,A) <->
+(ex B,C,D:list member(x, A) and member(y, A) and A = append(B, cons(x, append(C, cons(y, D)))));
+
+
+ 

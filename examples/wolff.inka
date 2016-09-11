@@ -1,0 +1,24 @@
+unspec structure Rpos;
+
+structure  #(get_Rpos:Rpos), dot(vector, Rpos):vector;
+
+d-function times(Rpos, Rpos):Rpos;
+
+d-function div(Rpos, Rpos):Rpos;
+
+axiom all r, r0:Rpos div(times(r, r0), r0) = r;
+
+d-function vtimes(Rpos, Vector):vector;
+
+axiom  all r, r1:rpos vtimes(r, #(r1)) = #(times(r, r1));
+
+axiom all r, r1:rpos all v1:vector vtimes(r, dot(v1, r1)) = dot(vtimes(r, v1), times(r, r1));
+
+d-function index(vector, vector):rpos;
+
+axiom all r0, r1:rpos index(#(r0), #(r1)) = div(r1, r0);
+
+axiom all r0:rpos all v0, v1:vector index(dot(v0, r0), dot(v1, times(index(v0, v1), r0))) 
+      = index(v0, v1);
+
+all v0:vector all r:rpos index(v0, vtimes(r, v0)) = r;

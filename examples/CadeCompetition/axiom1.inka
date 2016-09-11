@@ -1,0 +1,315 @@
+unspec structure elem;
+
+structure nil, cons(car:nat, cdr:list):list;
+
+
+function plus(x,y:nat):nat =
+if x = 0 then y
+if x = s(p(x)) then s(plus(p(x), y));
+
+
+function double(i:nat):nat =
+if i = 0 then 0
+if i = s(p(i)) then s(s(double(p(i))));
+
+
+function half(i:nat):nat =
+if i = 0 then 0
+if i = s(0) then 0
+if i = s(s(p(p(i)))) then s(half(p(p(i))));
+
+function times(i,j:nat):nat = 
+if i = 0 then 0
+if i = s(p(i)) then plus(j,times(p(i),j));
+
+
+function fact(x:nat):nat =
+if x = 0 then s(0)
+if x = s(p(x)) then times(x, fact(p(x)));
+
+
+function difference(i,j:nat):nat = 
+if i = 0 then 0
+if i = s(p(i)) and j = 0 then i
+if i = s(p(i)) and j = s(p(j)) then difference(p(i), p(j));
+
+function sub(x:nat):nat = p(x);
+
+
+function exp(i,j:nat):nat =
+if j = 0 then s(0)
+if j = s(p(j)) then times(i,exp(i,p(j)));
+
+
+function exp***(i,j:nat):nat =
+if j = 0 then s(0)
+if j = s(p(j)) then times(exp***(i,p(j)), i);
+
+
+function exp****(i,j:nat):nat =
+if j = 0 then s(0)
+if j = s(p(j)) then times(i,exp****(i,p(j)));
+
+
+function exp-fn(r0,r1,r2,r3,r4:nat):nat =
+if r4 = 0 then r1
+if r4 = s(p(r4)) then exp-fn(0, times(r3,r1), times(r3,r1), r3, p(r4));
+
+function fib(x:nat):nat  = 
+if x = 0 then 0
+if x = s(0) then s(0)
+if x = s(s(p(p(x)))) then plus(fib(p(x)), fib(p(p(x))));
+
+function nbr-plus-fib(x:nat):nat =
+if x = 0 then 0
+if x = s(0) then 0
+if x = s(s(p(p(x)))) then s(plus(nbr-plus-fib(p(x)), nbr-plus-fib(p(p(x)))));
+
+
+function fn2(x, y:nat):nat = plus(x,y);
+
+
+function foldl-fn(x:list, r:nat):nat =
+if x = nil then r
+if x = cons(car(x), cdr(x)) then foldl-fn(cdr(x),fn2(r,car(x)));
+
+
+predicate lessp(x, y:nat) =
+if y = 0 then false
+if y = s(p(y)) and x = 0 then true
+if y = s(p(y)) and x = s(p(x)) then lessp(p(x), p(y));
+
+
+function addtolist2 (x:nat, y:list):list =
+if y = nil then cons(x, nil)
+if y = cons(car(y), cdr(y)) and lessp(x, car(y)) then cons(car(y), addtolist2(x, cdr(y)))
+if y = cons(car(y), cdr(y)) and not lessp(x, car(y)) then cons(x, y);
+
+
+function sort2(x:list):list =
+if x = nil then nil
+if x = cons(car(x), cdr(x)) then addtolist2(car(x), sort2(cdr(x)));
+
+
+function max(x,y:nat):nat =
+if lessp(x, y) then y
+otherwise x;
+
+function maximum(x:list):nat =
+if x = nil then 0
+if x = cons(car(x), cdr(x)) and lessp(car(x), maximum(cdr(x))) then maximum(cdr(x))
+if x = cons(car(x), cdr(x)) and not lessp(car(x), maximum(cdr(x))) then car(x);
+
+predicate leq(x, y:nat) = not lessp(y, x);
+
+
+function remainder(i,j:nat):nat =
+if j = 0 then i
+if j = s(p(j)) and lessp(i, j) then i
+if j = s(p(j)) and not lessp(i,j) then remainder(difference(i,j),j);
+
+function quotient(i,j:nat):nat = 
+if j = 0 then 0
+if j = s(p(j)) and lessp(i,j) then 0
+if j = s(p(j)) and not lessp(i,j) then s(quotient(difference(i,j), j));
+
+
+predicate divides(x,y:nat) = remainder(y,x) = 0;
+
+predicate divides*'(x,y:nat) = remainder(y,x) = 0;
+
+
+predicate odd(x:nat) =
+if x = 0 then false
+if x = s(0) then true
+if x = s(s(p(p(x)))) then odd(p(p(x)));
+
+
+predicate even1(x:nat) =
+if x = 0 then true
+if x = s(p(x)) then odd(p(x));
+
+predicate even(x:nat) = (0 = remainder(x,s(s(0))));
+
+
+function positives(n:nat):list = 
+if n = 0 then nil
+if n = s(p(n)) then cons(n, positives(p(n)));
+
+function gcd(x,y:nat):nat = 
+if x = 0 then y
+if x = s(p(x)) and y = 0 then x
+if x = s(p(x)) and y = s(p(y)) and lessp(x, y) then gcd(x,difference(y, x))
+if x = s(p(x)) and y = s(p(y)) and not lessp(x, y) then gcd(difference(x, y), y);
+
+predicate res1*(n, a, r:nat) =
+  if n = 0 then true
+  if n = s(p(n)) and lessp(quotient(r, s(s(0))), remainder(times(a, n), r)) then not res1*(p(n), a, r)
+  if n = s(p(n)) and not lessp(quotient(r, s(s(0))), remainder(times(a, n), r)) then  res1*(p(n), a, r);
+
+function reflections(n,a,r:nat):list =
+if n = 0 then nil
+if n = s(p(n)) and lessp(quotient(r, s(s(0))),remainder(times(a,n),r)) then cons(difference(r,remainder(times(a,n),r)), reflections(p(n),a,r))
+if n = s(p(n)) and not lessp(quotient(r, s(s(0))),remainder(times(a,n),r)) then cons(remainder(times(a,n),r), reflections(p(n),a,r));
+
+predicate prime1(x, y:nat) =
+if y = 0 then false
+if y = s(0) then true
+if y = s(s(p(p(y)))) then not divides(y,x) and prime1(x, p(y));
+
+predicate prime(x:nat) = 
+x = s(s(p(p(x)))) and prime1(x,sub(x));
+
+
+function length(x:list):nat =
+if x = nil then 0
+if x = cons(car(x), cdr(x)) then s(length(cdr(x)));
+
+function append(x,y:list):list =
+if x = nil then y
+if x = cons(car(x), cdr(x)) then cons(car(x), append(cdr(x), y));
+
+
+predicate member(x:nat, y:list) =
+if y = nil then false
+if y = cons(car(y), cdr(y)) and car(y) = x then true
+if y = cons(car(y), cdr(y)) and not car(y) = x then member(x, cdr(y));
+
+
+function reverse*(x:list):list =
+if x = nil then nil
+if x = cons(car(x), cdr(x)) then append(reverse*(cdr(x)), cons(car(x), nil));
+
+function reverse-loop*(x,ans:list):list =
+if x = nil then ans
+if x = cons(car(x), cdr(x)) then reverse-loop*(cdr(x), cons(car(x),ans));
+
+function delete(x:nat, y:list):list =
+if y = nil then nil
+if y = cons(car(y), cdr(y)) and car(y) = x then cdr(y)
+if y = cons(car(y), cdr(y)) and not car(y) = x then cons(car(y), delete(x, cdr(y)));
+
+
+function bagint(x, y:list):list =
+if x = nil then nil
+if x = cons(car(x), cdr(x)) and member(car(x), y) then cons(car(x), bagint(cdr(x), delete(car(x), y)))
+if x = cons(car(x), cdr(x)) and not member(car(x), y) then bagint(cdr(x), y);
+
+
+predicate subbagp(x,y:list) =
+if x = nil then true
+if x = cons(car(x), cdr(x)) and member(car(x), y) then subbagp(cdr(x), delete(car(x), y))
+if x = cons(car(x), cdr(x)) and not member(car(x), y) then false;
+
+function s*(n, m, r:nat):list =
+if n = 0 then nil
+if n = s(p(n)) then cons(remainder(times(m, n),r), s*(p(n), m, r));
+
+function times-list(x:list):nat =
+if x = nil then s(0)
+if x = cons(car(x), cdr(x)) then times(car(x), times-list(cdr(x)));
+
+
+function squares(n,r:nat):list =
+if n = 0 then cons(0, nil)
+if n = s(p(n)) then cons(remainder(times(n,n),r), squares(p(n), r));
+
+
+predicate residue(a,p:nat) = (not divides(p,a) and member(remainder(a,p),squares(p,p)));
+
+function inverse(j,p:nat):nat = 
+if p = s(s(0)) then remainder(j, s(s(0)))
+if not p = s(s(0)) then remainder(exp(j,difference(p, s(s(0)))),p);
+
+
+function sigma(m,n:nat):nat = 
+if lessp(m,n) then plus(n,sigma(m,sub(n)))
+if not lessp(m, n) then 0;
+
+
+predicate all-non-zerop(x:list) = 
+if x = nil then true
+if x = cons(car(x), cdr(x)) then not car(x) = 0 and all-non-zerop(cdr(x));
+
+
+function complement(j,a,p:nat):nat = remainder(times(inverse(j,p),a),p);
+
+
+function comp-list(i, a, r:nat):list = 
+if i = 0 then nil
+if i = s(p(i)) and member(i, comp-list(p(i),a,r)) then comp-list(p(i),a,r)
+if i = s(p(i)) and not member(i, comp-list(p(i),a,r)) then cons(complement(i,a,r), comp-list(p(i),a, r));
+
+predicate perm(a, b:list) =
+if a = nil then b = nil
+if a = cons(car(a), cdr(a)) and member(car(a), b) then perm(cdr(a),delete(car(a), b))
+if a = cons(car(a), cdr(a)) and not member(car(a), b) then false;
+
+
+function reflect(x,p:nat):nat = difference(p,x);
+
+
+function reflect-list(n, a, r:nat):list = 
+if n = 0 then nil
+if not n = 0 and lessp(quotient(r, s(s(0))),remainder(times(a,n),r)) then cons(reflect(remainder(times(a, n),r),r), reflect-list(p(n),a,r))
+if not n = 0 and not lessp(quotient(r, s(s(0))),remainder(times(a,n),r)) then cons(remainder(times(a,n),r), reflect-list(p(n),a,r));
+
+function rt(x:nat):nat =
+if x = 0 then 0
+if x = s(p(x)) and times(s(rt(p(x))), s(rt(p(x)))) = x then s(rt(p(x)))
+if x = s(p(x)) and not times(s(rt(p(x))), s(rt(p(x)))) = x then rt(p(x));
+
+
+function ncar(x:nat):nat = difference(x,times(rt(x),rt(x)));
+
+function ncons(i,j:nat):nat = plus(i,times(plus(i,j),plus(i,j)));
+
+
+function h***(x,y:nat):nat = 0;
+
+
+function h-ac*(x:list, n:nat):nat =
+if x = nil then n
+if x = cons(car(x), cdr(x)) then h-ac*(cdr(x), h***(car(x), n));
+
+function h-pr*(x:list, n:nat):nat = 
+if x = nil then n
+if x = cons(car(x), cdr(x)) then h***(car(x), h-pr*(cdr(x), n));
+
+
+predicate subsetp(x,y:list) = 
+if x = nil then true
+if x = cons(car(x), cdr(x)) and member(car(x), y) then subsetp(cdr(x), y)
+if x = cons(car(x), cdr(x)) and not member(car(x), y) then false;
+
+
+function union(x,y:list):list =
+if x = nil then y
+if x = cons(car(x), cdr(x)) and member(car(x), y) then union(cdr(x), y)
+if x = cons(car(x), cdr(x)) and not member(car(x), y) then cons(car(x), union(cdr(x), y));
+
+
+predicate ordered(x:list) =
+if x = nil then true
+if x = cons(car(x), nil) then true
+if x of cons and cdr(x) of cons and lessp(car(cdr(x)), car(x)) then false
+otherwise ordered(cdr(x));
+
+
+function addtolist (x:nat, y:list):list =
+if y = nil then cons(x, nil)
+if y = cons(car(y), cdr(y)) and lessp(x, car(y)) then cons(x, y)
+if y = cons(car(y), cdr(y)) and not lessp(x, car(y)) then cons(car(y), addtolist(x, cdr(y)));
+
+
+d-function pr-apply(nat, nat):nat;
+
+
+function max2(fn, n:nat):nat =
+if n = 0 then pr-apply(fn, 0)
+if n = s(p(n)) then max(pr-apply(fn, n), max2(fn, p(n)));
+
+
+function max1(fn,i:nat):nat =
+if fn = 0 then max2(0, i)
+if fn = s(p(fn)) then max(max2(fn, i), max1(p(fn), i));

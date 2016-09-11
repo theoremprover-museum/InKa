@@ -1,0 +1,52 @@
+dmac579 all(a,pnat,all(p,pnat,imp(and(prime(p),and(imp(eq(p,{"int-2"},pnat),void),imp(divides(p,a),void))),eq(remainder(exp(a,quotient(p,{"int-2"})),p),if("residue*"(a,p),{"int-1"},sub(p)),pnat))))
+ 
+dmac580 all(a,pnat,all(b,pnat,all(p,pnat,imp(leq(b,a),eq(remainder(difference(a,remainder(b,p)),p),remainder(difference(a,b),p),pnat)))))
+ 
+dmac581 all(b,pnat,all(p,pnat,all(x,pnat,imp(and(lessp(x,p),and(imp(eq(x,0,pnat),void),imp(eq(b,0,pnat),void))),eq(remainder(difference(times(b,p),x),p),difference(p,x),pnat)))))
+
+
+dmac582 all p,x,y:nat leq(y,p) impl remainder(times(difference(p,y),x),p) = remainder(difference(p,remainder(times(y,x),p)),p)
+ 
+dmac583 all p,x,y:nat leq(y,p) impl remainder(times(x,difference(p,y)),p) = remainder(difference(p,remainder(times(x,y),p)),p)
+ 
+dmac584 all a,n,p:nat remainder(times(times(a,s(n)),times(exp(a,n),fact(n))),p) = remainder(times(exp(a,s(n)),fact(s(n))),p) ; symb. eval.
+ 
+
+dmac585 
+
+all a,n,r:nat 
+    (not p = 0 and not n = 0 and not lessp(quotient(p,s(s(0))),remainder(times(a,n),r)))
+    impl  (remainder(times-list(reflections(p(n),a,r)),r) = remainder(times(exp(a,p(n)),fact(p(n))),r) 
+           impl remainder(times-list(reflections(n,a,r)),r) = remainder(times(exp(a,n),fact(n)),r))
+ 
+dmac586 
+
+axiom all a,n,r:nat 
+    (not r  = 0 and not n = 0 and lessp(quotient(r,s(s(0))),remainder(times(a,n),r)))
+      impl (remainder(times-list(reflections(p(n),a,r)),r) = remainder(times(exp(a,p(n)),fact(p(n))),r)
+            impl remainder(times-list(reflections(n,a,r)),r)  =
+                 remainder(difference(r,remainder(times(exp(a,n),fact(n)),r)),r));
+
+dmac587 
+
+all a,n,r:nat 
+    (not r = 0 and not n = 0 and leq(remainder(times(a,n),r),quotient(r, s(s(0))))
+    impl (remainder(times-list(reflections(p(n),a,r)),r) = remainder(difference(p,remainder(times(exp(a,p(n)),fact(p(n))),r)),r)
+          impl remainder(times-list(reflections(n,a,r)),r) = remainder(difference(p,remainder(times(exp(a,n),fact(n)),r)),r)
+ 
+dmac588 
+
+all a,p:nat leq(a,r) impl remainder(difference(p,remainder(difference(p,a),r)),r) = remainder(a,r)
+ 
+dmac589 
+
+all a,n,r:nat 
+    (not r = 0 and not n = 0 and lessp(quotient(r, s(s(0))),remainder(times(a,n),r)))
+     impl (remainder(times-list(reflections(p(n),a,r)),r) = remainder(difference(r,remainder(times(exp(a,p(n)),fact(p(n))),r)),r)
+           impl remainder("times-list"(reflections(n,a,r)),r) = remainder(times(exp(a,n),fact(n)),r));
+ 
+ 
+dmac590 
+
+all(a,pnat,all(p,pnat,eq(remainder("times-list"(reflections(0,a,p)),p),remainder(times(exp(a,0),fact(0)),p),pnat)))
+ 

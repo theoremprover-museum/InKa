@@ -1,0 +1,369 @@
+
+
+structure nil, cons(car:nat, cdr:list):list;
+
+structure tt,ff:bool;
+
+% Our own version of the booleans, used in a limited way.
+enum structure tt, ff : bool;
+function mynot(b:bool):bool =
+if b = tt then ff %
+if b = ff then tt; %
+
+
+%
+% The abstract side.
+% For a natural number, the only information we are interested in is whether 
+% it's p2, p5, or something else.
+%
+
+% Abbreviations for some positive numbers.
+function p2:nat = s(s(0));
+function p5:nat = s(s(s(p2))); %
+
+% Abstraction for the naturals. The idea is that e1 represents p2,
+% e2 represents p5, and ne represents any other number (ne is also
+% used to represent "nothing" in case of abstracting the head of an
+% empty list. We'll refer to
+% a natural that abstracts into e1 as an "e1-element", and a natural
+% that abstracts into e2 as an "e2-element".
+enum structure e1, e2, ne : aelem;
+
+% The abstraction of naturals is captured by the function alphaelem.
+function alphaelem(a:nat):aelem =
+ if a = p2 then e1
+ otherwise { if a = p5 then e2
+             otherwise ne};
+
+% Abstraction of lists over naturals, based on the above abstraction of
+% individual naturals. Basically, the abstraction of a list says whether
+% there are occurences of e1-elements and e2-elements, if so, in which
+% order they occur, and whether there are multiple e1 or e2 elements. In
+% addition, the information whether the list is empty, whether it has
+% exactly one element, and what is the abstraction of its head is
+% maintained.  More precisely, an abstract list is a quadruple
+% quad(nonempty:bool, oneelem:bool, hd:aelem, ord:order), where nonempty
+% tells us whether the list is nonempty, oneelem whether it has exactly
+% one element, and hd is the abstraction of the head. The last field,
+% ord, basically gives information about the occurrence and order of
+% e1-elements and e2-elements in the list. In the case that there are
+% multiple occurrences of e1 or e2 in the list, then this is represented
+% by the ord field having value error.
+enum structure epsl, e1l, e2l, e1e2l, e2e1l, error : order;
+
+structure quad(nonempty:bool, oneelem:bool, hd:aelem, ord:order) : alist;
+
+% The following auxiliary functions will be used for computing the
+% abstraction of a list by function alpha below.
+
+function check_nonempty(l:list):bool =
+ if l = nil then ff
+ otherwise tt;
+
+
+function hasoneelem(l:list):bool =
+if l = nil then ff
+otherwise{ if cdr(l) = nil then tt
+           otherwise ff};
+
+
+function combine(x:aelem, y:order):order =
+ if x = ne then y
+ if x = e1 and y = epsl then e1l
+ if x = e1 and y = e2l then e1e2l
+ if x = e2 and y = epsl then e2l
+ if x = e2 and y = e1l then e2e1l
+ otherwise error;
+
+function alphaorder(l:list):order =
+ if l = nil then epsl
+ otherwise  combine(alphaelem(car(l)), alphaorder(cdr(l)));
+
+
+% Now we can define the function alpha that abstracts a concrete list.
+% Uses a hack: when taking the car of an empty list, INKA seems to
+% always return the "first" value of the element type. So the car of
+% an empty list over nat is 0. This fact is used in calculating the
+% 3rd field. Note that this is wrong when 0 is a distinguished element 
+% (e1-element).
+function alpha(l:list):alist =
+ quad(check_nonempty(l), hasoneelem(l), alphaelem(car(l)), alphaorder(l));
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% createlist(m,n) creates a list of length n filled with successive
+% numbers starting from m.
+function createlist(m:nat, n:nat):list = 
+if n = 0 then nil
+otherwise cons(m, createlist(s(m), p(n)));
+
+
+% The abstract createlist operation and the corresponding safety lemma.
+
+% acreatelist(m,n) creates the abstraction of a list of length n
+% filled with successive numbers starting from m. The fact that
+% acreatelist takes concrete naturals as arguments and not aelems may 
+% come as a surprise. The reason is that we have in fact two
+% occurrences of the type nat: Once as the element type of lists, and 
+% once as the argument type of createlist. It is abstracted only in
+% the first case. One could think of the abstraction in the second
+% case as being the identity.
+function acreatelist(m:nat, n:nat):alist = 
+ if n = 0 then quad(ff,ff,ne,epsl)
+ if n = s(0) then {
+  if m = s(s(0)) then quad(tt,tt,e1,e1l)
+  if m = s(s(s(s(s(0))))) then quad(tt,tt,e2,e2l)
+  otherwise quad(tt,tt,ne,epsl)
+ }
+ if n = s(s(0)) then {
+  if m = s(0) then quad(tt,ff,ne,e1l)
+  if m = s(s(0)) then quad(tt,ff,e1,e1l)
+  if m = s(s(s(s(0)))) then quad(tt,ff,ne,e2l)
+  if m = s(s(s(s(s(0))))) then quad(tt,ff,e2,e2l)
+  otherwise quad(tt,ff,ne,epsl)
+ }
+ if n = s(s(s(0))) then {
+  if m = 0 then quad(tt,ff,ne,e1l)
+  if m = s(0) then  quad(tt,ff,ne,e1l)
+  if m = s(s(0)) then quad(tt,ff,e1,e1l)
+  if m = s(s(s(0))) then quad(tt,ff,ne,e2l)
+  if m = s(s(s(s(0)))) then quad(tt,ff,ne,e2l)
+  if m = s(s(s(s(s(0))))) then quad(tt,ff,e2,e2l)
+  otherwise quad(tt,ff,ne,epsl)
+ }
+ if n = s(s(s(s(0)))) then {
+  if m = 0 then quad(tt,ff,ne,e1l)
+  if m = s(0) then quad(tt,ff,ne,e1l)
+  if m = s(s(0)) then quad(tt,ff,e1,e1e2l)
+  if m = s(s(s(0))) then quad(tt,ff,ne,e2l)
+  if m = s(s(s(s(0)))) then quad(tt,ff,ne,e2l)
+  if m = s(s(s(s(s(0))))) then quad(tt,ff,e2,e2l)
+  otherwise quad(tt,ff,ne,epsl)
+ }
+ if n = s(s(s(s(s(0))))) then {
+  if m = 0 then quad(tt,ff,ne,e1l)
+  if m = s(0) then quad(tt,ff,ne,e1e2l)
+  if m = s(s(0)) then quad(tt,ff,e1,e1e2l)
+  if m = s(s(s(0))) then quad(tt,ff,ne,e2l)
+  if m = s(s(s(s(0)))) then quad(tt,ff,ne,e2l)
+  if m = s(s(s(s(s(0))))) then quad(tt,ff,e2,e2l)
+  otherwise quad(tt,ff,ne,epsl)
+ }
+ otherwise {
+  if m = 0 then quad(tt,ff,ne,e1e2l)
+  if m = s(0) then quad(tt,ff,ne, e1e2l)
+  if m = s(s(0)) then quad(tt,ff,e1,e1e2l)
+  if m = s(s(s(0))) then quad(tt, ff, ne, e2l)
+  if m = s(s(s(s(0)))) then quad(tt, ff, ne, e2l)
+  if m = s(s(s(s(s(0))))) then quad(tt,ff,e2,e2l)
+  otherwise quad(tt,ff,ne,epsl)
+ };
+
+% The safety lemma for createlist/acreatelist.
+
+all m,n:nat
+ alpha(createlist(m,n)) = acreatelist(m,n);
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% makelistempty(l) returns the empty list. (Relic of an imperative
+% implementation of this datatype where arrays were used that were
+% cleared this way).
+function makelistempty(l:list):list = nil; 
+
+% The abstract makelistempty operation and the corresponding safety lemma.
+
+% amakelistempty(l) returns the abstraction of the empty list.
+
+function amakelistempty(l:alist):alist = quad(ff,ff,ne,epsl); 
+
+% The safety lemma for makelistempty/amakelistempty.
+% ***Automatically proven by INKA as of 21.4.00***
+all l:list
+ alpha(makelistempty(l)) = amakelistempty(alpha(l));
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% hasoneelem(l) checks whether l has exactly one element.
+function hasoneelem(l:list):bool = 
+if l = nil then ff
+if l of cons then 
+  { if cdr(l) = nil then tt
+    otherwise ff
+  };
+
+% The abstract hasoneelem operation and the corresponding safety lemma.
+
+% ahasoneelem(l) checks whether the abstract list l describes a
+% concrete list that has exactly one element.
+function ahasoneelem(l:alist):bool = 
+ oneelem(l);
+
+% The safety lemma for hasoneelem/ahasoneelem.
+% ***Automatically proven by INKA as of 21.4.00***
+all l:list
+ hasoneelem(l) = ahasoneelem(alpha(l));
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% append(e,l) appends the single element e to the right-most end of
+% list l.
+function append(e:nat, l:list):list =
+if l = nil then cons(e,nil)
+otherwise cons(car(l), append(e, cdr(l)));
+
+
+% The abstract append operation and the corresponding safety lemma.
+
+% Auxiliary function used to determine what the head of e appended to l 
+% should be.
+function whichhead(e: aelem, l:alist):aelem =
+ if nonempty(l) = ff then e
+ otherwise hd(l);
+
+% Function combiner is like combine, but "reversely".
+function combiner(e:aelem, ord:order):order =
+ if e = ne then ord
+ if e = e1 and ord = epsl then e1l
+ if e = e1 and ord = e2l then e2e1l
+ if e = e2 and ord = epsl then e2l
+ if e = e2 and ord = e1l then e1e2l
+ otherwise error;
+
+% aappend(e,l) takes an abstract element e, an abstract list l, and
+% "mimics" the concrete append operation.
+function aappend(e: aelem, l:alist):alist = 
+ quad(tt, mynot(nonempty(l)), whichhead(e, l), combiner(e, ord(l)));
+
+% The safety lemma for append/aappend.
+% ***Automatically proven by INKA as of 20.4.00***
+all l:list all n:nat
+ alpha(append(n,l)) = aappend(alphaelem(n),alpha(l));
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% removing the head of a list.
+function remhead(l:list):list =
+if l = nil then nil
+otherwise cdr(l);
+
+% The abstract remhead operation and the corresponding safety lemma.
+
+% We need a limited form of sets: We need to be able to insert new
+% elements and to test for membership. Using the predefined set type
+% of INKA is overkill, therefore we define our own limited set type,
+% implemented as lists.
+structure set_empty, set_insert(set_car:alist, set_cdr:set_l):set_l;
+
+predicate set_elem(e:alist, a:set_l) =
+ if a = set_empty then false
+ if a of set_insert and set_car(a) = e then true
+ otherwise set_elem(e, set_cdr(a));
+
+function aremhead(l:alist):set_l =
+if nonempty(l) = ff then set_insert(quad(ff, ff, ne, epsl), set_empty)
+otherwise {if oneelem(l) = tt then set_insert(quad(ff, ff, ne, epsl), 
+set_empty)
+otherwise {
+  if ord(l) = epsl then set_insert(quad(tt, ff, ne, epsl), 
+                       set_insert(quad(tt, tt, ne, epsl), set_empty))
+  if ord(l) = e1l then set_insert(quad(tt, ff, e1, epsl),
+                      set_insert(quad(tt, tt, e1, epsl),
+                      set_insert(quad(tt, ff, ne, e1l), set_empty)))
+  if ord(l) = e2l then set_insert(quad(tt, ff, e2, epsl),
+                      set_insert(quad(tt, tt, e2, epsl),
+                      set_insert(quad(tt, ff, ne, e2l), set_empty)))
+  if ord(l) = e1e2l then set_insert(quad(tt, ff, ne, e1e2l),
+                        set_insert(quad(tt, ff, e1, e2l), set_empty))
+  if ord(l) = e2e1l then set_insert(quad(tt, ff, ne, e2e1l),
+                        set_insert(quad(tt, ff, e2, e1l), set_empty))
+  otherwise
+     set_insert(quad(tt, ff, ne, error),
+     set_insert(quad(tt, ff, e1, e1l),
+     set_insert(quad(tt, ff, e1, e1e2l),
+     set_insert(quad(tt, ff, e1, e2e1l),
+     set_insert(quad(tt, ff, e1, error),
+     set_insert(quad(tt, ff, e2, e2l),
+     set_insert(quad(tt, ff, e2, e1e2l),
+     set_insert(quad(tt, ff, e2, e2e1l),
+     set_insert(quad(tt, ff, e2, error),
+                set_empty)))))))))}};
+
+
+% The safety lemma for remhead/aremhead.
+% ***NOT Automatically proven by INKA as of 20.4.00***
+all l:list set_elem(alpha(remhead(l)), aremhead(alpha(l)));
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% prefix(l1,l2) checks whether l1 is a prefix of l2.
+function prefix(l1,l2:list):bool = 
+if l1 = nil then tt
+if l1 of cons then 
+  { if car(l1) = car(l2) then prefix(cdr(l1), cdr(l2))
+    otherwise ff
+  };
+
+% The abstract prefix relation and the corresponding safety lemma.
+
+function aprefix(l1:alist, l2:alist):bool = 
+if nonempty(l1) = ff then tt
+otherwise 
+{if tl(l2) = error then tt
+ otherwise
+ {if tl(l1) = epsl AND nonempty(l2) = tt AND oneelem(l1) = tt then tt
+  otherwise
+  {if tl(l1) = epsl AND nonempty(l2) = tt AND oneelem(l2) = ff then tt 
+   otherwise
+   {if tl(l1) = e1l AND tl(l2) = e1l AND oneelem(l1) = tt then tt 
+    otherwise
+    {if tl(l1) = e1l AND tl(l2) = e1l AND oneelem(l2) = ff then tt
+     otherwise
+     {if tl(l1) = e1l AND tl(l2) = e1e2l then tt
+      otherwise
+      {if tl(l1) = e2l AND tl(l2) = e2l AND oneelem(l1) = tt then tt
+       otherwise
+       {if tl(l1) = e2l AND tl(l2) = e2l AND oneelem(l2) = ff then tt
+        otherwise
+        {if tl(l1) = e2l AND tl(l2) = e2e1l then tt
+         otherwise
+         {if tl(l1) = e1e2l AND tl(l2) = e1e2l then tt
+          otherwise 
+          {if tl(l1) = e2e1l AND tl(l2) = e2e1l then tt
+           otherwise ff
+}}}}}}}}}}};
+
+% In order to successfully guide INKA through the proof of the safety
+% lemma for prefix/aprefix, the following three auxiliary lemmata are
+% needed.
+
+% This first auxiliary lemma is proven automatically by INKA:
+all x,w,u,v:aelem all y,z:atail
+     aprefix(quad(tt, ff, u, y), quad(tt, ff, v, z)) = tt ->
+     aprefix(quad(tt, ff, w, combine(x, y)),
+             quad(tt, ff, w, combine(x, z))) = tt;
+
+% Also the second auxiliary lemma is proven automatically by INKA:
+all u:aelem all v:atail
+  aprefix(quad(tt, tt, u, combine(u, epsl)),
+          quad(tt, ff, u, combine(u,v))) = tt;
+
+%  To prove this third auxiliary lemma, interaction is necessary:
+all y,z:list all x:aelem
+  prefix(y, z) = tt ->
+    aprefix(quad(tt, ff, x, alphatail(y)),
+            quad(tt, ff, x, alphatail(z))) = tt;
+
+% The safety lemma for prefix/aprefix.
+% (***NOT Automatically proven by INKA as of 20.4.00***)
+all l1,l2:list all n:nat 
+  prefix(l1,l2) = tt -> aprefix(alpha(l1),alpha(l2)) = tt;
+
+

@@ -1,0 +1,71 @@
+ +INSERT
+STRUCTURE 0 succ (pred:nat):nat
+ |
+ +INSERT
+FUNCTION plus (n1,n2:nat):nat =
+IF n1 = 0 THEN n2
+IF NOT n1 = 0 THEN succ (plus (pred (n1) n2))
+ |
+ +INSERT
+associative(plus)
+ |
+ +INSERT
+commutative(plus)
+ |
+ +INSERT
+FUNCTION minus (n1,n2:nat):nat =
+IF n1 = 0 THEN 0
+IF NOT n1 = 0 AND n2 = 0 THEN n1
+IF NOT n1 = 0 AND NOT n2 = 0 THEN minus (pred (n1) pred (n2))
+ |
+ +INSERT
+FUNCTION times (n1,n2:nat):nat =
+IF n1 = 0 THEN 0
+IF NOT n1 = 0 THEN plus (times (pred (n1) n2) n2)
+ |
+ +INSERT
+associative(times)
+ |
+ +INSERT
+commutative(times)
+ |
+ +INSERT
+PREDICATE Odd (n1:nat) =
+IF n1 = 0 THEN False
+IF n1 = succ (0) THEN True
+IF NOT n1 = 0 AND NOT n1 = succ (0) THEN Odd (pred (pred (n1)))
+ |
+ +INSERT
+FUNCTION half (n1:nat):nat =
+IF n1 = 0 THEN 0
+IF n1 = succ (0) THEN 0
+IF NOT n1 = 0 AND NOT n1 = succ (0) THEN succ (half (pred (pred (n1))))
+ |
+ +INSERT
+FUNCTION exp (n1,n2:nat):nat =
+IF n2 = 0 THEN succ (0)
+IF NOT n2 = 0 THEN times (exp (n1 pred (n2)) n1)
+ |
+ +INSERT
+ALL n1:nat (NOT Odd (n1) IMPL half (n1) = half (succ (n1)))
+ |
+ +INSERT
+ALL n1:nat (Odd (n1) IMPL half (n1) = pred (half (succ (n1))))
+ |
+ +INSERT
+ALL n1,n2:nat (NOT Odd (n1) IMPL exp (times (n2 n2) half (n1)) = exp (n2 n1))
+ |
+ +INSERT
+ALL n1,n2:nat
+    (Odd (n1) IMPL times (exp (times (n2 n2) half (n1)) n2) = exp (n2 n1))
+ |
+ +INSERT
+FUNCTION f (n1,n2,n3:nat):nat =
+IF n1 = 0 THEN n3
+IF NOT n1 = 0 AND Odd (n1) THEN f (half (n1) times (n2 n2) times (n2 n3))
+IF NOT n1 = 0 AND NOT Odd (n1) THEN f (half (n1) times (n2 n2) n3)
+ |
+ -INSERT
+all x,y,z:nat f(x y z) = times(exp(y x) z)
+ |
+ OK

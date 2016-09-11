@@ -1,0 +1,509 @@
+ +INSERT
+STRUCTURE (var) f imply (form form):form
+ |
+ +INSERT
+FUNCTION neg (f1:form):form = imply (f1 f)
+ |
+ +INSERT
+STRUCTURE all.false extend (valuation var):valuation
+ |
+ +INSERT
+PREDICATE Assigned.True (v1:var va1:valuation) =
+IF va1 = all.false THEN False
+IF EX va2:valuation va1 = extend (va2 v1) THEN True
+IF EX va3:valuation EX v2:var va1 = extend (va3 v2) AND NOT v2 = v1
+   THEN Assigned.True (v1 va3)
+ |
+ +INSERT
+PREDICATE Model (v1:valuation f1:form) =
+IF f1 = f THEN False
+IF EX va1:var f1 = va1 THEN Assigned.True (va1 v1)
+IF EX f2,f3:form f1 = imply (f2 f3) THEN (Model (v1 f2) IMPL Model (v1 f3))
+ |
+ +INSERT
+PREDICATE Atomform (f1:form) =
+IF f1 = f THEN True
+IF EX v1:var f1 = v1 THEN True
+IF EX f2,f3:form f1 = imply (f2 f3) THEN False
+ |
+ +INSERT
+PREDICATE Axm1 (f1:form) =
+IF Atomform (f1) THEN False
+IF EX f2,f3:form f1 = imply (f2 f3) AND Atomform (f3) THEN False
+IF EX f4,f5,f6:form f1 = imply (f4 imply (f5 f6)) THEN f4 = f6
+ |
+ +INSERT
+PREDICATE Axm2 (f1:form) =
+IF Atomform (f1) THEN False
+IF EX f2,f3:form f1 = imply (f2 f3) AND Atomform (f2) THEN False
+IF EX f4,f5:form f1 = imply (f4 f5) AND Atomform (f5) THEN False
+IF EX f6,f7,f8,f9:form
+   f1 = imply (imply (f6 f7) imply (f8 f9)) AND Atomform (f7)
+   THEN False
+IF EX f10,f11,f12,f13:form
+   f1 = imply (imply (f10 f11) imply (f12 f13)) AND Atomform (f12)
+   THEN False
+IF EX f14,f15,f16,f17:form
+   f1 = imply (imply (f14 f15) imply (f16 f17)) AND Atomform (f17)
+   THEN False
+IF EX f18,f19,f20,f21,f22,f23,f24:form
+   f1
+   = imply (imply (f18 imply (f19 f20))
+            imply (imply (f21 f22) imply (f23 f24)))
+   THEN (f20 = f24 AND f19 = f22 AND f18 = f23 AND f18 = f21)
+ |
+ +INSERT
+PREDICATE Axm3 (f1:form) =
+IF Atomform (f1) THEN False
+IF EX f2,f3:form f1 = imply (f2 f3) AND Atomform (f2) THEN False
+IF EX f4,f5,f6:form f1 = imply (imply (f4 f5) f6) AND Atomform (f4) THEN False
+IF EX f7,f8,f9,f10:form f1 = imply (imply (imply (f7 f8) f9) f10)
+   THEN (f9 = f AND f8 = f AND f7 = f10)
+ |
+ +INSERT
+PREDICATE Axm (f1:form) = (Axm1 (f1) OR Axm2 (f1) OR Axm3 (f1))
+ |
+ +INSERT
+ALL f1:form ALL v1:valuation (Axm (f1) IMPL Model (v1 f1))
+ |
+ +INSERT
+PREDICATE Modus.Ponens (f1,f2,f3:form) =
+IF Atomform (f1) THEN False
+IF EX f4,f5:form f1 = imply (f4 f5) THEN (f4 = f2 AND f5 = f3)
+ |
+ +INSERT
+PREDICATE Mp (f1,f2,f3:form) =
+(Modus.Ponens (f1 f2 f3) OR Modus.Ponens (f2 f1 f3))
+ |
+ +INSERT
+FUNCTION prem.impl (f1,f2,f3:form):form =
+IF f2 = imply (f1 f3) THEN f2
+IF NOT f2 = imply (f1 f3) THEN f1
+ |
+ +INSERT
+STRUCTURE EMPTY add (prefix:sequence postfix:form):sequence
+ |
+ +INSERT
+PREDICATE Element (f1:form s1:sequence) =
+IF s1 = EMPTY THEN False
+IF EX s2:sequence s1 = add (s2 f1) THEN True
+IF EX f2:form EX s3:sequence s1 = add (s3 f2) AND NOT f1 = f2
+   THEN Element (f1 s3)
+ |
+ +INSERT
+PREDICATE Subsequence (s1,s2:sequence) =
+IF s1 = EMPTY THEN True
+IF EX f1:form EX s3:sequence s1 = add (s3 f1) AND NOT Element (f1 s2)
+   THEN False
+IF EX f2:form EX s4:sequence s1 = add (s4 f2) AND Element (f2 s2)
+   THEN Subsequence (s4 s2)
+ |
+ +INSERT
+PREDICATE Mp.Deduction (s1:sequence f1:form) =
+IF s1 = EMPTY THEN False
+IF EX f2:form s1 = add (EMPTY f2) THEN False
+IF EX f3,f4:form EX s2:sequence s1 = add (add (s2 f3) f4) AND Mp (f3 f4 f1)
+   THEN True
+IF EX f5,f6:form EX s3:sequence
+   s1 = add (add (s3 f5) f6) AND NOT Mp (f5 f6 f1)
+   THEN (Mp.Deduction (add (s3 f5) f1) OR Mp.Deduction (add (s3 f6) f1))
+ |
+ +INSERT
+FUNCTION premise (s1:sequence f1:form):form =
+IF s1 = EMPTY THEN f1
+IF EX f2:form s1 = add (EMPTY f2) THEN f1
+IF EX f3,f4:form EX s2:sequence s1 = add (add (s2 f3) f4) AND Mp (f3 f4 f1)
+   THEN prem.impl (f3 f4 f1)
+IF EX f5,f6:form EX s3:sequence
+   s1 = add (add (s3 f5) f6)
+   AND NOT Mp (f5 f6 f1)
+   AND NOT Mp.Deduction (add (s3 f6) f1)
+   THEN premise (add (s3 f5) f1)
+IF EX f7,f8:form EX s4:sequence
+   s1 = add (add (s4 f7) f8)
+   AND NOT Mp (f7 f8 f1)
+   AND Mp.Deduction (add (s4 f8) f1)
+   THEN premise (add (s4 f8) f1)
+ |
+ +INSERT
+PREDICATE Deduction (s1,s2:sequence) =
+IF s2 = EMPTY THEN True
+IF EX f1:form EX s3:sequence s2 = add (s3 f1) AND Axm (f1)
+   THEN Deduction (s1 s3)
+IF EX f2:form EX s4:sequence s2 = add (s4 f2) AND Element (f2 s1)
+   THEN Deduction (s1 s4)
+IF EX f3:form EX s5:sequence s2 = add (s5 f3) AND Mp.Deduction (s5 f3)
+   THEN Deduction (s1 s5)
+IF EX f4:form EX s6:sequence
+   s2 = add (s6 f4)
+   AND NOT Axm (f4)
+   AND NOT Element (f4 s1)
+   AND NOT Mp.Deduction (s6 f4)
+   THEN False
+ |
+ +INSERT
+PREDICATE Proof (s1,s2:sequence f1:form) =
+IF s2 = EMPTY THEN False
+IF EX s3:sequence s2 = add (s3 f1) THEN Deduction (s1 s2)
+IF EX f2:form EX s4:sequence s2 = add (s4 f2) AND NOT f1 = f2 THEN False
+ |
+ +INSERT
+ALL f1,f2,f3:form
+    (NOT prem.impl (f3 f2 f1) = f3 IMPL prem.impl (f3 f2 f1) = f2)
+ |
+ +INSERT
+ALL f1:form ALL s1:sequence
+    (Mp.Deduction (s1 f1) IMPL Element (premise (s1 f1) s1))
+ |
+ +INSERT
+ALL f1:form ALL s1:sequence
+    (Mp.Deduction (s1 f1)
+     IMPL Mp (imply_1 (premise (s1 f1)) premise (s1 f1) f1))
+ |
+ +INSERT
+ALL f1,f2,f3:form
+    mp(f3 f2 f1) IMPL
+    (imply_1 (prem.impl (f3 f2 f1)) = f3
+     OR imply_1 (prem.impl (f3 f2 f1)) = f2)
+ |
+ +INSERT
+ALL f1:form ALL s1:sequence
+    (Mp.Deduction (s1 f1) IMPL Element (imply_1 (premise (s1 f1)) s1))
+ |
+ +INSERT
+ALL f1,f2,f3:form ALL v1:valuation
+    ((Mp (f3 f2 f1) AND Model (v1 f2) AND Model (v1 f3)) IMPL Model (v1 f1))
+ |
+ +INSERT
+ALL f1:form ALL s1:sequence ALL v1:valuation
+    ((Element (f1 s1) AND Deduction (EMPTY s1)) IMPL Model (v1 f1))
+ |
+ +INSERT
+FUNCTION concat (s1,s2:sequence):sequence =
+IF s2 = EMPTY THEN s1
+IF EX f1:form EX s3:sequence s2 = add (s3 f1) THEN add (concat (s1 s3) f1)
+ |
+ +INSERT
+ALL f1:form ALL s1,s2:sequence
+    (NOT Mp.Deduction (concat (s1 s2) f1)
+     IMPL (NOT Mp.Deduction (s1 f1) AND NOT Mp.Deduction (s2 f1)))
+ |
+ +INSERT
+ALL s1,s2,s3:sequence
+    ((Deduction (s1 s2) AND Deduction (s1 s3))
+     IMPL Deduction (s1 concat (s2 s3)))
+ |
+ +INSERT
+FUNCTION thm1 (f1:form):form = imply (f1 f1)
+ |
+ +INSERT
+FUNCTION deduce.thm1 (f1:form):sequence =
+add (add (add (add (add (EMPTY
+                         imply (imply (f1 imply (imply (f1 f1) f1))
+                                imply (imply (f1 imply (f1 f1)) imply (f1 f1)))
+)
+                    imply (f1 imply (imply (f1 f1) f1)))
+               imply (f1 imply (f1 f1)))
+          imply (imply (f1 imply (f1 f1)) imply (f1 f1)))
+     imply (f1 f1))
+ |
+ +INSERT
+FUNCTION delete (s1:sequence f1:form):sequence =
+IF s1 = EMPTY THEN s1
+IF EX f2:form EX s2:sequence s1 = add (s2 f2) AND NOT f1 = f2
+   THEN delete (s2 f1)
+IF EX f3:form EX s3:sequence s1 = add (s3 f3) AND f1 = f3 THEN s1
+ |
+ +INSERT
+FUNCTION eliminate.hypothesis (s1,s2:sequence):sequence =
+IF s1 = EMPTY THEN s2
+IF NOT s1 = EMPTY AND s2 = EMPTY THEN s2
+IF EX f1,f2:form EX s3,s4:sequence
+   s1 = add (s3 f1) AND s2 = add (s4 f2) AND f1 = f2
+   THEN deduce.thm1 (f2)
+IF EX f3,f4:form EX s5,s6:sequence
+   s1 = add (s5 f3) AND s2 = add (s6 f4) AND NOT f3 = f4 AND Element (f4 s5)
+   THEN add (add (add (EMPTY imply (f4 imply (f3 f4))) f4) imply (f3 f4))
+IF EX f5,f6:form EX s7,s8:sequence
+   s1 = add (s7 f5) AND s2 = add (s8 f6) AND NOT Element (f6 s1) AND Axm (f6)
+   THEN add (add (add (EMPTY imply (f6 imply (f5 f6))) f6) imply (f5 f6))
+IF EX f7,f8:form EX s9,s10:sequence
+   s1 = add (s9 f7)
+   AND s2 = add (s10 f8)
+   AND NOT Element (f8 s1)
+   AND NOT Axm (f8)
+   AND Mp.Deduction (s10 f8)
+   THEN add (add (add (add (add (concat (eliminate.hypothesis (s1
+                                                               delete (s10
+                                                                       imply_1 (
+premise (s10
+         f8))))
+                                         eliminate.hypothesis (s1
+                                                               delete (s10
+                                                                       premise (
+s10
+f8))))
+                                 imply (f7 imply_1 (premise (s10 f8))))
+                            imply (f7 premise (s10 f8)))
+                       imply (imply (f7 premise (s10 f8))
+                              imply (imply (f7 imply_1 (premise (s10 f8)))
+                                     imply (f7 f8))))
+                  imply (imply (f7 imply_1 (premise (s10 f8))) imply (f7 f8)))
+             imply (f7 f8))
+IF EX f9,f10:form EX s11,s12:sequence
+   s1 = add (s11 f9)
+   AND s2 = add (s12 f10)
+   AND NOT Axm (f10)
+   AND NOT Element (f10 s1)
+   AND NOT Mp.Deduction (s12 f10)
+   THEN s2
+ |
+ +INSERT
+FUNCTION thm0 (f1:form):form = imply (f f1)
+ |
+ +INSERT
+FUNCTION deduce.thm0 (f1:form):sequence =
+eliminate.hypothesis (add (EMPTY f)
+                      add (add (add (add (add (EMPTY
+                                               imply (f
+                                                      imply (imply (f1 f) f)))
+                                          f)
+                                     imply (imply (f1 f) f))
+                                imply (imply (imply (f1 f) f) f1))
+                           f1))
+ |
+ +INSERT
+FUNCTION thm2 (f1,f2:form):form = imply (f1 imply (f2 imply (f1 f2)))
+ |
+ +INSERT
+FUNCTION deduce.thm2 (f1,f2:form):sequence =
+eliminate.hypothesis (add (EMPTY f1) add (EMPTY imply (f2 imply (f1 f2))))
+ |
+ +INSERT
+ALL f1,f2:form Proof (EMPTY deduce.thm2 (f2 f1) thm2 (f2 f1))
+ |
+ +INSERT
+ALL f1:form Proof (EMPTY deduce.thm1 (f1) thm1 (f1))
+ |
+ +INSERT
+FUNCTION thm3 (f1,f2:form):form =
+imply (f1 imply (neg (f2) neg (imply (f1 f2))))
+ |
+ +INSERT
+FUNCTION deduce.thm3 (f1,f2:form):sequence =
+eliminate.hypothesis (add (EMPTY f1)
+                      eliminate.hypothesis (add (add (EMPTY f1) imply (f2 f))
+                                            eliminate.hypothesis (add (add (add
+(EMPTY
+ f1)
+imply (f2
+       f))
+                                                                       imply (f1
+                                                                              f2
+))
+                                                                  add (add (add
+(add (add (EMPTY f1) imply (f1 f2))
+ f2)
+imply (f2
+       f))
+                                                                       f))))
+ |
+ +INSERT
+FUNCTION thm4 (f1,f2:form):form = imply (neg (f1) imply (f2 imply (f1 f2)))
+ |
+ +INSERT
+FUNCTION deduce.thm4 (f1,f2:form):sequence =
+eliminate.hypothesis (add (EMPTY imply (f1 f))
+                      add (EMPTY imply (f2 imply (f1 f2))))
+ |
+ +INSERT
+ALL f1,f2:form Proof (EMPTY deduce.thm4 (f1 f2) thm4 (f1 f2))
+ |
+ +INSERT
+FUNCTION thm5 (f1,f2:form):form =
+imply (neg (f1) imply (neg (f2) imply (f1 f2)))
+ |
+ +INSERT
+FUNCTION deduce.thm5 (f1,f2:form):sequence =
+eliminate.hypothesis (add (EMPTY imply (f1 f))
+                      eliminate.hypothesis (add (add (EMPTY imply (f1 f))
+                                                 imply (f2 f))
+                                            eliminate.hypothesis (add (add (add
+(EMPTY
+ imply (f1 f))
+imply (f2
+       f))
+                                                                       f1)
+                                                                  add (concat (
+add (add (add (EMPTY f1) imply (f1 f))
+     f)
+deduce.thm0 (f2))
+                                                                       f2))))
+ |
+ +INSERT
+FUNCTION thm7 (f1,f2:form):form =
+imply (imply (f1 f2) imply (imply (neg (f1) f2) f2))
+ |
+ +INSERT
+FUNCTION el.hyp1 (f1,f2:form):sequence =
+eliminate.hypothesis (add (add (add (add (EMPTY imply (f1 f2))
+                                     imply (imply (f1 f) f2))
+                                imply (f2 f))
+                           f1)
+                      add (add (add (add (add (EMPTY imply (f1 f2)) f1) f2)
+                                imply (f2 f))
+                           f))
+ |
+ +INSERT
+FUNCTION deduce.thm7 (f1,f2:form):sequence =
+eliminate.hypothesis (add (EMPTY imply (f1 f2))
+                      eliminate.hypothesis (add (add (EMPTY imply (f1 f2))
+                                                 imply (imply (f1 f) f2))
+                                            eliminate.hypothesis (add (add (add
+(EMPTY
+ imply (f1 f2))
+imply (imply (f1 f)
+       f2))
+                                                                       imply (f2
+                                                                              f
+))
+                                                                  concat (
+el.hyp1 (f1
+         f2)
+                                                                          add (
+EMPTY
+                                                                               f
+)))))
+ |
+ +INSERT
+FUNCTION val.form (v1:valuation f1:form):form =
+IF Model (v1 f1) THEN f1
+IF NOT Model (v1 f1) THEN neg (f1)
+ |
+ +INSERT
+FUNCTION val.hypotheses (v1:valuation f1:form):sequence =
+IF f1 = f THEN EMPTY
+IF EX va1:var f1 = va1 THEN add (EMPTY val.form (v1 f1))
+IF EX f2,f3:form f1 = imply (f2 f3)
+   THEN concat (val.hypotheses (v1 f2) val.hypotheses (v1 f3))
+ |
+ +INSERT
+FUNCTION val.deduction (v1:valuation f1:form):sequence =
+IF f1 = f THEN deduce.thm1 (f)
+IF EX va1:var f1 = va1 THEN add (EMPTY val.form (v1 f1))
+IF EX f2,f3:form f1 = imply (f2 f3) AND Model (v1 f2) AND Model (v1 f3)
+   THEN add (add (add (add (concat (concat (val.deduction (v1 f2)
+                                            val.deduction (v1 f3))
+                                    deduce.thm2 (f2 f3))
+                            f2)
+                       imply (f3 f1))
+                  f3)
+             f1)
+IF EX f4,f5:form f1 = imply (f4 f5) AND Model (v1 f4) AND NOT Model (v1 f5)
+   THEN add (add (add (add (concat (concat (val.deduction (v1 f4)
+                                            val.deduction (v1 f5))
+                                    deduce.thm3 (f4 f5))
+                            f4)
+                       imply (neg (f5) neg (f1)))
+                  neg (f5))
+             neg (f1))
+IF EX f6,f7:form f1 = imply (f6 f7) AND NOT Model (v1 f6) AND Model (v1 f7)
+   THEN add (add (add (add (concat (concat (val.deduction (v1 f6)
+                                            val.deduction (v1 f7))
+                                    deduce.thm4 (f6 f7))
+                            neg (f6))
+                       imply (f7 f1))
+                  f7)
+             f1)
+IF EX f8,f9:form
+   f1 = imply (f8 f9) AND NOT Model (v1 f8) AND NOT Model (v1 f9)
+   THEN add (add (add (add (concat (concat (val.deduction (v1 f8)
+                                            val.deduction (v1 f9))
+                                    deduce.thm5 (f8 f9))
+                            neg (f8))
+                       imply (neg (f9) f1))
+                  neg (f9))
+             f1)
+ |
+ -INSERT
+   ALL I:VALUATION ALL X:FORM PROOF(VAL.HYPOTHESES(I X) VAL.DEDUCTION(I X) VAL.FORM(I X))
+ |
+ -INSERT
+   STRUCTURE MKPAIR(HYPPART:SEQUENCE DEDPART:SEQUENCE):PAIR
+ |
+ -INSERT
+   STRUCTURE (PAIR) MKTREE(TREE TREE):TREE
+ |
+ -INSERT
+   PREDICATE IS.PAIR(T:TREE)=
+   IF EX P:PAIR T=P THEN TRUE
+   IF EX T1,T2:TREE T=MKTREE(T1 T2) THEN FALSE
+ |
+ -INSERT
+   PREDICATE ADMISSIBLE.TREE(T:TREE)=
+   IF IS.PAIR(T) THEN TRUE
+   IF EX T1,T2:TREE T=MKTREE(T1 T2) AND IS.PAIR(T1) AND IS.PAIR(T2) THEN TRUE
+   IF EX T1,T2:TREE T=MKTREE(T1 T2) AND IS.PAIR(T1) AND NOT IS.PAIR(T2) THEN FALSE
+   IF EX T1,T2:TREE T=MKTREE(T1 T2) AND NOT IS.PAIR(T1) AND IS.PAIR(T2) THEN FALSE
+   IF EX T1,T2:TREE T=MKTREE(T1 T2) AND NOT IS.PAIR(T1) AND NOT IS.PAIR(T2) THEN
+   ADMISSIBLE.TREE(T1) AND ADMISSIBLE.TREE(T2)
+ |
+ -INSERT
+   FUNCTION MERGE.PROOFS(H1,D1,H2,D2:SEQUENCE):SEQUENCE=
+   IF H1=EMPTY THEN EMPTY
+   IF D1=EMPTY AND NOT H1=EMPTY THEN EMPTY
+   IF EX H,D:SEQUENCE EX X,Y:FORM H1=ADDFORM(H X) AND D1=ADDFORM(D Y) THEN
+   ADDFORM(ADDFORM(CONCAT(CONCAT(ELIMINATE.HYPOTHESIS(H1 D1) ELIMINATE.HYPOTHESIS(H2 D2))
+   DEDUCE.THM7(X Y)) IMPLY(IMPLY(NEG(X) Y) Y)) Y)
+ |
+ -INSERT
+   ALL H,D1,D2:SEQUENCE ALL X,Y:FORM
+   PROOF(ADDFORM(H X) D1,Y) AND PROOF(ADDFORM(H NEG(X)) D2 Y) IMPL
+   PROOF(H MERGE.PROOFS(ADDFORM(H X) D1 ADDFORM(H NEG(X)) D2) Y)
+ |
+ -INSERT
+   FUNCTION MERGE.TREE(T:TREE):TREE=
+   IF IS.PAIR(T) THEN T
+   IF EX T1,T2:TREE T=MKTREE(T1 T2) AND NOT IS.PAIR(T) AND IS.PAIR(T1) AND IS.PAIR(T2) THEN
+   MKPAIR(PREFIX(HYP.PART(T1)) MERGE.PROOFS(HYP.PART(T1) DED.PART(T1) HYP.PART(T2) DED.PART(T2)))
+   IF EX T1,T2:TREE T=MKTREE(T1 T2) AND NOT IS.PAIR(T) AND NOT IS.PAIR(T1) AND NOT IS.PAIR(T2) AND
+   ADMISSIBLE.TREE(T) THEN MKTREE(MERGE.TREE(T1) MERGE.TREE(T2))
+   IF NOT IS.PAIR(T) AND NOT ADMISSIBLE.TREE(T) THEN T
+ |
+ -INSERT
+   FUNCTION ELIMINATE.TREE(T:TREE):SEQUENCE=
+   IF IS.PAIR(T) THEN DED.PART(T)
+   IF NOT IS.PAIR(T) AND ADMISSIBLE.TREE(T) THEN ELIMINATE.TREE(MERGE.TREE(T))
+   IF NOT IS.PAIR(T) AND NOT ADMISSIBLE.TREE(T) THEN EMPTY
+ |
+ -INSERT
+   FUNCTION CREATE.TREE(VARLIST,I:VALUATION X:FORM):TREE=
+   IF VARLIST=EMPTY THEN MKPAIR(VAL.HYPOTHESES(I X) VAL.DEDUCTION(I X))
+   IF EX VARS:VALUATION EX V:VAR VARLIST=EXTEND(VARS V) THEN
+   MKTREE(CREATE.TREE(VARS EXTEND(I V) X) CREATE.TREE(VARS I X))
+ |
+ -INSERT
+   FUNCTION UNION(I J:VALUATION):VALUATION=
+   IF J=ALL.FALSE THEN I
+   IF EX K:VALUATION EX V:VAR J=EXTEND(K V) AND ASSIGNED.TRUE(V I) THEN UNION(I K)
+   IF EX K:VALUATION EX V:VAR J=EXTEND(K V) AND NOT ASSIGNED.TRUE(V I) THEN EXTEND(UNION(I K) V)
+ |
+ -INSERT
+   FUNCTION ALL.TRUE(X:FORM):VALUATION=
+   IF X=F THEN EMPTY
+   IF EX V:VAR X=V THEN EXTEND(ALL.FALSE V)
+   IF EX Y,Z:FORM X=IMPLY(Y Z) THEN UNION(ALL.TRUE(Y) ALL.TRUE(Z))
+ |
+ -INSERT
+   FUNCTION DEDUCTION.TREE(X:FORM):TREE=
+   CREATE.TREE(ALL.TRUE(X) ALL.FALSE X)
+ |
+ -INSERT
+   ALL X:FORM( ALL I:VALUATION MODEL(I X)) IMPL PROOF(EMPTY ELIMINATE.TREE(DEDUCTION.TREE(X)) X)
+ |
+ -INSERT
+   ALL X,Y:FORM ALL H,S:SEQUENCE
+   NOT (NOT AXM(Y) AND NOT ELEMENT(y h) AND NOT MP.DEDUCTION(S Y)) IMPL
+   POSTFIX(ELIMINATE.HYPOTHESIS( ADDFORM(H X) ADDFORM(S Y))) = IMPLY(X Y)
+ |
+ OK

@@ -1,0 +1,136 @@
+ +INSERT
+STRUCTURE t,f:bool
+ |
+ +INSERT
+STRUCTURE (variable,bool):atom
+ |
+ +INSERT
+STRUCTURE empty mkalist (variable bool alist):alist
+ |
+ +INSERT
+STRUCTURE (atom) mkif (atom ifexp ifexp):ifexp
+ |
+ +INSERT
+FUNCTION append (a1,a2:alist):alist =
+IF a1 = empty THEN a2
+IF EX a3:alist EX b1:bool EX v1:variable a1 = mkalist (v1 b1 a3)
+   THEN mkalist (v1 b1 append (a3 a2))
+ |
+ +INSERT
+FUNCTION assignment (a1:atom al1:alist):bool =
+IF EX b1:bool a1 = b1 THEN b1
+IF EX v1:variable a1 = v1 AND al1 = empty THEN f
+IF EX al2:alist EX b2:bool EX v2:variable
+   a1 = v2 AND al1 = mkalist (v2 b2 al2)
+   THEN b2
+IF EX al3:alist EX b3:bool EX v3,v4:variable
+   a1 = v4 AND al1 = mkalist (v3 b3 al3) AND NOT v4 = v3
+   THEN assignment (a1 al3)
+ |
+ +INSERT
+FUNCTION value (i1:ifexp a1:alist):bool =
+IF EX at1:atom i1 = at1 THEN assignment (at1 a1)
+IF EX at2:atom EX i2,i3:ifexp
+   i1 = mkif (at2 i2 i3) AND assignment (at2 a1) = t
+   THEN value (i2 a1)
+IF EX at3:atom EX i4,i5:ifexp
+   i1 = mkif (at3 i4 i5) AND assignment (at3 a1) = f
+   THEN value (i5 a1)
+ |
+ +INSERT
+FUNCTION und (b1,b2:bool):bool = IF NOT b1 = f THEN b2 IF b1 = f THEN f
+ |
+ +INSERT
+PREDICATE Assigned (a1:atom al1:alist) =
+IF EX b1:bool a1 = b1 THEN True
+IF EX v1:variable a1 = v1 AND al1 = empty THEN False
+IF EX al2:alist EX b2:bool EX v2,v3:variable
+   a1 = v3 AND al1 = mkalist (v2 b2 al2) AND v3 = v2
+   THEN True
+IF EX al3:alist EX b3:bool EX v4,v5:variable
+   a1 = v5 AND al1 = mkalist (v4 b3 al3) AND NOT v5 = v4
+   THEN Assigned (a1 al3)
+ |
+ +INSERT
+ALL a1:alist ALL at1:atom (assignment (at1 a1) = t IMPL Assigned (at1 a1))
+ |
+ +INSERT
+ALL a1,a2:alist ALL at1:atom
+    (assignment (at1 append (a2 a1)) = t
+     IMPL (assignment (at1 a1) = t OR assignment (at1 a2) = t))
+ |
+ +INSERT
+FUNCTION taut (i1:ifexp a1:alist):bool =
+IF EX at1:atom i1 = at1 THEN assignment (at1 a1)
+IF EX at2:atom EX i2,i3:ifexp
+   i1 = mkif (at2 i2 i3) AND Assigned (at2 a1) AND assignment (at2 a1) = t
+   THEN taut (i2 a1)
+IF EX at3:atom EX i4,i5:ifexp
+   i1 = mkif (at3 i4 i5) AND Assigned (at3 a1) AND assignment (at3 a1) = f
+   THEN taut (i5 a1)
+IF EX at4:atom EX i6,i7:ifexp EX v1:variable
+   i1 = mkif (at4 i6 i7) AND at4 = v1 AND NOT Assigned (at4 a1)
+   THEN und (taut (i6 mkalist (v1 t a1)) taut (i7 mkalist (v1 f a1)))
+ |
+ +INSERT
+ALL a1:alist ALL at1:atom (taut (at1 empty) = t IMPL value (at1 a1) = t)
+ |
+ +INSERT
+FUNCTION falsify (i1:ifexp a1:alist):alist =
+IF EX b1:bool i1 = b1 THEN a1
+IF EX v1:variable i1 = v1 AND NOT Assigned (v1 a1) THEN a1
+IF EX v2:variable i1 = v2 AND Assigned (v2 a1) AND assignment (v2 a1) = f
+   THEN a1
+IF EX v3:variable i1 = v3 AND Assigned (v3 a1) AND assignment (v3 a1) = t
+   THEN empty
+IF EX at1:atom EX i2,i3:ifexp
+   i1 = mkif (at1 i2 i3) AND Assigned (at1 a1) AND assignment (at1 a1) = t
+   THEN falsify (i2 a1)
+IF EX at2:atom EX i4,i5:ifexp
+   i1 = mkif (at2 i4 i5) AND Assigned (at2 a1) AND assignment (at2 a1) = f
+   THEN falsify (i5 a1)
+IF EX at3:atom EX i6,i7:ifexp EX v4:variable
+   i1 = mkif (at3 i6 i7)
+   AND at3 = v4
+   AND NOT Assigned (at3 a1)
+   AND taut (i6 mkalist (v4 t a1)) = f
+   THEN falsify (i6 mkalist (v4 t a1))
+IF EX at4:atom EX i8,i9:ifexp EX v5:variable
+   i1 = mkif (at4 i8 i9)
+   AND at4 = v5
+   AND NOT Assigned (at4 a1)
+   AND NOT taut (i8 mkalist (v5 t a1)) = f
+   AND taut (i9 mkalist (v5 f a1)) = f
+   THEN falsify (i9 mkalist (v5 f a1))
+IF EX at5:atom EX i10,i11:ifexp EX v6:variable
+   i1 = mkif (at5 i10 i11)
+   AND at5 = v6
+   AND NOT Assigned (at5 a1)
+   AND NOT taut (i10 mkalist (v6 t a1)) = f
+   AND NOT taut (i11 mkalist (v6 f a1)) = f
+   THEN empty
+ |
+ +INSERT
+ALL a1:atom (taut (a1 empty) = f IMPL value (a1 falsify (a1 empty)) = f)
+ |
+ +INSERT
+ALL a1:alist ALL i1:ifexp (taut (i1 empty) = t IMPL value (i1 a1) = t)
+ |
+ +INSERT
+ALL a1:alist ALL at1:atom
+    (assignment (at1 a1) = f IMPL NOT assignment (at1 a1) = t)
+ |
+ +INSERT
+ALL a1:alist ALL at1:atom
+    (NOT assignment (at1 a1) = t IMPL assignment (at1 a1) = f)
+ |
+ +INSERT
+ALL a1:alist ALL i1:ifexp (NOT value (i1 a1) = f EQV value (i1 a1) = t)
+ |
+ +INSERT
+ALL a1:alist ALL i1:ifexp (NOT taut (i1 a1) = f EQV taut (i1 a1) = t)
+ |
+ -INSERT
+ALL a1:ifexp (taut (a1 empty) = f IMPL value (a1 falsify (a1 empty)) = f)
+ |
+ OK

@@ -1,0 +1,439 @@
+N1 dmac8 (0.05s);
+
+axiom all x,y:nat plus(x, s(y)) = s(plus(x, y));
+
+all x:nat all y:nat difference(plus(x,y),x) = y;
+
+axiom all x,y:nat plus(x,y) = plus(y, x);
+
+all x:nat all y:nat difference(plus(y,x),x) = y;
+
+
+N2 dmac20  failed!!!;
+
+axiom all x,y:list all n:nat subbagp(x, y) impl subbagp(x, cons(n, y));
+
+axiom all x,y:list all n:nat subbagp(cons(n, x), y) impl subbagp(x, y);
+
+all x:list all y:list subbagp(bagint(x,y),x);
+
+
+N3 dmac59 (0.16s);
+
+all i:nat even1(i) impl double(half(i)) = i;
+
+
+N4 dmac85 ;
+
+all x:nat all y:list ordered(y) impl ordered(addtolist(x,y));
+
+
+N5 dmac 112 (0.1s);
+
+all x:nat all y:nat all z:nat difference(plus(x,y),plus(x,z)) = difference(y,z);
+
+
+
+N6 dmac155  (0.0s);
+
+(all y:nat remainder(0, y) = 0);
+
+
+N7 dmac176 ;
+
+all a,b,k,x:nat (not divides(x,a) and a = gcd(times(x,a),times(b,a))) impl not times(k,x) = times(b,a);
+
+
+N8 dmac181  interactive;
+
+axiom all x,z:nat (not z = s(0) and not z = x and not x = 0 and not x = s(0)) impl
+ divides(z,x) impl not prime1(x, p(x));
+
+all x,y:nat (prime(x) and not y = s(0) and not x = y) impl not remainder(x,y) = 0;
+
+
+
+N9 dmac213 (0.0s);
+
+all i:nat all k:nat (i = 0 and leq(i,k)) IMPL sigma(i,k) = sigma(0, k);
+
+
+
+N10 dmac243  (? + 0.12s);
+
+axiom all l:list all x:nat member(x, l) impl length(l) = s(p(length(l)));
+
+all l:list all x:nat member(x,l) impl length(delete(x,l)) = p(length(l));
+
+all l:list all x:nat not member(x, l) impl length(delete(x, l)) = length(l);
+
+
+
+N11 dmac252  falsches context insert;
+
+axiom all x,y:nat plus(x,y) = plus(y, x);
+
+all n:nat s(nbr-plus-fib(n)) = fib(s(n));
+
+
+
+N12 dmac 287 (0.02s);
+
+all x:nat times(x, 0) = 0;
+
+
+N13 dmac319  Lemma 0.07s + 0.04s ;
+
+all lst:list all q,r:nat fn2(q, foldl-fn(lst, r)) = foldl-fn(append(lst, cons(q, nil)), r);
+
+all lst:list all r:nat foldr-fn(lst,r) = foldl-fn(reverse*(lst),r);
+
+
+
+N14 dmac 340 (0.06 s);
+
+all n:nat car(positives(n)) = n; 
+
+
+N15 dmac355  0.51 sec ;
+
+axiom all x,y:nat lessp(x, y) impl lessp(p(x), y);
+
+axiom all x,y,p:nat prime(p) impl (remainder(times(x, y), p) = 0 impl (remainder(x, p) = 0 or remainder(y, p) = 0));
+
+all m,n,p:nat  (prime(p) and not remainder(m,p) = 0 and lessp(n,p)) impl all-non-zerop(s*(n,m,p));
+
+
+
+N16 dmac361 non-inductive interactive (eigentlich trivial, bloede fallunterscheidung);
+
+axiom all x,y,z:nat times(x, times(y, z)) = times(times(x, y), z);
+
+axiom all k,m,q: nat prime(q)
+                    impl remainder(times(m,exp(m,times(k,p(q)))), q) = remainder(m, q);
+
+all k,m,r,q:nat prime(q) impl remainder(times(m,exp(m,times(k,times(p(r),p(q))))),q) =
+                              remainder(m,q);
+
+
+N17 dmac362 no idea;
+
+(all ed,m,p,q:nat (prime(p) and prime(q) and not p = q and lessp(m,times(p,q)) and remainder(ed,times(sub(p),sub(q))) = s(0))
+   impl remainder(exp(m,ed),times(p,q)) = m);
+
+
+N18 dmac422 ;
+ 
+axiom all a,j,p:nat prime(p) and not divides(p,j)) 
+              impl remainder(times(j, remainder(times(inverse(j,p), a), p)), p) 
+                   = remainder(a,p);
+
+all a,j,p:nat (prime(p) and not divides(p,j) and not divides(p,a)) impl complement(complement(j,a,p),a,p) = remainder(j,p);
+ 
+
+
+N19 dmac431 ;
+
+all a,p:nat (prime(p) and not divides(p,a) and not residue(a,p)) impl   
+            times-list(comp-list(sub(p),a,p)) = fact(sub(p));
+
+N20 dmac475 ;
+
+axiom all x,y:nat lessp(x, y) impl lessp(p(x), y);
+
+axiom all a,i,j,p:nat (prime(p) and lessp(j,i) and lessp(i,p) and not remainder(a,p) = 0) impl 
+   not remainder(times(a,j),p) = remainder(times(a,i),p);
+ 
+axiom all x,y:nat not lessp(quotient(y, s(s(0))), x) impl lessp(x, y);
+
+axiom all x,y:nat lessp(j, i) impl not lessp(i, j);
+
+all a,i,j,p:nat (prime(p) and not divides(s(s(0)),p) and not divides(p,a) and
+                 leq(i,quotient(p,s(s(0)))) and lessp(j,i)) impl not                
+               member(remainder(times(a,i),p), reflect-list(j,a,p));
+
+N21 dmac481 ;
+
+all a,p:nat (prime(p) and not divides(s(s(0)),p) and not divides(p,a) and res1*(quotient(p,s(s(0))),a,p)) 
+        impl remainder(exp(a,quotient(p,s(s(0)))),p) = s(0);
+
+
+N22 dmac522 ;
+
+(all i:nat (all j:nat (all p:nat all(q,pnat, (prime(p) and prime(q) and not p = q and lessp(i,q) and lessp(j,p)) 
+        impl not member(times(i,p),mults(j,q))))));
+
+
+N23 dmac533;
+ (all a:nat(all i:nat (all p:nat (prime(p) and not divides(p,a) and remainder(a,p) = remainder(times(i,i),p)) impl not divides(p,i))));
+
+
+N24 dmac 573;
+
+all y:nat all x:nat even(difference(y,x)) EQV (lessp(y,x) OR (even(y) EQV even(x)));
+
+
+N25 dmac584  interactive , AC-umformungen;
+
+axiom all x,y:nat times(x, y) = times(y, x);
+
+axiom all x,y,z:nat times(x, plus(y, z)) = plus(times(x, y), times(x, z));
+
+axiom all x,y,z:nat times(x, times(y, z)) = times(times(x, y), z);
+
+all a,n,r:nat remainder(times(times(a,s(n)),times(exp(a,n),fact(n))),r) =
+              remainder(times(exp(a,s(n)),fact(s(n))),r);
+
+
+N26 dmac591 ;
+
+axiom all p, x:nat not x = 0 and divides(s(s(0)), p)  impl
+ (and(imp(eq(x,0,pnat),void),imp(divides({"int-2"},p),void)),
+    imp(eq(remainder(difference(p,x),p),x,pnat),void))))
+
+
+axiom all a,n,r:nat 
+    (not r  = 0 and n = s(p(n)) and lessp(quotient(r,s(s(0))),remainder(times(a,n),r)))
+      impl (remainder(times-list(reflections(p(n),a,r)),r) = remainder(times(exp(a,p(n)),fact(p(n))),r)
+            impl remainder(times-list(reflections(n,a,r)),r)  =
+                 remainder(difference(r,remainder(times(exp(a,n),fact(n)),r)),r));
+
+
+axiom all a,n,r:nat leq(a,r) impl remainder(difference(n,remainder(difference(n,a),r)),r) = remainder(a,r);
+
+axiom all a,n,r:nat 
+    (not r = 0 and n = s(p(n)) and lessp(quotient(r, s(s(0))),remainder(times(a,n),r)))
+     impl (remainder(times-list(reflections(p(n),a,r)),r) =
+           remainder(difference(r,remainder(times(exp(a,p(n)),fact(p(n))),r)),r)
+           impl remainder(times-list(reflections(n,a,r)),r) = remainder(times(exp(a,n),fact(n)),r));
+
+ 
+all a,n,r:nat res1*(n, a, s(r)) impl remainder(times-list(reflections(n,a,s(r))),s(r)) 
+                                     =   remainder(times(exp(a,n),fact(n)),s(r));
+
+all a,n,r:nat not res1*(n,a,s(r)) impl remainder(times-list(reflections(n, a, s(r))), s(r))
+                    = remainder(difference(s(r),remainder(times(exp(a,n),fact(n)),s(r))),s(r));
+
+
+N27 dmac596 interactive, no induction;
+
+axiom all x,y,z:nat (lessp(x, y) and lessp(y, z)) impl lessp(x, z);
+
+axiom all x,y,z:nat not lessp(x, x);
+
+axiom all m,p,x,y:nat (prime(p) and not remainder(m,p) = 0) impl
+        ((remainder(times(m,x),p) = remainder(times(m,y),p)) eqv (remainder(x,p) = remainder(y,p)));
+
+all a,i,j,k:nat  (prime(k) and lessp(j,i) and lessp(i,k) and not divides(k,a)) 
+                    IMPL not remainder(times(a,i),k) = remainder(times(a,j),k);
+
+
+
+N28 dmac617 no hint;
+
+all a,p:nat (prime(p) and not p = s(s(0)) and not divides(p,a)) impl
+              perm(positives(quotient(p,s(s(0)))),reflections(quotient(p,s(s(0))),a,p));
+
+
+N29 dmac661 ;
+
+all x:sexpr listp(right(right(x))) IMPL 
+  count(x) = s(s(plus(count(left(x),plus(count(left(right(x))), count(right(right(x))));
+
+
+N30 dmac 674 (1.14sec);
+
+axiom all x,y:nat times(x, y) = times(y, x);
+
+axiom all x:nat difference(x, x) = 0;
+
+axiom all x,y:nat plus(x, y) = plus(y, x);
+
+axiom all x,y,z:nat plus(x, plus(y, z)) = plus(plus(x, y), z);
+
+axiom all u,x,y,z:nat 
+     difference(s(plus(u, plus(x, plus(y, z)))), plus(u, plus(x, y))) 
+     = s(difference(plus(y, z), y));
+
+axiom all u,v:nat rt(plus(u,times(plus(u,v),plus(u,v)))) = plus(u,v);
+
+all i,j:nat ncar(ncons(i,j)) = i;
+
+
+N31 dmac681 eg-eval zu lang + rt nicht ausgewertet;
+
+axiom all x,y:nat lessp(s(x), y) impl lessp(x, y);
+
+all d,x:nat not lessp(x,difference(rt(x),d));
+
+
+
+N32 dmac686 case-analysis (0.1s);
+
+all x:nat not lessp(x, x);
+
+all x,y:nat lessp(x, y) impl not lessp(x, y);
+
+all i,j:nat not lessp(max2(i,j), pr-apply(i,j));
+
+
+N33 dmac688 (0.0 s)
+
+axiom all fn,i,j:nat not lessp(max1(plus(j,fn),i), pr-apply(fn,i));
+
+all fn,j:nat 
+  not lessp(max1(plus(j,fn),plus(j,fn)), pr-apply(fn,plus(j,fn)));
+
+
+N34 dmac700 (0.15s);
+
+axiom all x,y,z:nat times(x, times(y, z)) = times(times(x, y), z);
+
+all r0,r1,r2,r3,r4:nat exp-fn(r0,r1,r2,r3,r4) = times(exp***(r3,r4),r1);
+
+
+N35 dmac 770 (0.1 sec);
+
+axiom all y:nat all x,z:list subbagp(x, delete(y, z)) impl subbagp(x, z);
+
+all x,y:list subbagp(x,y) impl subbagp(cdr(x),y);
+
+
+N36 dmac801 (0.08sec);
+
+all a:list  all b:list subsetp(a,b) impl union(a,b) = b;
+
+
+N37 dmac816 0.08s ;
+
+axiom all x,y,z:nat times(times(x, y), z) = times(x, times(y, z));
+
+all i,j,k:nat exp****(i,plus(j,k)) = times(exp****(i,j), exp****(i,k));
+
+
+
+N38 dmac834  0.01s + 0.02s + 0.05s + 0.01s;
+all x,y,z:list append(x, append(y, z)) = append(append(x, y), z);
+
+all x:list append(x, nil) = x;
+
+all x,y:list reverse-loop*(x, y) = append(reverse*(x), y);
+
+all x:list reverse-loop*(x,nil) = reverse*(x);
+
+
+
+N39 dmac873  (0.13s);
+
+(all x:nat (all y:nat (all z:nat lessp(plus(x,y),plus(x,z)) EQV lessp(y,z))));
+
+
+N40 dmac928 (non-inductive interactive) ;
+
+axiom all x,y:nat times(x, y) = times(y, x);
+
+axiom all x,y,z:nat not remainder(x, y) = 0 impl not x = times(y, z);
+
+axiom all a,k,x:nat gcd(times(k,x),times(a,x)) = times(x, gcd(a,k));
+
+all a,b,k,x:nat (not divides(x,a) and a = gcd(times(x,a),times(b,a))) 
+                       impl not times(k,x) = times(b,a);
+
+
+N41 dmac929 ;
+
+(all b:nat (all x:nat (not "divides*"(x,b) and not x = 0 and not sub(x) = 0 and prime1*(x,sub(x))) impl gcd*(b,x) = 1))
+ 
+XS
+
+N42 dmac955 : anderes Induktionsschema;
+
+all x,y,z:nat lessp(x, y) and lessp(y, z) impl lessp(x, z);
+
+all x,y,z:nat not lessp(x, y) and not lessp(y, z) impl not lessp(x, z);
+
+all u,v:nat all x:list not lessp(v, maximum(cons(u, x))) impl 
+                             (not lessp(v, u) and not lessp(v, maximum(x)));
+
+axiom all v,w:nat all y:list (not lessp(v,w) and addtolist2(v,y) = cons(v, y))
+                        impl  addtolist2(v, addtolist2(w, y)) = cons(v, addtolist2(w, y));
+
+all v:nat all z:list not lessp(v, maximum(z)) impl addtolist2(v, sort2(z)) = cons(v, sort2(z));
+
+
+
+N43 dmac982 (0.04sec)
+
+axiom all y,z:nat all x:list h-pr*(x, h***(z, y)) = h***(z, h-pr*(x, y));
+
+all ac:nat all l:list h-ac*(l,ac) = h-pr*(l,ac);
+
+
+N44 dmac1016;
+
+(all board:list (all x:nat "length****"(board) = 9 impl iff(legalp(x,board),legalp1(x,board))));
+
+
+N45 dmac1037;
+
+(all opening:natlist (all xmoves1:natlist (all xmoves2:natlist "init-game"("length****"(opening),
+	"tic-tac-toe"(append(opening,xmoves1))) = "init-game"("length****"(opening),"tic-tac-toe"(append(opening,xmoves2)));
+
+N46 dmac1084;
+
+ all len:nat all n:nat "length****"("number->board"(n,len)) = len;
+
+
+
+N47 dmac1124 (0.07 s + 0.07) ;
+
+all i:nat all j:nat leq(i, j) impl plus(difference(i,j),j) = j;
+
+all i:nat all j:nat not leq(i, j) impl plus(difference(i, j), j) = i;
+
+
+
+N48 dmac1157 (all x:t619 (all y:t620 (all z:t621 zlessp*(y, x) IMPL not lessp(m1(x,y,z),m1(zsub1(x),y,z)))));
+
+
+
+N49 dmac1166 all x:sexplist all y:sexplist all z:sexplist (not "zlesseqp*"(x,y) and m1(zsub1(y),z,x) = m1(x,y,z)) IMPL lessp(m3(zsub1(y),z,x),m3(x,y,z));
+
+
+
+N50 dmac1168  no definition of ordinalp ;
+
+ all x:natlist ordinalp(make-ordinal3(x));
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

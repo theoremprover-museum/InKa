@@ -1,0 +1,60 @@
+unspec structure dummy;
+
+d-predicate p1(dummy);
+
+d-predicate p2(dummy);
+
+d-function d0:dummy;
+
+d-function d1:dummy; 
+
+d-function f(dummy):dummy;
+
+
+axiom all x:dummy  not P1(x) or not x = d0;
+
+axiom all x:dummy  not P1(x) or f(d0) = d0;
+
+axiom all x:dummy  not P2(x) or not x = d1;
+
+axiom all x:dummy  not P2(x) or f(d0) = d1;
+
+axiom all x:dummy not P2(x) or f(d1) = d0;
+
+ex x:dummy not P1(x) and not P2(x);
+
+-P1(x) |  -(x=d0).
+-P1(x) | f(d0)=d0.
+
+-P2(x) |  -(x=d1).
+-P2(x) |  f(d0)=d1.
+-P2(x) |  f(d1)=d0.
+
+-P3(x) |  -(x=d2).
+-P3(x) |  f(d0)=d1.
+-P3(x) |  f(d1)=d2.
+-P3(x) |  f(d2)=d0.
+
+-P4(x) |  -(x=d3).
+-P4(x) |  f(d0)=d1.
+-P4(x) |  f(d1)=d2.
+-P4(x) |  f(d2)=d3.
+-P4(x) |  f(d3)=d0.
+
+-P5(x) |  -(x=d4).
+-P5(x) |  f(d0)=d1.
+-P5(x) |  f(d1)=d2.
+-P5(x) |  f(d2)=d3.
+-P5(x) |  f(d3)=d4.
+-P5(x) |  f(d4)=d0.
+
+-P6(x) |  -(x=d5).
+-P6(x) |  f(d0)=d1.
+-P6(x) |  f(d1)=d2.
+-P6(x) |  f(d2)=d3.
+-P6(x) |  f(d3)=d4.
+-P6(x) |  f(d4)=d5.
+-P6(x) |  f(d5)=d0.
+
+P1(x) | P2(x) | P3(x) | P4(x) | P5(x) | P6(x).
+

@@ -1,0 +1,15 @@
+structure nil, cons(car:nat, cdr:list):list;
+
+function append(x,y:list):list =
+if x = nil then y
+otherwise cons(car(x), append(cdr(x), y));
+
+function rot(x:nat, y:list):list =
+if x = 0 then y
+otherwise {if y = nil then nil otherwise rot(p(x), append(cdr(y), cons(car(y), nil)))};
+
+function length(x:list):nat =
+if x = nil then 0
+otherwise s(length(cdr(x)));
+
+all x:list rot(length(x), x) = x;

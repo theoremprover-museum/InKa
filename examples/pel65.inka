@@ -1,0 +1,15 @@
+d-function plus(nat, nat):nat;
+
+d-function min(nat):nat;
+
+axiom all x:nat plus(0, x) = x;
+
+axiom all x:nat plus(x, 0) = x;
+
+axiom all x:nat plus(min(x), x) = 0;
+
+axiom all x,y,z:nat plus(x, plus(y, z)) = plus(plus(x, y), z);
+
+axiom all x:nat plus(x, x) = 0;
+
+all x,y:nat plus(x,y) = plus(y, x);

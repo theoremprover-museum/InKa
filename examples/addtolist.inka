@@ -1,0 +1,30 @@
+structure nil, cons(CAR:NAT, CDR:LIST):list;
+
+function delete(x:nat, y:list):list =
+if y = nil then nil
+if y of cons and car(y) = x then cdr(y)
+otherwise cons(car(y), delete(x, cdr(y)));
+
+predicate member(x:nat, y:list) =
+if y = nil then false
+if y of cons and car(y) = x then true
+otherwise member(x, cdr(y));
+
+predicate le(x,y:nat) =
+if x = 0 then true
+if x of s and y = 0 then false
+otherwise le(p(x), p(y));
+
+predicate ord(x:list) =
+if x = nil then true
+if x of cons and cdr(x) = nil then true
+otherwise {if le(car(x), car(cdr(x))) then ord(cdr(x))
+           otherwise false};
+
+function plus(x,y:nat):nat =
+if x = 0 then y
+otherwise s(plus(p(x), y));
+
+all x,y:nat ex z:nat le(x, y) impl plus(x, z) = y;
+
+all x:list all n:nat ord(x) impl (ex y:list ord(y) and x = delete(n, y) and member(n, y));

@@ -1,0 +1,144 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Our own version of the booleans, used in a limited way.
+enum structure tt, ff : bool;
+function mynot(b:bool):bool =
+if b = tt then ff
+if b = ff then tt;
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%
+% The concrete side.
+% The datatype of interest is lists over natural numbers, with the operation
+% append (see the description below). 
+%
+
+% Abbreviations for some positive numbers.
+function p1:nat = s(0);
+function p2:nat = s(p1);
+function p5:nat = s(s(s(p2)));
+
+% Standard lists.
+structure nil, cons(car:nat, cdr:list):list;
+
+% append(e,l) appends the single element e to the right-most end of list l.
+function append(e:nat, l:list):list =
+if l = nil then cons(e,nil)
+otherwise cons(car(l), append(e, cdr(l)));
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%
+% The abstract side.
+% For a natural number, the only information we are interested in is whether 
+% it's p2, p5, or something else.
+%
+
+% Abstraction for the naturals. The idea is that e1 represents p2,
+% e2 represents p5, and ne represents any other number. We'll refer to
+% a natural that abstracts into e1 as an "e1-element", and a natural
+% that abstracts into e2 as an "e2-element".
+enum structure e1, e2, ne : aelem;
+
+% The abstraction of naturals is captured by the function alphaelem.
+function alphaelem(a:nat):aelem =
+if a = p2 then e1
+otherwise { if a = p5 then e2
+              otherwise ne} ;
+
+% Abstraction of lists over naturals, based on the above abstraction of
+% individual naturals. Basically, the abstraction of a list says whether
+% there are occurences of e1-elements and e2-elements, if so, in which
+% order they occur, and whether there are multiple e1 or e2 elements. In
+% addition, the information whether the list is empty, whether it has
+% exactly one element, and what is the abstraction of its head is
+% maintained.  More precisely, an abstract list is a quadruple
+% quad(nonempty:bool, oneelem:bool, hd:aelem, tl:atail), where nonempty
+% tells us whether the list is nonempty, oneelem whether it has exactly
+% one element, and hd is the abstraction of the head. The last field,
+% tl, basically gives information about the occurrence and order of
+% e1-elements and e2-elements in the list. In the case that there are
+% multiple occurrences of e1 or e2 in the list, then this is represented
+% by the tl field having value error.
+% (Type name atail is now slightly misleading as it does not concern
+% the tail but the whole list).
+enum structure epsl, e1l, e2l, e1e2l, e2e1l, error : atail;
+
+structure quad(nonempty:bool, oneelem:bool, hd:aelem, tl:atail) : alist;
+
+function check_nonempty(l:list):bool =
+if l = nil then ff
+otherwise tt;
+
+function check_oneel(l:list):bool =
+if l = nil then ff
+otherwise{ if cdr(l) = nil then tt
+           otherwise ff
+         };
+
+% (Still called alphatail, but always used for the full list now.)
+
+
+function combine(x:aelem, y:atail):atail =
+
+ if x = ne then y
+ if x = e1 and y = epsl then e1l
+ if x = e1 and y = e2l then e1e2l
+ if x = e2 and y = epsl then e2l
+ if x = e2 and y = e1l then e2e1l
+ otherwise error;
+
+function alphatail(l:list):atail =
+if l = nil then epsl
+otherwise  combine(alphaelem(car(l)), alphatail(cdr(l)));
+
+
+
+% Now we can define the function alpha that abstracts a concrete list.
+% Uses a hack: when taking the car of an empty list, INKA seems to
+% always return the "first" value of the element type. So the car of
+% an empty list over nat is 0. This fact is used in calculating the
+% 3rd field. Note that this is wrong when 0 is a distinguished element 
+% (e1-element).
+function alpha(l:list):alist =
+quad(check_nonempty(l), check_oneel(l), alphaelem(car(l)), alphatail(l));
+
+
+function aux(e: aelem, l:alist):aelem =
+if nonempty(l) = ff then e
+otherwise hd(l);
+
+% Finally, we can "lift" the append operation.
+% aappend(e,l) takes an abstract element e, an abstract list l, and
+% "mimics" the concrete append operation.
+
+function combiner(e:aelem, tl:atail):atail =
+if e = ne then tl
+if e = e1 and tl = epsl then e1l
+if e = e1 and tl = e2l then e2e1l
+if e = e2 and tl = epsl then e2l
+if e = e2 and tl = e1l then e1e2l
+otherwise error;
+
+
+
+function aappend(e: aelem, l:alist):alist = 
+quad(tt, mynot(nonempty(l)), aux(e, l), combiner(e, tl(l)));
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% The statement of the safety proof looks as follows.
+all l:list all n:nat
+  alpha(append(n,l)) = aappend(alphaelem(n),alpha(l));
+
+
+
+

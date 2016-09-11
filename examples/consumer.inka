@@ -1,0 +1,220 @@
+unspec structure channel_data;
+
+structure t,f:bool;
+
+enum structure l1, l2, l3, l4, l5:labels;
+
+function neg(x:bool):bool =
+if x = f then t
+otherwise f;
+
+all x,y:bool neg(x) = y eqv not x = y;
+
+structure emptylist, cons(first:channel_data, rest:channel_data_list):channel_data_list;
+
+
+function append(x,y:channel_data_list):channel_data_list =
+  if x = emptylist then y
+  otherwise cons(first(x), append(rest(x), y));
+
+
+structure emptyqueue, enqueue(enqueue_queue:queue, enqueue_elem : channel_data):queue;
+
+function length(q:queue):nat =
+  if q = emptyqueue then 0
+  otherwise s(length(enqueue_queue(q)));
+
+
+function last(q:queue):channel_data =
+  if q = emptyqueue then ?
+  if q = enqueue(emptyqueue, enqueue_elem(q)) then enqueue_elem(q)
+  otherwise last(enqueue_queue(q));
+
+
+function dequeue(q:queue):queue =
+  if q = emptyqueue then ?
+  if q = enqueue(emptyqueue, enqueue_elem(q)) then emptyqueue
+  otherwise enqueue(dequeue(enqueue_queue(q)), enqueue_elem(q));
+
+
+function convert_ql(q:queue):channel_data_list =
+   if q = emptyqueue then emptylist
+   otherwise cons(enqueue_elem(q),convert_ql(enqueue_queue(q)));
+
+predicate less(x,y:nat) =
+  if y = 0 then false
+  if x = 0 and y of s then true
+  otherwise less(p(x), p(y));
+
+d-function max:nat;
+
+all at:labels all sig1,sig2,ac1,ac2:bool all inn:channel_data
+  all h2_outt, h2_outt', h1_inn, h1_inn':channel_data_list 
+    all q:queue
+
+ (at = l1 and sig1 = T and ac1 = T and sig2 = T and ac2 = T and h1_inn = emptylist
+   and h2_outt = emptylist and  q = emptyqueue)
+  impl
+
+  ((((at = l3 or at = l4) and not sig1 = ac1) 
+     impl h1_inn = cons(inn, append(convert_ql(q), h2_outt)))
+    and (((at = l3 or at = l4) and sig1 = ac1) 
+          impl h1_inn = append(convert_ql(q), h2_outt))
+    and (at = l2 impl 
+        (not sig1 = ac1 and h1_inn = cons(inn, append(convert_ql(q), h2_outt))))
+    and ((at = l1 and sig1 = ac1) impl h1_inn = append(convert_ql(q), h2_outt))
+    and ((at = l1 and not sig1 = ac1) 
+          impl h1_inn = cons (inn,append(convert_ql(q), h2_outt)))
+    and (at = l4 impl sig2 = ac2));
+
+
+
+
+
+all at,at':labels 
+  all sig1,sig1',sig2,sig2',ac1,ac1',ac2,ac2':bool 
+  all outt, outt':channel_data
+  all inn,inn':channel_data
+  all h2_outt, h2_outt', h1_inn, h1_inn':channel_data_list 
+  all q,q':queue
+
+((at = l1 AND not sig1 = ac1 AND less(length(q), max) AND
+  ac1' = ac1 AND outt' = outt AND sig2' = sig2 AND
+  h2_outt' = h2_outt AND q' = q AND at' = l2 and 
+  inn' = inn and h1_inn' = h1_inn and sig1' = sig1 and
+
+  (((at = l3 or at = l4) and not sig1 = ac1) 
+   impl h1_inn = cons(inn, append(convert_ql(q), h2_outt)))
+  and (((at = l3 or at = l4) and sig1 = ac1) 
+       impl h1_inn = append(convert_ql(q), h2_outt))
+  and (at = l2 
+       impl (not sig1 = ac1 and h1_inn = cons(inn, append(convert_ql(q), h2_outt))))
+  and ((at = l1 and sig1 = ac1) impl h1_inn = append(convert_ql(q), h2_outt))
+  and ((at = l1 and not sig1 = ac1) 
+       impl h1_inn = cons (inn,append(convert_ql(q), h2_outt)))
+  and (at = l4 impl sig2 = ac2))
+impl
+  ((((at' = l3 or at' = l4) and not sig1' = ac1') 
+   impl h1_inn' = cons(inn', append(convert_ql(q'), h2_outt')))
+   and (((at' = l3 or at' = l4) and sig1' = ac1') 
+         impl h1_inn' = append(convert_ql(q'), h2_outt'))
+   and (at' = l2 
+        impl (not sig1' = ac1' and h1_inn' = cons(inn', append(convert_ql(q'), h2_outt'))))
+   and ((at' = l1 and sig1' = ac1') 
+        impl h1_inn' = append(convert_ql(q'), h2_outt'))
+   and ((at' = l1 and not sig1' = ac1') 
+        impl h1_inn' = cons (inn',append(convert_ql(q'), h2_outt')))
+   and (at' = l4 impl sig2' = ac2')));
+
+
+
+
+axiom all x:queue all y:channel_data_list 
+  Less(0, length(x)) impl append(convert_ql(dequeue(x)), cons(last(x), y)) 
+                          = append(convert_ql(x), y);
+
+
+all at,at':labels 
+  all sig1,sig1',sig2,sig2',ac1,ac1',ac2,ac2':bool 
+  all outt, outt':channel_data
+  all inn,inn':channel_data
+  all h2_outt, h2_outt', h1_inn, h1_inn':channel_data_list 
+  all q,q':queue
+
+((at = l4 AND ac1' = ac1 AND outt' = last(q) AND
+  not sig2' = sig2 AND h2_outt' = cons(last(q), h2_outt) AND
+  q' = dequeue(q) AND at' = l1 and 
+  inn' = inn and h1_inn' = h1_inn and sig1' = sig1 and
+
+  (((at = l3 or at = l4) and not sig1 = ac1) 
+   impl h1_inn = cons(inn, append(convert_ql(q), h2_outt)))
+  and (((at = l3 or at = l4) and sig1 = ac1) 
+       impl h1_inn = append(convert_ql(q), h2_outt))
+  and (at = l2 
+       impl (not sig1 = ac1 and h1_inn = cons(inn, append(convert_ql(q), h2_outt))))
+  and ((at = l1 and sig1 = ac1) impl h1_inn = append(convert_ql(q), h2_outt))
+  and ((at = l1 and not sig1 = ac1) 
+       impl h1_inn = cons (inn,append(convert_ql(q), h2_outt)))
+  and (at = l4 impl sig2 = ac2 and less(0, length(q))))
+impl
+  ((((at' = l3 or at' = l4) and not sig1' = ac1') 
+   impl h1_inn' = cons(inn', append(convert_ql(q'), h2_outt')))
+   and (((at' = l3 or at' = l4) and sig1' = ac1') 
+         impl h1_inn' = append(convert_ql(q'), h2_outt'))
+   and (at' = l2 
+        impl (not sig1' = ac1' and h1_inn' = cons(inn', append(convert_ql(q'), h2_outt'))))
+   and ((at' = l1 and sig1' = ac1') 
+        impl h1_inn' = append(convert_ql(q'), h2_outt'))
+   and ((at' = l1 and not sig1' = ac1') 
+        impl h1_inn' = cons (inn',append(convert_ql(q'), h2_outt')))
+   and (at' = l4 impl sig2' = ac2' and less(0, length(q')))));
+
+
+
+all at,at':labels all sig1,sig1',ac1,ac1':bool all inn,inn':channel_data
+  all h2_outt, h2_outt', h1_inn, h1_inn':channel_data_list  
+
+ ((((ex m:channel_data_list h1_inn = append(m, h2_outt))
+ and (at = l4 impl (ex m:channel_data_list h1_inn = cons(inn, append(m, h2_outt))))
+ and (at = l3 impl sig1 = ac1)
+ and (at = l4 impl not sig1 = ac1))
+   and
+  (at = l1 and sig1' = sig1 and inn' = inn and h1_inn' = h1_inn
+   and at' = l2 and ac1' = ac1 and h2_outt' = h2_outt))
+
+ impl 
+
+ ((ex m1:channel_data_list h1_inn' = append(m1, h2_outt'))
+  and (at' = l4 impl (ex m1:channel_data_list h1_inn' = cons(inn', append(m1, h2_outt'))))
+  and (at' = l3 impl sig1' = ac1')
+  and (at' = l4 impl not sig1' = ac1')));
+
+
+
+all at,at':labels all sig1,sig1',ac1,ac1':bool all inn,inn':channel_data
+  all h2_outt, h2_outt', h1_inn, h1_inn':channel_data_list  
+
+ ((((ex m:channel_data_list h1_inn = append(m, h2_outt))
+ and (at = l4 impl (ex m:channel_data_list h1_inn = cons(inn, append(m, h2_outt))))
+ and (at = l3 impl sig1 = ac1)
+ and (at = l4 impl not sig1 = ac1))
+   and
+
+  (at = l2 and sig1 = ac1 and sig1' = sig1 and inn' = inn and
+   h1_inn' = h1_inn and at' = l2 and ac1' = ac1 and h2_outt' = h2_outt))
+
+  impl
+
+ ((ex m1:channel_data_list h1_inn' = append(m1, h2_outt'))
+  and (at' = l4 impl (ex m1:channel_data_list h1_inn' = cons(inn', append(m1, h2_outt'))))
+  and (at' = l3 impl sig1' = ac1')
+  and (at' = l4 impl not sig1' = ac1')));
+
+
+
+
+all at,at':labels all sig1,sig1',ac1,ac1':bool all inn,inn':channel_data
+  all h2_outt, h2_outt', h1_inn, h1_inn':channel_data_list  all x:channel_data
+
+ ((((ex m:channel_data_list h1_inn = append(m, h2_outt))
+ and (at = l4 impl (ex m:channel_data_list h1_inn = cons(inn, append(m, h2_outt))))
+ and (at = l3 impl sig1 = ac1)
+ and (at = l4 impl not sig1 = ac1))
+   and
+
+  (at = l3 and sig1' = neg(sig1) and inn' = x and h1_inn' = cons(x, h1_inn)
+   and at' = l1 and ac1' = ac1 and h2_outt' = h2_outt))
+
+  impl
+
+ ((ex m1:channel_data_list h1_inn' = append(m1, h2_outt'))
+  and (at' = l4 impl (ex m1:channel_data_list h1_inn' = cons(inn', append(m1, h2_outt'))))
+  and (at' = l3 impl sig1' = ac1')
+  and (at' = l4 impl not sig1' = ac1')));
+
+
+
+
+
+
+

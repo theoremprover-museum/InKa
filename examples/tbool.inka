@@ -1,0 +1,19 @@
+unspec structure dummy;
+
+d-function f(dummy, dummy, dummy):dummy;
+
+d-function g(dummy):dummy;
+
+axiom all u,v,x,y,z:dummy f(u, v, f(x, y, z)) = f(f(u, v, x), y, f(u, v, z));
+
+axiom all x,y:dummy f(y, x, x) = x;
+
+axiom all x,y:dummy f(x, y, g(y)) = x;
+
+all x,y:dummy f(y, x, y) = y;
+
+all x,y:dummy f(g(y), x, y) = x;
+
+all x,y:dummy f(x, x, y) = x;
+
+all x,y:dummy f(g(y), y, x) = x;

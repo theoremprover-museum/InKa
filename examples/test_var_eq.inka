@@ -1,0 +1,7 @@
+structure nil, cons(car:nat, cdr:list):list;
+
+function app(x,y:list):list =
+if x = nil then y
+otherwise cons(car(x), app(cdr(x), y));
+
+all x:list all n:nat ex y,z:list app(y, x) = cons(n, z);

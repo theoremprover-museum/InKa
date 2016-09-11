@@ -1,0 +1,22 @@
+ -INSERT
+STRUCTURE 0 succ (pred:number):number
+ |
+ -INSERT
+STRUCTURE empty add (head:number tail:list):list
+ |
+ -INSERT
+PREDICATE Lt (n1,n2:number) =
+IF n2 = 0 THEN False
+IF n1 = 0 AND NOT n2 = 0 THEN True
+IF n1 = succ (pred (n1)) AND n2 = succ (pred (n2))
+   THEN Lt (pred (n1) pred (n2))
+ |
+ -INSERT
+FUNCTION larger (n1:number l1:list):list =
+IF l1 = empty THEN empty
+IF l1 = add (head (l1) tail (l1)) AND Lt (n1 head (l1))
+   THEN add( head(l1) larger (n1 tail (l1)))
+IF l1 = add (head (l1) tail (l1)) AND NOT Lt (n1 head (l1))
+   THEN larger (n1 tail (l1))
+ |
+ OK

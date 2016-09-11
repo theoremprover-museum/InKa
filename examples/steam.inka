@@ -1,0 +1,43 @@
+UNSPEC STRUCTURE wolf;
+UNSPEC STRUCTURE bird;
+UNSPEC STRUCTURE fox;
+UNSPEC STRUCTURE caterpillar;
+UNSPEC STRUCTURE snail;
+
+STRUCTURE (wolf),(bird),(fox),(caterpillar),(snail):animal;
+
+UNSPEC STRUCTURE grain;
+
+STRUCTURE (grain):plant;
+
+STRUCTURE (animal),(plant):anny;
+
+D-PREDICATE Muchsmaller(animal,animal);
+
+D-PREDICATE Eats(anny,anny);
+
+D-FUNCTION a:wolf;
+
+D-FUNCTION b:fox;
+D-FUNCTION c:bird;
+D-FUNCTION d:caterpillar;
+D-FUNCTION e:snail;
+D-FUNCTION f:grain;
+
+AXIOM ALL w:animal (ALL x:plant Eats (w,x)) OR (ALL y:animal Muchsmaller (y,w) AND (EX z:plant Eats (y,z)) IMPL Eats (w,y));
+AXIOM all x:caterpillar all y:bird Muchsmaller(x ,y);
+AXIOM all x:snail all y:bird Muchsmaller(x ,y);
+AXIOM all x:bird all y:fox  Muchsmaller(x, y);
+AXIOM all x:fox all y:wolf Muchsmaller(x ,y);
+
+AXIOM all x:wolf all y:fox not Eats(x ,y);
+AXIOM all x:wolf all y:grain not Eats(x ,y);
+AXIOM all x:bird all y:caterpillar Eats (x ,y);
+AXIOM all x:bird all y:snail not Eats(x, y);
+AXIOM all x:caterpillar (ex y:plant Eats(x, y));
+AXIOM all x:snail (ex y:plant Eats(x, y));
+
+
+
+ex x,y:animal Eats(x, y) and (ex z:grain Eats(y, z));
+

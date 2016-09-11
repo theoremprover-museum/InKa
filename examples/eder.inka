@@ -1,0 +1,13 @@
+unspec structure dummy;
+
+d-function g(dummy):dummy;
+
+function f(x:nat, y:dummy):dummy =
+if x = 0 then y
+otherwise g(g(f(p(x), y)));
+
+d-predicate E(dummy);
+
+axiom all x:dummy E(x) or E(g(x));
+
+all x:nat ex y:dummy  E(y) and E(f(x, y));

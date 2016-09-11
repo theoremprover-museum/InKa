@@ -1,0 +1,91 @@
+ -INSERT
+STRUCTURE 0 s (p:nat):nat
+ |
+ -INSERT
+FUNCTION plus (n1,n2:nat):nat =
+IF n1 = 0 THEN n2
+IF NOT n1 = 0 THEN s (plus (p (n1) n2))
+ |
+ -INSERT
+FUNCTION times (n1,n2:nat):nat =
+IF n1 = 0 THEN 0
+IF NOT n1 = 0 THEN plus (n1 times (p (n1) n2))
+ |
+ -INSERT
+PREDICATE Even (n1:nat) =
+IF n1 = 0 THEN True
+IF n1 = s (0) THEN False
+IF NOT n1 = 0 AND NOT n1 = s (0) THEN Even (p (p (n1)))
+ |
+ -INSERT
+STRUCTURE nil cons (car:nat cdr:list):list
+ |
+ -INSERT
+FUNCTION app (l1,l2:list):list =
+IF l1 = nil THEN l2
+IF NOT l1 = nil THEN cons (car (l1) app (cdr (l1) l2))
+ |
+ -INSERT
+FUNCTION length (l1:list):nat =
+IF l1 = nil THEN 0
+IF NOT l1 = nil THEN s (length (cdr (l1)))
+ |
+ -INSERT
+FUNCTION rev (l1:list):list =
+IF l1 = nil THEN l1
+IF NOT l1 = nil THEN app (rev (cdr (l1)) cons (car (l1) nil))
+ |
+ -INSERT
+FUNCTION rotate (n1:nat l1:list):list =
+IF n1 = 0 THEN l1
+IF NOT n1 = 0 THEN rotate (p (n1) app (cdr (l1) cons (car (l1) nil)))
+ |
+ -INSERT
+FUNCTION rev2 (l1,l2:list):list =
+IF l1 = nil THEN l2
+IF NOT l1 = nil THEN rev2 (cdr (l1) cons (car (l1) l2))
+ |
+ -INSERT
+;ALL n1:nat plus (plus (n1 n1) n1) = plus (n1 plus (n1 n1))
+ |
+ -INSERT
+;ALL n1:nat plus (n1 s (n1)) = s (plus (n1 n1))
+ |
+ -INSERT
+;ALL n1:nat plus (n1 s (n1)) = plus (s (n1) n1)
+ |
+ -INSERT
+;all x:nat times(x plus(x x))=plus(times(x x) times(x x))
+ |
+ -INSERT
+;all x:nat times(plus(x x) x)=plus(times(x x) times(x x))
+ |
+ -INSERT
+;ALL n1:nat
+    plus (plus (s (s (0)) n1) n1) = plus (s (s (0)) plus (n1 n1))
+ |
+ -INSERT
+;ALL n1,n2:nat plus (plus (n2 n1) n2) = plus (n2 plus (n1 n2))
+ |
+ -INSERT
+;all x:nat not x=0 impl plus(p(x) s(s(x)))=plus(s(x) x)
+ |
+ -INSERT
+;all x:nat even(plus(x x))
+ |
+ -INSERT
+;ALL l1:list length (rev (l1)) = length (l1)
+ |
+ -INSERT
+;all l:list rotate(length(l) l)=l
+ |
+ -INSERT
+;all l:list all y:nat rev(app(rev(l) cons(y nil)))=cons(y rev(l))
+ |
+ -INSERT
+;all l:list rev2(l nil)=rev(l)
+ |
+ -INSERT
+ALL l1:list app (app (l1 l1) l1) = app (l1 app (l1 l1))
+ |
+ OK

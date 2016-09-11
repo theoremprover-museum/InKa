@@ -1,0 +1,46 @@
+STRUCTURE 0 s (nat):nat
+
+STRUCTURE empty cons (nat list):list
+
+PREDICATE Le (n1,n2:nat) =
+IF n1 = 0 THEN True
+IF NOT n1 = 0 AND n2 = 0 THEN False
+IF EX n3,n4:nat n1 = s (n3) AND n2 = s (n4) THEN Le (n3 n4)
+
+PREDICATE Gt (n1,n2:nat) = NOT Le (n1 n2)
+
+FUNCTION min (l1:list):nat =
+IF l1 = empty THEN 0
+IF EX n1:nat l1 = cons (n1 empty) THEN n1
+IF EX l2:list EX n2,n3:nat l1 = cons (n2 cons (n3 l2)) AND Le (n2 n3)
+   THEN min (cons (n2 l2))
+IF EX l3:list EX n4,n5:nat l1 = cons (n4 cons (n5 l3)) AND Gt (n4 n5)
+   THEN min (cons (n5 l3))
+
+FUNCTION delete (n1:nat l1:list):list =
+IF l1 = empty THEN l1
+IF EX l2:list l1 = cons (n1 l2) THEN l2
+IF EX l3:list EX n2:nat l1 = cons (n2 l3) AND NOT n1 = n2
+   THEN cons (n2 delete (n1 l3))
+
+PREDICATE Member (n1:nat l1:list) =
+IF l1 = empty THEN False
+IF EX l2:list EX n2:nat l1 = cons (n2 l2) AND n1 = n2 THEN True
+IF EX l3:list EX n3:nat l1 = cons (n3 l3) AND NOT n1 = n3 THEN Member (n1 l3)
+
+PREDICATE Ordered (l1:list) =
+IF l1 = empty THEN True
+IF EX l2:list EX n1:nat l1 = cons (n1 l2) AND NOT n1 = min (l1) THEN False
+IF EX l3:list EX n2:nat l1 = cons (n2 l3) AND n2 = min (l1) THEN Ordered (l3)
+
+predicate perm(x,y:list) =
+if x=empty then y=empty
+if y=empty and not x=empty then false
+if ex u:nat ex v:list x=cons(u v) and not y=empty and member(u y) then perm(v delete(u y))
+if ex u:nat ex v:list x=cons(u v) and not y=empty and not member(u y) then false
+
+all x,y:list perm(x, y) impl perm(y, x)
+
+all x,y,z:list perm(x, y) and perm(y, z) impl perm(x, z)
+
+all x:list ex y:list perm(y, x) and ordered(y)

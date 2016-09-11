@@ -1,0 +1,47 @@
+structure nil, cons(car:nat, cdr:list):list;
+
+function app(x, y:list):list =
+if x = nil then y
+otherwise cons(car(x), app(cdr(x), y));
+
+
+predicate leq(x, y:nat) =
+if x = 0 then true
+if x = s(p(x)) and y = 0 then false
+otherwise leq(p(x), p(y));
+
+
+function leqlist (x:nat, y:list):list =
+if Y = nil then nil
+if y = cons(car(y), cdr(y)) and leq(car(y), x) then cons(car(y), leqlist(x, cdr(y)))
+otherwise leqlist(x, cdr(y));
+
+function grtlist (x:nat, y:list):list =
+if Y = nil then nil
+if y = cons(car(y), cdr(y)) and leq(car(y), x) then grtlist(x, cdr(y))
+otherwise cons(car(y), grtlist(x, cdr(y)));
+
+
+function qsort(x:list):list =
+if x = nil then nil
+otherwise app(qsort(leqlist(car(x), cdr(x))), cons(car(x), grtlist(car(x), cdr(x)))) ;
+
+predicate sorted(x:list) =
+if x = nil then true
+if x = cons(car(x), nil) then true
+otherwise {if leq(car(x), car(cdr(x))) then sorted(cdr(x))
+	   otherwise false};
+
+
+function occ(x:nat, y:list):nat =
+if y = nil then 0
+if y = cons(car(y), cdr(y)) and car(y) = x then s(occ(x, cdr(y)))
+otherwise occ(x, cdr(y));
+
+all l:list sorted(qsort(l));
+
+all l:list all x:nat occ(x, qsort(l)) = occ(x, l);
+
+
+
+

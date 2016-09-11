@@ -1,0 +1,19 @@
+all x,y:nat plus(x, s(y)) = s(plus(x, y));
+
+all x:nat plus(x, 0) = x;
+
+All x,y:nat Ex z:nat leq(y, x) -> plus(z, y) = x;
+
+predicate ordered(x:list) =
+if x = nil then true
+if x = cons(car(x), nil) then true
+if x of cons and cdr(x) of cons and lessp(car(cdr(x)), car(x))
+     then false
+if x of cons and cdr(x) of cons and not lessp(car(cdr(x)), car(x))
+     then ordered(cdr(x));
+
+
+All x:list All n:nat ordered(x) -> (Ex y:list ordered(y) and x = delete(n, y) and member(n, y));
+
+
+

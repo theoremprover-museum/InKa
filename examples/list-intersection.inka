@@ -1,0 +1,22 @@
+ -INSERT
+STRUCTURE 0 succ (pred:number):number
+ |
+ -INSERT
+STRUCTURE empty add (head:number tail:list):list
+ |
+ -INSERT
+PREDICATE Element (n1:number l1:list) =
+IF l1 = empty THEN False
+IF l1 = add (head (l1) tail (l1)) AND head (l1) = n1 THEN True
+IF l1 = add (head (l1) tail (l1)) AND NOT head (l1) = n1
+   THEN Element (n1 tail (l1))
+ |
+ -INSERT
+FUNCTION list.intersection (l1,l2:list):list =
+IF l1 = empty THEN empty
+IF l1 = add (head (l1) tail (l1)) AND Element (head (l1) l2)
+   THEN add (head (l1) list.intersection (tail (l1) l2))
+IF l1 = add (head (l1) tail (l1)) AND NOT Element (head (l1) l2)
+   THEN list.intersection (tail (l1) l2)
+ |
+ OK

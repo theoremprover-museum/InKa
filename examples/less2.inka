@@ -1,0 +1,29 @@
+structure 0, s(nat):nat
+
+predicate less(x,y:nat) =
+if y of 0 then false
+if y of s then {if x of 0 then true otherwise less(s_1(x) s_1(y))}
+
+function plus(x,y:nat):nat =
+if x = 0 then y otherwise s(plus(s_1(x) y))
+
+function times(x,y:nat):nat =
+if x = 0 then 0 otherwise plus(y times(s_1(x) y))
+
+all x,y:nat plus(x y) = plus(y x)
+
+all x,y:nat ex u,v:nat not y = 0 impl (plus(times(y u) v) = x and less(v y))
+
+all x:nat less(x s(x))
+
+
+
+
+
+
+
+
+
+
+
+OK

@@ -1,0 +1,117 @@
+ +INSERT
+STRUCTURE 0 s (nat):nat
+ |
+ +INSERT
+STRUCTURE empty insert (nat list):list
+ |
+ +INSERT
+PREDICATE Member (n1:nat l1:list) =
+IF l1 = empty THEN False
+IF EX l2:list EX n2:nat l1 = insert (n2 l2) AND n1 = n2 THEN True
+IF EX l3:list EX n3:nat l1 = insert (n3 l3) AND NOT n1 = n3
+   THEN Member (n1 l3)
+ |
+ +INSERT
+FUNCTION delete (n1:nat l1:list):list =
+IF l1 = empty THEN empty
+IF EX l2:list EX n2:nat l1 = insert (n2 l2) AND n1 = n2 THEN delete (n1 l2)
+IF EX l3:list EX n3:nat l1 = insert (n3 l3) AND NOT n1 = n3
+   THEN insert (n3 delete (n1 l3))
+ |
+ +INSERT
+FUNCTION ins (n1:nat l1:list):list =
+IF Member (n1 l1) THEN l1
+IF NOT Member (n1 l1) THEN insert (n1 l1)
+ |
+ +INSERT
+PREDICATE Is.Set (l1:list) =
+IF l1 = empty THEN True
+IF EX l2:list EX n1:nat l1 = insert (n1 l2)
+   THEN (Is.Set (l2) AND NOT Member (n1 l2))
+ |
+ +INSERT
+PREDICATE Subset (l1,l2:list) =
+IF l1 = empty THEN True
+IF EX l3:list EX n1:nat l1 = insert (n1 l3)
+   THEN (Member (n1 l2) AND Subset (l3 l2))
+ |
+ +INSERT
+PREDICATE Eq.Set (l1,l2:list) = (Subset (l1 l2) AND Subset (l2 l1))
+ |
+ +INSERT
+ALL l1,l2:list ALL n1:nat (Subset (l1 l2) IMPL Subset (l1 insert (n1 l2)))
+ |
+ +INSERT
+ALL l1:list Subset (l1 l1)
+ |
+ +INSERT
+ALL l1:list Eq.Set (l1 l1)
+ |
+ +INSERT
+ALL l1,l2:list (Eq.Set (l2 l1) IMPL Eq.Set (l1 l2))
+ |
+ +INSERT
+ALL l1,l2:list ALL n1:nat
+    ((Member (n1 l1) AND Subset (l1 l2)) IMPL Member (n1 l2))
+ |
+ +INSERT
+ALL l1,l2,l3:list ((Subset (l1 l2) AND Subset (l2 l3)) IMPL Subset (l1 l3))
+ |
+ +INSERT
+ALL l1,l2,l3:list ((Eq.Set (l3 l2) AND Eq.Set (l2 l1)) IMPL Eq.Set (l3 l1))
+ |
+ +INSERT
+ALL l1:list ALL n1:nat Member (n1 ins (n1 l1))
+ |
+ +INSERT
+ALL l1,l2:list ALL n1:nat
+    (Subset (l2 l1) IMPL Subset (ins (n1 l2) ins (n1 l1)))
+ |
+ +INSERT
+ALL l1,l2:list ALL n1:nat
+    (Eq.Set (l1 l2) IMPL Eq.Set (ins (n1 l1) ins (n1 l2)))
+ |
+ +INSERT
+ALL l1:list ALL n1,n2:nat
+    (Member (n1 l1) IMPL (n2 = n1 OR Member (n1 delete (n2 l1))))
+ |
+ +INSERT
+ALL l1,l2:list ALL n1:nat
+    (Subset (l1 l2) IMPL Subset (delete (n1 l1) delete (n1 l2)))
+ |
+ +INSERT
+ALL l1,l2:list ALL n1:nat
+    (Eq.Set (l2 l1) IMPL (Member (n1 l2) IMPL Member (n1 l1)))
+ |
+ +INSERT
+ALL l1,l2:list ALL n1:nat
+    (Eq.Set (l2 l1) IMPL Eq.Set (delete (n1 l2) delete (n1 l1)))
+ |
+ +INSERT
+ALL l1,l2,l3,l4:list
+    ((Subset (l1 l2) AND Subset (l2 l3) AND Subset (l3 l4))
+     IMPL Subset (l1 l4))
+ |
+ +INSERT
+ALL l1,l2,l3,l4:list
+    ((Eq.Set (l1 l2) AND Eq.Set (l3 l4))
+     IMPL (Subset (l1 l3) IMPL Subset (l2 l4)))
+ |
+ +INSERT
+ALL l1,l2:list ALL n1:nat
+    (Subset (l1 l2) IMPL (Member (n1 l1) IMPL Member (n1 l2)))
+ |
+ +INSERT
+ALL l1,l2:list ALL n1:nat
+    (Eq.Set (l2 l1) IMPL (Member (n1 l2) IMPL Member (n1 l1)))
+ |
+ +INSERT
+ALL l1:list ALL n1:nat (Is.Set (l1) IMPL Is.Set (ins (n1 l1)))
+ |
+ +INSERT
+ALL l1:list ALL n1,n2:nat (Member (n2 delete (n1 l1)) IMPL Member (n2 l1))
+ |
+ +INSERT
+ALL l1:list ALL n1:nat (Is.Set (l1) IMPL Is.Set (delete (n1 l1)))
+ |
+ OK

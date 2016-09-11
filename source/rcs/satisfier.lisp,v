@@ -1,0 +1,1731 @@
+head	1.3;
+access
+	serge
+	hutter
+	inka;
+symbols;
+locks
+	hutter:1.3; strict;
+comment	@;;; @;
+
+
+1.3
+date	99.11.30.15.44.59;	author hutter;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	99.11.26.09.09.27;	author hutter;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	97.08.20.08.07.30;	author serge;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@
+
+(in-package :INKA)
+
+
+;;; This a totally new implementation of the satisfier module of inka.
+;;;
+;;; This module tries to instantiate symbols, which satisfy the test sat=variable.is
+;;; in order to to generate an instance of a formula which is true wrt. the given 
+;;; axioms.
+
+
+(defvar sat*max.depth 25)
+
+
+
+(defun sat-satisfy.gterm (gterm)
+  
+  ;;; Input:  a gterm and a boolean. Gterm has to be a quantifier-free gterm with only AND and OR as junctions.
+  ;;;         free variables occurring in gterm are considered as ex-quantified while skolem-functions are not allowed.
+  ;;; Effect: it is tested, whether there is an assignment to the variables of \verb$GTERM$ such that \verb$GTERM$ is valid.
+  ;;;         If comment is non-NIL the result of this call is documented.
+  ;;; Value:  a multiple-value \verb$(SUBSTITUTION CUTS)$:
+  ;;;         if assignment has been found, \verb$SUBSTITUTION$ represents it/is T and \verb$CUTS$ is undefined;
+  ;;;         if no assignment has been found \verb$SUBSTITUTION$ is NIL and
+  ;;;         \verb$CUTS$ is NIL, if it is sure, that no assignment exists
+  ;;;         \verb$CUTS$ is non-NIL otherwise
+
+  (let ((result (sat=satisfy.formula (list gterm) nil)))
+    (cond (result (mapc #'(lambda (var.term)
+			    (format t "~A : ~A ~%" (car var.term) (sat=gterm.insert.bindings (cdr var.term))))
+			(car result))
+		  result))))
+
+
+
+;;; =========================================================================================================
+;;;
+;;; This is a framework for an AND-OR-TREE mechanism.
+;;;
+;;;   AND - OR trees are implemented in the following way:
+;;;
+;;;   and -branches are lists  (AND P1 ... Pn) with Pi being the specific problems
+;;;   or - branches are (OR binding P1 ... Pm) with Pi being the specific problems
+
+
+
+(defun sat=merge.problems (n1 n2) 
+  
+  (cond ((cdr n1) 
+	 (let (l1 l2)
+	   (mapc #'(lambda (formula)
+		     (cond ((and (da-literal.is formula)
+				 (da-predicate.is.equality (da-literal.symbol formula))
+				 (da-sign.is.positive (da-literal.sign formula))
+				 (or (da-variable.is (da-gterm.symbol (car (da-literal.termlist formula))))
+				     (da-variable.is (da-gterm.symbol (second (da-literal.termlist formula))))))
+			    (push formula l1))
+			   (t (push formula l2))))
+		 n1)
+	   (append l1 l2 n2)))
+	(t (append n1 n2))))
+			    
+
+
+(defun sat=satisfy.formula (problems &optional inst)
+  
+;;; Input:  LITERAL to be solved, maximum and actual pointer to SAT*LITERAL.STACK
+;;; Effect: a deduction step of the calculus is executed
+;;; Value:  list of alternative gterms or alternatives or the atoms 'SOLVED or 'CONTRA
+  
+  (cond ((null problems) (sat=solution inst))
+	(t (let ((formula (car problems)) old.formula)
+	     (cond ((eq (da-gterm.symbol formula) 'and)
+		    (sat=satisfy.formula (sat=merge.problems (da-gterm.termlist formula) (cdr problems)) inst))
+		   ((eq (da-gterm.symbol formula) 'or)
+		    (some #'(lambda (sub.formula)
+			      (sat=satisfy.formula (cons sub.formula (cdr problems)) inst))
+			  (da-gterm.termlist formula)))
+		   ((> (sat=literal.depth formula) sat*max.depth) nil)
+		   (t (setq old.formula formula)
+		      (setq formula (sat=literal.insert.depth (eg-eval (sat=gterm.insert.bindings formula)) old.formula))
+		      (cond ((da-formula.is.false formula) nil)
+			    ((da-formula.is.true formula) 
+			     (sat=satisfy.formula (cdr problems) inst))
+			    ((not (da-literal.is formula)) 
+			     (sat=satisfy.formula (cons formula (cdr problems)) inst))
+			    ((not (da-predicate.is.equality (da-gterm.symbol formula)))
+			     (some #'(lambda (case)
+				       (sat=satisfy.formula (sat=merge.problems case (cdr problems)) inst))
+				   (sat=rule.predicate.definition formula)))
+			    (t (sat=satisfy.equation formula (cdr problems) inst)))))))))
+
+
+
+(defun sat=solution (inst)
+
+  (list (mapcar #'(lambda (var) (cons var (getf (da-variable.attributes var) 'sat.binding))) inst)))
+
+
+(defun sat=satisfy.equation (formula other.problems inst)
+
+  (let (instantiation sols ok)
+    (cond ((setq instantiation (sat=rule.unification formula))
+	   (cond ((sat=satisfy.formula other.problems (cons instantiation inst)))
+		 (t (sat=binding.delete instantiation)
+		    nil)))
+	  ((setq sols (cond ((sat=rule.instantiate.vars formula))
+			    ((sat=rule.selector formula))
+			    ((sat=rule.function.definition formula))))
+	   (some #'(lambda (new.problems)
+		     (setq new.problems (sat=merge.problems new.problems other.problems))
+		     (sat=satisfy.formula new.problems inst))
+		 sols)))))
+
+
+
+;;; Rules of the calculus
+;;; ---------------------
+
+
+(defun sat=rule.unification (equation)
+
+  ;;; Input:  a literal with the equality symbol
+  ;;; Effect: implements the unification rule: if both sides can be unified then 
+  ;;;         the binding is computed. Note that both sides of the equation will
+  ;;;         not be equal !
+  ;;; Value:  the binding
+
+  (cond ((da-sign.is.positive (da-literal.sign equation))
+	 (cond ((sat=term.check.and.insert.binding (car (da-gterm.termlist equation)) (second (da-gterm.termlist equation)))
+		(da-term.symbol (car (da-gterm.termlist equation))))
+	       ((sat=term.check.and.insert.binding (second (da-gterm.termlist equation)) (car (da-gterm.termlist equation)))
+		(da-term.symbol (second (da-gterm.termlist equation))))))))
+
+
+(defun sat=rule.selector (equation)
+  
+  ;; Input:  a literal with the equality symbol
+  ;; Effect: implements the selector rule:
+  ;; Value:  an or.tree
+  
+  (let ((l.symbol (da-gterm.symbol (car (da-gterm.termlist equation))))
+	(r.symbol (da-gterm.symbol (second (da-gterm.termlist equation)))))
+    (cond ((and (da-function.is l.symbol)
+		(da-function.is.selector l.symbol))
+	   (sat=decompose.selector.terms (car (da-gterm.termlist equation)) 
+					 (second (da-gterm.termlist equation)) 
+					 equation))
+	  ((and (da-function.is r.symbol)
+		(da-function.is.selector r.symbol))
+	   (sat=decompose.selector.terms (second (da-gterm.termlist equation)) 
+					 (car (da-gterm.termlist equation)) 
+					 equation)))))
+
+
+(defun sat=decompose.selector.terms (term1 term2 equation)
+
+  (let* ((selector (da-term.symbol term1))
+	 (refl (member (da-function.sort selector) (da-function.domain.sorts selector)))
+	 (sign (da-literal.sign equation))
+	 new.lit new.term term)
+    (mapcar #'(lambda (constructor)
+		(setq new.lit (da-literal.create (da-sign.plus)(da-predicate.equality)
+						 (list (car (da-term.termlist term1))
+						       (da-term.create constructor
+								       (mapcar #'(lambda (sort sel)
+										   (setq term (da-term.create 
+												   (da-variable.create sort)))
+										   (cond ((eq sel selector) (setq new.term term)))
+										   term)
+									       (da-function.domain.sorts constructor)
+									       (DA-SORT.SELECTORS.OF.CONSTRUCTOR constructor))))))
+		(list (sat=literal.insert.depth new.lit equation)
+		      (sat=literal.insert.depth (da-literal.create sign (da-predicate.equality)
+								   (list (cond (new.term)
+									       (refl (second (da-gterm.termlist new.lit)))
+									       (t (DA-SORT.EXCEPTION.VALUE (da-term.sort term2))))
+									 term2))
+						equation)))
+	    (da-sort.constructor.fcts (car (da-function.domain.sorts selector))))))
+
+
+(defun sat=rule.function.definition (equation)
+
+  (let ((sign (da-literal.sign equation))
+	(left (car (da-literal.termlist equation)))
+	(right (second (da-literal.termlist equation))))
+    (cond ((and (da-function.is (da-gterm.symbol left))
+		(da-function.definition (da-gterm.symbol left)))
+	   (sat=rule.function.definition.1 sign left right equation))
+	  ((and (da-function.is (da-gterm.symbol right))
+		(da-function.definition (da-gterm.symbol right)))
+	   (sat=rule.function.definition.1 sign right left equation)))))
+
+
+(defun sat=rule.function.definition.1 (sign term constant.term equation)
+
+  ;;; Input:  a sign and two terms
+  ;;; Effect: all alternatives to make TERM and CONSTANT.TERM equal (resp. different) are generated,
+  ;;;         where TERM is expanded according to the definition of its leading symbol
+  ;;; Value:  a list of alternatives
+  
+  (LET ((symbol (da-term.symbol term)) alternatives result)
+    (COND ((and (da-prefun.is symbol) (da-prefun.definition symbol))
+	   (sat=bind.formal.parameters (da-function.formal.parameters symbol) (da-gterm.termlist term))
+	   (da-gterm.def.map.with.conds 
+	    (da-prefun.definition symbol)
+	    #'(lambda (value conditions)
+		(setq conditions (sat=insert.bindings.in.condition conditions equation))
+		(cond ((neq conditions 'fail)
+		       (setq result (cons (sat=literal.insert.depth 
+					   (da-literal.create sign (da-predicate.equality)
+							      (list constant.term
+								    (sat=gterm.insert.bindings (second (da-gterm.termlist value)))))
+					   equation)
+					  conditions))
+		       (setq alternatives (cond ((da-symbol.occurs.in.gterm symbol (second (da-gterm.termlist value)))
+						 (nconc alternatives (list result)))
+						(t (cons result alternatives))))))))					     
+	   (sat=bindings.delete (da-function.formal.parameters symbol))
+	   alternatives))))
+
+
+(defun sat=rule.predicate.definition (literal)
+  
+  ;; Input:  a literal with predicate different from equality
+  ;; Effect: all alternatives to solve LITERAL are generated
+  ;; Value:  a list of alternatives
+  
+  (let ((sign (da-literal.sign literal))
+	(symbol (da-literal.symbol literal))
+	alternatives result rec)
+    (cond ((and (da-prefun.is symbol) (da-prefun.definition symbol))
+	   (sat=bind.formal.parameters (da-predicate.formal.parameters symbol) (da-gterm.termlist literal))
+	   (da-gterm.def.map.with.conds 
+	    (da-prefun.definition symbol)
+	    #'(lambda (value conditions)
+		(setq conditions (sat=insert.bindings.in.condition conditions literal))
+		(cond ((neq conditions 'fail)
+		       (cond ((da-literal.is value)
+			      (cond ((eq sign (da-literal.sign value))
+				     (push conditions alternatives))))
+			     (t (setq rec (da-symbol.occurs.in.gterm 
+					   symbol (second (da-gterm.termlist (second (da-gterm.termlist value))))))
+				(setq result (sat=literal.insert.depth 
+					      (sat=gterm.insert.bindings
+					       (cond ((da-sign.is.positive sign)
+						      (second (da-gterm.termlist (second (da-gterm.termlist value)))))
+						     (T (second (da-gterm.termlist (car (da-gterm.termlist value)))))))
+					      literal))
+				(setq alternatives (cond (rec (nconc alternatives (list (cons result conditions))))
+							 (t (cons (cons result conditions) alternatives))))))))))
+	   (sat=bindings.delete (da-predicate.formal.parameters symbol))
+	   alternatives))))
+
+
+(defun sat=insert.bindings.in.condition (litlist literal)
+
+  (let (result new.lit term constr)
+    (cond ((every #'(lambda (lit)
+		      (setq new.lit (eg-eval (sat=gterm.insert.bindings (da-formula.negate lit))))
+		      (cond ((da-formula.is.false new.lit) nil)
+			    ((da-formula.is.true new.lit) t)
+			    ((and (da-literal.is new.lit)
+				  (multiple-value-setq (term constr) (DA-LITERAL.IS.NORMALIZED.MATCH new.lit)))
+			     (push (sat=literal.insert.depth 
+				    (da-literal.create (da-sign.plus) (da-predicate.equality)
+						       (list term
+							     (da-term.create constr
+									     (mapcar #'(lambda (sort)
+											 (da-term.create (da-variable.create sort)))
+										     (da-function.domain.sorts constr)))))
+				    literal)
+				   result))
+			    (t (push (sat=literal.insert.depth new.lit literal) result))))
+		  litlist)
+	   result)
+	  (t 'fail))))
+
+
+(defun sat=rule.instantiate.vars (equation)
+  
+  ;; Input:  a variable, a constructor.term and a pointer to SAT*LITERAL.STACK
+  ;; Effect: all occurences of VAR are substituted with an term cu*, where c is the leading symbol 
+  ;;         of CONS.TERM and all ui are new variables
+  ;; Value:  undefined
+  
+  (let ((l.symbol (da-gterm.symbol (car (da-literal.termlist equation))))
+	(r.symbol (da-gterm.symbol (second (da-literal.termlist equation))))
+	(sign (da-literal.sign equation)))
+    (cond ((da-variable.is l.symbol)
+	   (sat=instantiate.var.with.all.constructors (car (da-literal.termlist equation))
+						      (second (da-literal.termlist equation))
+						      sign equation))
+	  ((da-variable.is r.symbol)
+	   (sat=instantiate.var.with.all.constructors (second (da-literal.termlist equation))
+						      (car (da-literal.termlist equation))
+						      sign equation)))))
+
+
+
+(DEFUN SAT=INSTANTIATE.VAR.WITH.ALL.CONSTRUCTORS (var TERM sign equation)
+  
+  ;; Input:  a variable and a TERM
+  ;; Effect: all alternatives are generated, to assign an constructor term to VAR, which is different 
+  ;;         from TERM
+  ;; Value:  a list of alternatives
+  
+  (MAPCAR #'(LAMBDA (CONSTRUCTOR)
+	      (let ((new.term (da-term.create constructor (mapcar #'(lambda (sort)
+								      (da-term.create (da-variable.create sort)))
+								  (da-function.domain.sorts constructor)))))
+		(LIST (sat=literal.insert.depth (DA-LITERAL.CREATE '+ (DA-PREDICATE.EQUALITY) (LIST var new.term))
+						equation)
+		      (sat=literal.insert.depth (DA-LITERAL.CREATE sign (DA-PREDICATE.EQUALITY)
+								   (LIST new.term TERM))
+						equation))))
+	  (DA-SORT.CONSTRUCTOR.FCTS (da-term.sort var))))
+
+
+
+
+
+;;; Misc. functions
+;;; ===============
+
+
+
+(defun sat=create.function.with.new.vars (symbol)
+  
+;;; Input:  a constructor symbol 
+;;; Effect: a term with leading symbol SYMBOL and new variables is created.
+;;; Value:  the created term
+  
+  (cond ((da-function.is symbol)
+	 (da-term.create symbol (mapcar #'(lambda (sort)
+					    (da-term.create (da-variable.create sort)))
+					(da-function.domain.sorts symbol))))
+ 	(t symbol)))
+
+
+;;; =======================================
+;;; Macros, etc.
+;;; =======================================
+
+
+(defun sat=formula.is.trivially.solvable (lit)
+
+  (cond ((da-formula.is.false lit) 'true)
+	((da-formula.is.true lit) 'false)
+	((and (da-literal.is lit)
+	      (da-literal.is.equation lit))
+	 (let ((left (car (da-gterm.termlist lit))) (right (second (da-gterm.termlist lit))))
+	   (cond ((uni-term.are.equal left right)
+		  (cond ((da-sign.is.positive (da-literal.sign lit)) 'true)
+			(t 'false)))
+		 ((and (da-function.is (da-gterm.symbol left))
+		       (da-function.is (da-gterm.symbol right))
+		       (da-function.is.constructor (da-gterm.symbol left))
+		       (da-function.is.constructor (da-gterm.symbol right))
+		       (neq (da-gterm.symbol left) (da-gterm.symbol right)))
+		  (cond ((da-sign.is.positive (da-literal.sign lit)) 'false)
+			(t 'true))))))))
+
+
+(defun sat=bindings.delete (symbols)
+
+  (mapc #'(lambda (symbol) 
+	    (sat=binding.delete symbol))
+	symbols))
+
+
+(defun sat=binding.delete (symbol)
+
+  (remf (da-variable.attributes symbol) 'sat.binding))
+
+
+
+(defun sat=term.binding (term)
+
+  (let ((symbol (da-gterm.symbol term)))
+    (cond ((and (null (da-term.termlist term))
+		(da-variable.is symbol))
+	   (getf (da-variable.attributes symbol) 'sat.binding)))))
+
+
+
+(defun SAT=BIND.FORMAL.PARAMETERS (t1 t2)
+
+  (mapc #'(lambda (var term) 
+	    (setf (getf (da-variable.attributes var) 'sat.binding) term))
+	t1 t2))
+
+
+(defun sat=term.check.and.insert.binding (term binding)
+
+  (let ((symbol (da-gterm.symbol term)))
+    (cond ((and (null (da-term.termlist term))
+		(da-variable.is symbol)
+		(not (da-symbol.occurs.in.gterm symbol binding)))
+	   (setf (getf (da-variable.attributes symbol) 'sat.binding) binding)))))
+
+
+
+(defun sat=term.are.equal (term1 term2)
+  
+  ;;; input:  two terms
+  ;;; value:  t, if both terms are equal under the given bindings, else nil.
+
+  (let ((symbol1 (da-gterm.symbol term1)) (symbol2 (da-gterm.symbol term2)))
+    (cond ((and (da-variable.is symbol1) (da-variable.binding symbol1))
+	   (sat=term.are.equal (da-variable.binding symbol1) term2))
+	  ((and (da-variable.is symbol2) (da-variable.binding symbol2)
+	   (sat=term.are.equal term1 (da-variable.binding symbol2))))
+	  ((and (eq symbol1 symbol2)
+		(or (every #'(lambda (s1 s2)
+			       (sat=term.are.equal s1 s2))
+			   (da-gterm.termlist term1) (da-gterm.termlist term2))
+		    (and (da-symbol.has.attribute symbol1 'commutative)
+			 (every #'(lambda (s1 s2)
+			       (sat=term.are.equal s1 s2))
+			   (da-gterm.termlist term2) (da-gterm.termlist term1)))))))))
+
+
+
+(defun sat=gterm.insert.bindings (term)
+
+  ;;; Input:  a  gterm
+  ;;; Effect: inserts bindings without destroying term but incorporating structure
+  ;;;         sharing.
+  ;;; Value:  the gterm with inserted bindings and a flag, which is T iff changes have been
+  ;;;         made to term
+
+  (let (binding)
+    (cond ((setq binding (sat=term.binding term))
+	   (values (sat=gterm.insert.bindings binding) t))
+	  (t (multiple-value-bind (termlist changes)
+		 (sat=gtermlist.insert.bindings (da-gterm.termlist term))
+	       (cond ((null changes) (values term t))
+		     ((da-literal.is term)
+		      (values (da-literal.create (da-literal.sign term) (da-literal.symbol term) termlist) t))
+		     ((da-term.is term)
+		      (values (da-term.create (da-term.symbol term) termlist) t))
+		     (t (values (da-gterm.create (da-term.symbol term) termlist) t))))))))
+
+
+(defun sat=gtermlist.insert.bindings (termlist)
+
+  ;;; Input:  a gtermlist
+  ;;; Effect: inserts bindings without destroying termlist but incorporating structure
+  ;;;         sharing.
+  ;;; Value:  the gtermlist with inserted bindings and a flag, which is T iff changes have been
+  ;;;         made to termlist
+
+  (cond ((null termlist) (values nil t))
+	(t (multiple-value-bind (new.termlist termlist.copied) (sat=gtermlist.insert.bindings (cdr termlist))
+	     (multiple-value-bind (new.term term.copied) (sat=gterm.insert.bindings (car termlist))
+	       (cond ((or termlist.copied term.copied) 
+		      (values (cons new.term new.termlist) t))
+		     (t termlist)))))))
+
+
+
+
+(defun sat=literal.depth (literal)
+
+  (cond ((da-literal.is literal)
+	 (cond ((da-literal.is.true literal) 0)
+	       ((da-literal.is.false literal) 0)
+	       ((getf (da-literal.attributes literal) 'sat_depth))
+	       (t  0)))
+	((member (da-gterm.symbol literal) '(or and))
+	 (sat=literal.depth (car (da-gterm.termlist literal))))))
+
+
+(defun sat=literal.insert.depth (literal old.literal)
+
+  (cond ((da-literal.is literal)
+	 (cond ((and (not (da-literal.is.true literal)) 
+		     (not (da-literal.is.false literal)))
+		(setf (getf (da-literal.attributes literal) 'sat_depth)
+		      (1+ (sat=literal.depth old.literal))))))
+	((member (da-gterm.symbol literal) '(or and))
+	 (mapc #'(lambda (gterm)
+		   (sat=literal.insert.depth gterm old.literal))
+	       (da-gterm.termlist literal))))
+  literal)
+
+@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@d1 1
+a1 3
+;;; xx.08.92 mp ---                   addapted to gterms
+;;; 22.11.92 dh SAT=APPLY.SELECTOR.RULES    base.constants eliminated
+;;; 22.11.92 dh SAT=INSTANTIATE.VAR.WITH.ALL.CONSTRUCTORS    base.constants eliminated
+d6 5
+a10 23
+;;; declaration of global structures and variables
+;;; ============================================== 
+
+(DEFVAR SAT*LITERAL.STACK (MAKE-ARRAY '(2000 3)))   ;; stores literals of the current problem
+(DEFVAR SAT*LITERAL.POINTER 0)
+
+(DEFVAR SAT*BRANCH.STACK (MAKE-ARRAY '(100 6)))     ;; stores all branches not yet explored
+(DEFVAR SAT*BRANCH.POINTER 0)
+
+(DEFVAR SAT*DATA.STACK (MAKE-ARRAY '(1000)))        ;; stores objects to be undone when backtracking
+(DEFVAR SAT*DATA.POINTER 0)                   
+
+(DEFVAR SAT*RESET.BINDINGS NIL)       ;; temporary list of variables during renaming
+(DEFVAR SAT*BRANCH.DEPTH 12)          ;; controls depth of search tree
+(DEFVAR SAT*MAX.BRANCH.POINTER 0)     ;; records maximum depth of search tree
+(DEFVAR SAT*EXPANSIONS 3)             ;; controls number of expansions of the same symbol
+(DEFVAR SAT*EXPANDED.SYMBOLS NIL)     ;; records all expanded symbols
+(DEFVAR SAT*CUT.REASONS NIL)          ;; records all cut subtrees of the search tree
+(DEFVAR SAT*CYCLES.DETECTED 0)        ;; unused
+(DEFVAR SAT*PROBLEMS 0)               ;; counter of all examined literals for statistical use
+
+(DEFVAR SAT*TRACE NIL)                ;; switch toggling internal output
+
+d13 1
+a13 2
+;;; INTERFACE functions
+;;; ===================
+a15 1
+(DEFUN SAT-TEST.GTERM (GTERM &optional comment)
+d17 1
+a17 15
+  ;;; Input:   a gterm and a boolean
+  ;;; Effect:  satisfier is called, to test whether \verb$GTERM$ is obviously unsatisfiable.
+  ;;;        If \verb$COMMENT$ is non-NIL the result of this call is documented.
+  ;;; Value:  a multiple-value \verb$(SUBSTITUTION CUTS)$:
+  ;;;         if assignment has been found, \verb$SUBSTITUTION$ is a list of pairs (variable assignment)
+  ;;;         and \verb$CUTS$ is undefined;
+  ;;;         if no assignment has been found, \verb$SUBSTITUTION$ is NIL and
+  ;;;         \verb$CUTS$ is NIL, if it is sure, that no assignment exists
+  ;;;         \verb$CUTS$ is non-NIL otherwise.
+  
+  (SAT=SATISFY.gterm (da-formula.negate (DA-gterm.COPY gterm))
+		     (cond (comment 'falsify))))
+
+
+(DEFUN SAT-SATISFY.gterm (GTERM &optional comment)
+d19 2
+a20 1
+  ;;; Input:  a gterm and a boolean
+d29 5
+a33 57
+  (SAT=SATISFY.gterm (DA-gterm.COPY gterm) (cond (comment 'satisfy))))
+
+
+(DEFUN SAT=SATISFY.gterm (GTERM comment)
+
+;;; Input:  a GTERM and a flag
+;;; Effect: it is tested, whether there is an assignment to the variables of GTERM such that GTERM is valid.
+;;;         ao-mechanizm is initialized, ao-mechanizm is called.
+;;;         If comment is non-NIL the result of this call is documented.
+;;; Value:  a multiple-value (SUBSTITUTION CUTS):
+;;;         if assignment has been found, SUBSTITUTION represents it/is T and CUTS is undefined;
+;;;         if no assignment has been found SUBSTITUTION is NIL and
+;;;            CUTS is NIL, if it is sure, that no assignment exists
+;;;            CUTS is non-NIL otherwise
+
+  (COND ((SAT=GTERM.IS.APPLICABLE GTERM)
+	 (COND (SAT*TRACE
+		(FORMAT T "~%==========================~%Satisfier called with following gterm: ~a~%" gterm)))
+	 (SETQ SAT*CUT.REASONS NIL SAT*LITERAL.POINTER 0 SAT*BRANCH.POINTER 0 SAT*DATA.POINTER 0)
+	 (SETQ SAT*EXPANDED.SYMBOLS NIL SAT*CYCLES.DETECTED 0 SAT*MAX.BRANCH.POINTER 0)
+	 (unwind-protect
+	     (CATCH 'SAT*ABNORMAL.EXIT
+	       (sat=check.bindings (da-gterm.variables gterm))
+	       (SAT=INSERT.BRANCH.STEP SAT*LITERAL.POINTER gterm SAT*DATA.POINTER gterm)
+	       (SAT=PUT.OR.TREE SAT*BRANCH.POINTER (SAT=INSERT.NEXT.ALTERNATIVE gterm))
+	       (values (sat=print.solution (SAT=SOLVE.TREE) gterm sat*cut.reasons comment)
+		       (car sat*cut.reasons)))
+	   (sat=reset.bindings sat*reset.bindings)))
+	(T (VALUES NIL 'NON.FREE.STRUCTURE))))
+
+
+(DEFUN SAT=GTERM.IS.APPLICABLE (GTERM)
+  ;;; edited : 02.04.93 by CS
+  ;;; input  : a gterm
+  ;;; value  : T iff GTERM contains only literals where each argument sort
+  ;;;          possesses solely injective constructors (in all positions) whose range is separated
+  ;;;          (free constructors)
+
+  (COND ((DA-LITERAL.IS GTERM)
+	 (EVERY #'SAT=SORT.IS.FREE (MAPCAR #'(lambda(x) (DA-TERM.SORT x)) (DA-LITERAL.TERMLIST GTERM))))
+	(T (EVERY #'SAT=GTERM.IS.APPLICABLE (DA-GTERM.TERMLIST GTERM)))))
+
+
+(DEFUN SAT=SORT.IS.FREE (SORT)
+  ;;; edited : 02.04.93 by CS
+  ;;; input  : a sort
+  ;;; value  : T iff SORT possesses solely free constructors
+
+  (AND (EVERY #'(LAMBDA (CONSTRUCTOR)
+		  (LET ((POSITION 0))
+		    (AND (DA-FUNCTION.HAS.DISJUNCT.RANGE CONSTRUCTOR)
+			 (EVERY #'(LAMBDA (IGNORE)
+				    (DECLARE (IGNORE IGNORE))
+				    (DA-FUNCTION.IS.INJECTIVE CONSTRUCTOR (INCF POSITION)))
+				(DA-FUNCTION.DOMAIN.SORTS CONSTRUCTOR)))))
+	      (DA-SORT.CONSTRUCTOR.FCTS SORT))
+       (EVERY #'SAT=SORT.IS.FREE (DA-SORT.BASE.SORTS SORT))))
+d38 1
+a39 3
+;;; 
+;;; If you want to use this utility, you have to define several functions, which are the interface between
+;;; your application and this AND-OR-mechanism.
+d41 1
+a41 7
+;;; a) functions to enter new problems and how to divide a problem in several subproblems.
+;;; 
+;;; WARNING: Don't enter a number as a problem. This will cause a damage of the AND-OR-mechanism !!!
+;;; 
+;;; SAT=LITERAL.IS.SOLVED (LITERAL) : T, iff given LITERAL is a leaf.
+;;; SAT=CREATE.OR.TREE (LITERAL) : a list of alternatives, denoting the OR-part.
+;;; SAT=INSERT.NEXT.ALTERNATIVE (OR.TREE) : expands the given tree for the first alternative.
+d43 2
+a44 5
+;;; b) an user-specific datastack:
+;;;    This stack is maintained by this utility. You may enter new entries by SAT=PUSH.DATA.
+;;;    In case of backtracking all intermediately written entries are removed and for every removed
+;;;    entry SAT=POP.DATA is called.
+
+a45 25
+(DEFUN SAT=SOLVE.TREE ()
+  
+  ;; Input:  None
+  ;; Effect: searches for assignment
+  ;; Value:  T, iff all subproblems are solved, NIL else
+  
+  (LET ((CURSOR SAT*LITERAL.POINTER) (LAST.BRANCH 1) (COUNTER 0) LITERAL)
+    (WHILE (> CURSOR 0)
+      (COND (SAT*TRACE (FORMAT T "~% Cursor = ~A  Last branch = ~A " CURSOR LAST.BRANCH)))
+      (SETQ LITERAL (SAT=GET.ACTUAL.LITERAL CURSOR))
+      (INCF COUNTER)
+      (COND ((NUMBERP LITERAL)			; and - subtree is solved !
+	     (SETQ CURSOR (SAT=BRANCH.ORIGINAL.LITERAL LITERAL)))
+	    ((SAT=LITERAL.IS.MARKED CURSOR)
+	     (DECF CURSOR))
+	    ((SAT=LITERAL.IS.SOLVED LITERAL)	; trivial subproblem
+	     (DECF CURSOR))
+	    ((SAT=LITERAL.IS.UNSOLVABLE LITERAL)
+	     (MULTIPLE-VALUE-SETQ (CURSOR LAST.BRANCH) (SAT=FALL.BACK.TO.LAST.BRANCH LAST.BRANCH)))
+	    (T (MULTIPLE-VALUE-SETQ (CURSOR LAST.BRANCH)
+		 (SAT=LITERAL.IS.EXPANDABLE CURSOR LAST.BRANCH)))))
+    (COND (sat*trace (FORMAT T "~% ============== ~% problemsize ~a branchdepth ~a ~% --------------"
+			     COUNTER SAT*MAX.BRANCH.POINTER)))
+    (SETQ SAT*PROBLEMS COUNTER)
+    (NOT (EQUAL LAST.BRANCH 0))))          
+d48 1
+a48 1
+(DEFUN SAT=LITERAL.IS.EXPANDABLE (CURSOR LAST.BRANCH)
+d50 14
+a63 20
+  ;; Input:  a pointer to the actual literal and a pointer for backtracking
+  ;; Effect: list of subproblems to solve the actual literal is computed
+  ;; Value:  a pointer to the new actual literal and a pointer for backtracking
+  
+  (LET (alternatives EASY.LITERAL REFERENCE)
+    (SETQ REFERENCE (SAT=GET.NEXT.LITERAL CURSOR)) ;; returns pointer to SAT*LITERAL.STACK
+    (SAT=MARK.LITERAL.SOLVED REFERENCE)            ;; even if literal is unsolvable
+    (SETQ EASY.LITERAL (SAT=GET.ACTUAL.LITERAL REFERENCE))
+    (SETQ alternatives (SAT=CREATE.OR.TREE EASY.LITERAL CURSOR reference))
+    (COND ((EQ alternatives 'SOLVED)
+	   (VALUES CURSOR LAST.BRANCH))
+	  ((EQ alternatives 'CONTRA)
+	   (SAT=FALL.BACK.TO.LAST.BRANCH LAST.BRANCH))
+	  (alternatives
+	   (COND ((SAT=INSERT.BRANCH.STEP CURSOR alternatives SAT*DATA.POINTER EASY.LITERAL)
+		  (SAT=PUSH.LITERAL SAT*BRANCH.POINTER)
+		  (SAT=PUT.OR.TREE SAT*BRANCH.POINTER  (SAT=INSERT.NEXT.ALTERNATIVE alternatives))
+		  (VALUES SAT*LITERAL.POINTER SAT*BRANCH.POINTER))
+		 (T (SAT=FALL.BACK.TO.LAST.BRANCH LAST.BRANCH))))
+	  (T (SAT=FALL.BACK.TO.LAST.BRANCH LAST.BRANCH)))))
+d66 1
+a66 1
+(DEFUN SAT=CREATE.OR.TREE (LITERAL MAXIMUM actual)
+d72 21
+a92 52
+  (cond ((eq (da-gterm.symbol literal) 'and) (list (da-gterm.termlist literal)))
+	((eq (da-gterm.symbol literal) 'or) (da-gterm.termlist literal))
+	(t (SAT=DELETE.CONTRADICTIONS
+	    (cond ((da-literal.is.false literal) 'contra)
+		  ((da-literal.is.true literal) 'solved)
+		  ((and (da-literal.is literal)
+			(not (da-predicate.is.equality (da-literal.symbol literal))))
+		   (sat=expand.predicate literal))
+		  ((da-literal.is literal)
+		   (setq literal (sat=orientate.literal literal))
+		   (LET ((SIGN (DA-LITERAL.SIGN LITERAL)) 
+			 (LEFT (car (da-literal.termlist literal)))
+			 (RIGHT (second (da-literal.termlist literal))))
+		     (COND (SAT*TRACE (FORMAT T "~%Literal (~a): ~a" actual literal)))
+		     (cond ((SAT=SYMBOL.IS.SELECTOR LEFT)
+			    (SAT=APPLY.SELECTOR.RULES SIGN LEFT RIGHT))
+			   ((AND (SAT=SYMBOL.IS.DEFINED LEFT) (SAT=SYMBOL.IS.DEFINED RIGHT))
+			    (SAT=EXPAND.BOTH.DEFINED SIGN LEFT RIGHT))
+			   ((SAT=SYMBOL.IS.DEFINED left)
+			    (SAT=APPLY.PARAMODULATION SIGN LEFT RIGHT))
+			   ((AND (SAT=SYMBOL.IS.CONSTRUCTOR LEFT) 
+				 (EQ (DA-TERM.SYMBOL LEFT) (DA-TERM.SYMBOL RIGHT)))                     
+			    (COND ((EQ SIGN '+) 
+				   (SAT=APPLY.FUNCTIONALITY LEFT RIGHT))
+				  (T (SAT=APPLY.INJECTIVITY LEFT RIGHT))))
+			   ((SAT=SYMBOL.IS.CONSTRUCTOR LEFT) 
+			    (SAT=ERROR "~%ERROR: different constructors in SAT=CREATE.OR.TREE")
+			    (COND ((EQ SIGN '+) 'CONTRA)
+				  (T 'SOLVED)))
+			   ;; assertion: LEFT is a variable
+			   ((NOT (SAT=VARIABLE.IS LEFT)) (SAT=ERROR "~%ERROR: LEFT is not a variable"))
+			   ((AND (EQ SIGN '+) (NOT (SAT=OCCUR.CHECK LEFT RIGHT)))
+			    (SAT=APPLY.INSTANTIATION LEFT RIGHT MAXIMUM))
+			   ((SAT=SYMBOL.IS.DEFINED RIGHT)
+			    (SAT=APPLY.PARAMODULATION SIGN RIGHT LEFT))
+			   ((SAT=SYMBOL.IS.SELECTOR RIGHT)
+			    (SAT=APPLY.SELECTOR.RULES SIGN RIGHT LEFT))
+			   ((AND (SAT=SYMBOL.IS.CONSTRUCTOR RIGHT)
+				 (SAT=TERM.OCCURS.IN.TERM LEFT RIGHT))
+			    (SAT=ERROR "~%ERROR: strict subterm occurs in SAT=CREATE.OR.TREE")
+			    (COND ((EQ SIGN '+) 'CONTRA)
+				  (T 'SOLVED)))
+			   ((SAT=SYMBOL.IS.CONSTRUCTOR RIGHT)
+			    (COND ((EQ SIGN '+)
+				   (SAT=INSTANTIATE.VAR.WITH.CONSTRUCTOR LEFT RIGHT MAXIMUM)
+				   'solved)
+				  (T (SAT=INSTANTIATE.VAR.WITH.ALL.CONSTRUCTORS LEFT RIGHT))))
+			   ;; assertion: RIGHT is a variable
+			   ((NOT (SAT=VARIABLE.IS RIGHT)) (SAT=ERROR "~%ERROR: RIGHT is not a variable"))
+			   ((EQ SIGN '-)
+			    (SAT=INSTANTIATE.VAR.WITH.ALL.CONSTRUCTORS LEFT RIGHT))
+			   (T (SAT=ERROR "~%ERROR: no case applies in SAT=CREATE.OR.TREE"))))))))))
+a94 20
+(DEFUN SAT=FALL.BACK.TO.LAST.BRANCH (BRANCH)
+  
+  ;; Input:  a pointer for backtracking
+  ;; Effect: backtracking
+  ;; Value:  a pointer to the actual literal and a pointer for backtracking
+  
+  (COND (SAT*TRACE (FORMAT T "~%Enter SAT=FALL.BACK.TO.LAST.BRANCH - * *  ~A  * * -" BRANCH)))
+  (LET (OR.TREE)
+       (COND ((ZEROP BRANCH)
+	      (COND (SAT*TRACE (FORMAT T "~%Exit SAT=FALL.BACK.TO.LAST.BRANCH : 0 0")))
+	      (VALUES 0 0))
+	     (T (SAT=POP.LITERALS (SAT=BRANCH.LAST.LITERAL BRANCH))  
+		(SAT=POP.DATASTACK (SAT=BRANCH.DATA.POINTER BRANCH))
+		(COND ((SETQ OR.TREE (SAT=BRANCH.OR.TREE BRANCH))
+		       (COND ((NEQ BRANCH 1) (SAT=PUSH.LITERAL BRANCH)))  
+		       (SAT=PUT.OR.TREE BRANCH (SAT=INSERT.NEXT.ALTERNATIVE OR.TREE))
+		       (COND (SAT*TRACE (FORMAT T "~%Exit SAT=FALL.BACK.TO.LAST.BRANCH : ~a ~a"
+						SAT*LITERAL.POINTER BRANCH)))
+		       (VALUES SAT*LITERAL.POINTER BRANCH))
+		      (T (SAT=FALL.BACK.TO.LAST.BRANCH (DECF SAT*BRANCH.POINTER))))))))
+d96 19
+a115 34
+(DEFUN SAT=LITERAL.IS.SOLVED (LITERAL)
+  
+  ;; Input:  a LITERAL
+  ;; Effect: implements the three deletion rules of the calculus
+  ;; Value:  T, iff LITERAL is solved, NIL else
+  
+  (cond ((da-literal.is literal)
+	 (LET ((SIGN (DA-LITERAL.SIGN LITERAL))
+	       (PREDICATE (DA-LITERAL.SYMBOL LITERAL))
+	       (LEFT (CAR (DA-LITERAL.TERMLIST LITERAL)))
+	       (RIGHT (CADR (DA-LITERAL.TERMLIST LITERAL))))
+	      (COND ((DA-LITERAL.IS.TRUE LITERAL))
+		    ((AND (EQ SIGN '-) (DA-PREDICATE.IS.FALSE PREDICATE)))
+		    ((NOT (DA-PREDICATE.IS.EQUALITY PREDICATE)) NIL)
+		    ((NEQ (DA-TERM.SORT LEFT) (DA-TERM.SORT RIGHT)) NIL)
+		    ((AND (uni-term.are.equal LEFT RIGHT) (EQ SIGN '+)) T)   ;; t = t
+		    ((AND (SAT=SYMBOL.IS.CONSTRUCTOR LEFT)                   ;; c1t* =/= c2t*
+			  (SAT=SYMBOL.IS.CONSTRUCTOR RIGHT)
+			  (NEQ (DA-TERM.SYMBOL LEFT) (DA-TERM.SYMBOL RIGHT))
+			  (EQ SIGN '-)))
+		    ((AND (EQ SIGN '-)                                       ;; strict subterms
+			  (SAT=TERM.OCCURS.IN.TERM LEFT RIGHT)))
+		    ((AND (EQ SIGN '-)
+			  (SAT=TERM.OCCURS.IN.TERM RIGHT LEFT))))))
+	((eq (da-gterm.symbol literal) 'and)
+	 (null (da-gterm.termlist literal)))
+	((eq (da-gterm.symbol literal) 'or) NIL)))
+
+
+(DEFUN SAT=LITERAL.IS.UNSOLVABLE (LITERAL)
+
+  ;; Input:  a LITERAL
+  ;; Effect: implements theorem 3-3
+  ;; Value:  T, iff LITERAL is unsolvable, NIL else
+a116 26
+  (cond ((da-literal.is literal)
+	 (LET ((SIGN (DA-LITERAL.SIGN LITERAL))
+	       (PREDICATE (DA-LITERAL.SYMBOL LITERAL))
+	       (LEFT (CAR (DA-LITERAL.TERMLIST LITERAL)))
+	       (RIGHT (SECOND (DA-LITERAL.TERMLIST LITERAL))))
+	      (COND ((DA-LITERAL.IS.FALSE LITERAL))
+		    ((AND (EQ SIGN '-) (DA-PREDICATE.IS.TRUE PREDICATE)))
+		    ((NOT (DA-PREDICATE.IS.EQUALITY PREDICATE)) NIL)
+		    ((NEQ (DA-TERM.SORT LEFT) (DA-TERM.SORT RIGHT))
+		     (sat=error "~%Different sorts on both sides of equation ~a" (list LITERAL))
+		     (PUSH 'DIFFERENT.SORTS SAT*CUT.REASONS) T)
+		    ((AND (EQ SIGN '+)
+			  (SAT=SYMBOL.IS.CONSTRUCTOR LEFT)
+			  (SAT=SYMBOL.IS.CONSTRUCTOR RIGHT)
+			  (NEQ (DA-TERM.SYMBOL LEFT) (DA-TERM.SYMBOL RIGHT))))
+		    ((AND (EQ SIGN '+)
+			  (SAT=TERM.OCCURS.IN.TERM LEFT RIGHT)))
+		    ((AND (EQ SIGN '+)
+			  (SAT=TERM.OCCURS.IN.TERM RIGHT LEFT)))
+		    ((EQ SIGN '-)
+		     (uni-term.are.EQUAL LEFT RIGHT)))))
+	((eq (da-gterm.symbol literal) 'and)
+	 NIL)
+	((eq (da-gterm.symbol literal) 'or)
+	 (null (da-gterm.termlist literal)))))
+  
+d122 1
+a122 7
+(DEFUN SAT=APPLY.FUNCTIONALITY (LEFT RIGHT)
+  
+;;; Input:  two constructor terms 
+;;; Effect: all plans to make these terms equal are generated
+;;; Value:  list of alternatives
+  
+  (LIST (SAT=APPLY.FUNCTIONALITY.1 LEFT RIGHT)))
+d124 5
+a128 15
+(DEFUN SAT=APPLY.FUNCTIONALITY.1 (LEFT RIGHT)
+  (LET (RESULT)
+    (COND ((EQ (DA-TERM.SYMBOL LEFT) (DA-TERM.SYMBOL RIGHT))
+	   ;; both terms have the same leading symbol => use functionality
+	   (MAPC #'(LAMBDA (LL RR)
+		     (COND ((uni-term.are.EQUAL LL RR))
+			   ((AND (EQ (DA-TERM.SYMBOL LL) (DA-TERM.SYMBOL RR))
+				 (SAT=SYMBOL.IS.CONSTRUCTOR LL))
+			    (MAPC #'(LAMBDA (LIT)
+				      (PUSH LIT RESULT))
+				  (SAT=APPLY.FUNCTIONALITY.1 LL RR)))
+			   (T (PUSH (DA-LITERAL.CREATE '+ (DA-PREDICATE.EQUALITY) (LIST LL RR)) RESULT))))
+		 (DA-TERM.TERMLIST LEFT) (DA-TERM.TERMLIST RIGHT))
+	   RESULT)
+	  (T (SAT=ERROR "~%ERROR: different symbols in SAT=APPLY.FUNCTIONALITY")))))
+d130 5
+a134 13
+
+(DEFUN SAT=APPLY.INJECTIVITY (LEFT RIGHT)
+  
+;;; Input:  two constructor terms 
+;;; Effect: all plans to make these terms different are generated
+;;; Value:  list of alternatives
+  
+  (COND ((EQ (DA-TERM.SYMBOL LEFT) (DA-TERM.SYMBOL RIGHT))
+	 ;; both terms have the same leading symbol => use injectivity
+	 (MAPCAR #'(LAMBDA (LEFT RIGHT)
+		     (LIST (DA-LITERAL.CREATE '- (DA-PREDICATE.EQUALITY) (LIST LEFT RIGHT))))
+		 (DA-TERM.TERMLIST LEFT) (DA-TERM.TERMLIST RIGHT)))
+	(T (SAT=ERROR "~%ERROR: different symbols in APPLY.INJECTIVITY"))))
+d137 1
+a137 1
+(DEFUN SAT=APPLY.PARAMODULATION (SIGN TERM CONSTANT.TERM)
+d139 3
+a141 4
+;;; Input:  a sign and two terms
+;;; Effect: all alternatives to make TERM and CONSTANT.TERM equal (resp. different) are generated,
+;;;         where TERM is expanded according to the definition of its leading symbol
+;;; Value:  a list of alternatives
+d143 79
+a221 10
+  (LET ((SYMBOL (DA-TERM.SYMBOL TERM)) alternatives)
+    (COND ((SAT=TEST.SYMBOL SYMBOL)
+	   (sat=bind.formal.parameters (da-function.formal.parameters symbol) (da-term.termlist term))
+	   (setq alternatives (da-gterm.def.mapcan.with.conds (da-function.definition symbol)
+							      #'sat=expand.function.definition))
+	   (sat=reset.bindings (da-function.formal.parameters symbol))
+	   (mapc #'(lambda(alt)
+		     (setf (car (da-literal.termlist (car alt))) constant.term)
+		     (setf (da-literal.sign (car alt)) sign))
+		 alternatives)
+d225 1
+a225 15
+(defun sat=expand.function.definition (value conditions)
+
+  ;; Input: VALUE and CONDITIONS representing a leaf of a function definition
+  ;; Value: a list of the result literal and all negated conditions
+  
+  (list (mapcar #'sat=insert.bindings.gterm
+	      (cons (da-gterm.copy value) (mapcar #'(lambda(lit)
+				      (let ((new.lit (da-literal.copy lit)))
+					(setf (da-literal.sign new.lit)
+					      (da-sign.other.sign (da-literal.sign new.lit)))
+					new.lit))
+				  conditions)))))
+
+
+(DEFUN SAT=EXPAND.PREDICATE (LITERAL)
+d231 24
+a254 15
+  (LET ((SIGN (DA-LITERAL.SIGN LITERAL))
+	(symbol (DA-LITERAL.SYMBOL LITERAL))
+	(TERMLIST (DA-LITERAL.TERMLIST LITERAL))
+	alternatives)
+    (COND ((SAT=TEST.SYMBOL symbol)
+	   (sat=bind.formal.parameters (da-predicate.formal.parameters symbol) termlist)
+	   (setq alternatives
+		 (da-gterm.def.mapcan.with.conds  (da-predicate.definition symbol)
+						 #'sat=expand.predicate.definition))
+	   (sat=reset.bindings (da-predicate.formal.parameters symbol))	   
+	   (mapc #'(lambda(alt)
+		     (cond ((da-sign.is.negative sign)
+			    (setf (car alt) (da-literal.negate (cdar alt))))
+			   (t (setf (car alt) (cdar alt)))))
+		 alternatives)
+d258 1
+a258 1
+(defun sat=expand.predicate.definition (value conditions)
+d260 20
+a279 13
+  ;; Input: VALUE and CONDITIONS representing a leaf of a predicate definition
+  ;; Value: a list of the result literal and all negated conditions
+  
+  (let ((val (sat=insert.bindings.gterm (da-gterm.copy value))))
+    (list (cons (cons (car (da-gterm.termlist (car (da-gterm.termlist val))))
+		      (da-literal.negate (cadr (da-gterm.termlist (car (da-gterm.termlist val))))))
+		;; VALUE is of the form (AND (OR P(x) Not_result) (OR Not_P(x) result))
+		(mapcar #'(lambda(lit)
+			    (let ((new.lit (da-literal.copy lit)))
+			      (setf (da-literal.sign new.lit)
+				    (da-sign.other.sign (da-literal.sign new.lit)))
+			      (sat=insert.bindings.gterm new.lit)))
+			conditions)))))
+d282 1
+a282 13
+(DEFUN SAT=EXPAND.BOTH.DEFINED (SIGN LEFT RIGHT)
+  
+  ;; Input:  a SIGN and two terms
+  ;; Effect: list of alternatives to make terms equal (resp. different) is generated
+  ;; Value:  an or.tree
+  
+  (COND ((AND (EQ SIGN '+) (EQ (DA-TERM.SYMBOL LEFT) (DA-TERM.SYMBOL RIGHT)))
+	 (APPEND (SAT=APPLY.FUNCTIONALITY LEFT RIGHT)
+		 (SAT=APPLY.PARAMODULATION SIGN LEFT RIGHT)))
+	(T (SAT=APPLY.PARAMODULATION SIGN LEFT RIGHT))))
+
+
+(DEFUN SAT=INSTANTIATE.VAR.WITH.CONSTRUCTOR (VAR CONS.TERM CURSOR)
+d289 12
+a300 2
+  (LET ((FOO (SAT=CREATE.FUNCTION.WITH.NEW.VARS (DA-TERM.SYMBOL CONS.TERM))))
+    (SAT=APPLY.INSTANTIATION VAR FOO CURSOR)))                        ;; v = cu* => cu* =?= cons.term
+d303 1
+a303 1
+(DEFUN SAT=INSTANTIATE.VAR.WITH.ALL.CONSTRUCTORS (VAR TERM)
+d311 9
+a319 31
+	      (LET ((FOO (SAT=CREATE.FUNCTION.WITH.NEW.VARS CONSTRUCTOR)))
+		   (LIST (DA-LITERAL.CREATE '+ (DA-PREDICATE.EQUALITY)
+					    (LIST VAR FOO))
+			 (DA-LITERAL.CREATE '- (DA-PREDICATE.EQUALITY)
+					    (LIST FOO TERM)))))
+	  (DA-SORT.CONSTRUCTOR.FCTS (DA-TERM.SORT TERM))))
+
+
+(DEFUN SAT=APPLY.SELECTOR.RULES (SIGN LEFT RIGHT)
+  
+  ;; Input:  a SIGN and two terms, LEFT and RIGHT, where LEFT has a selector as leading symbol
+  ;; Effect: all alternatives to make LEFT and RIGHT equal (resp. different) are generated
+  ;; Value:  an or.tree
+  
+  (LET ((ARG (CAR (DA-TERM.TERMLIST LEFT)))
+	(SORT (CAR (DA-FUNCTION.DOMAIN.SORTS (DA-TERM.SYMBOL LEFT)))))
+    (MAPCAR #'(LAMBDA (CONSTRUCTOR)
+		(LET (POS (FOO (SAT=CREATE.FUNCTION.WITH.NEW.VARS CONSTRUCTOR)))
+		  (LIST (COND ((AND (DA-FUNCTION.IS CONSTRUCTOR)
+				    (SETQ POS (POSITION (DA-TERM.SYMBOL LEFT)
+							(DA-SORT.SELECTORS.OF.CONSTRUCTOR CONSTRUCTOR))))
+			       (DA-LITERAL.CREATE SIGN (DA-PREDICATE.EQUALITY)
+						  (LIST (NTH POS (DA-TERM.TERMLIST FOO)) RIGHT)))
+			      ((SAT=SYMBOL.IS.REFLEXIVE left)
+			       (DA-LITERAL.CREATE SIGN (DA-PREDICATE.EQUALITY)
+						  (LIST FOO RIGHT)))
+			      (T (DA-LITERAL.CREATE SIGN (DA-PREDICATE.EQUALITY)
+						    (LIST (DA-SORT.EXCEPTION.VALUE (da-term.sort left))
+							  RIGHT))))
+			(DA-LITERAL.CREATE '+ (DA-PREDICATE.EQUALITY) (LIST ARG FOO)))))
+	     (DA-SORT.CONSTRUCTOR.FCTS SORT))))
+a321 81
+(DEFUN SAT=APPLY.INSTANTIATION (VAR TERM CURSOR)
+  
+  ;; Input:  a variable, a term and a pointer to SAT*LITERAL.STACK
+  ;; Effect: all occurences of var are substituted with term
+  ;; Value:  'CONTRA, iff an unsolvable literal has been detected, 'SOLVED else
+  
+  (LET (LOCAL.CURSOR LITERAL (CONTRA NIL))
+    (SAT=SET.BINDING VAR TERM)
+    (SAT=PUSH.DATA VAR)
+    (SETQ LOCAL.CURSOR CURSOR)       ;; map over SAT*LITERAL.STACK
+    (WHILE (> LOCAL.CURSOR 0)
+      (SETQ LITERAL (SAT=GET.ACTUAL.LITERAL LOCAL.CURSOR))
+      (COND ((NUMBERP LITERAL)
+	     (SETQ LOCAL.CURSOR (SAT=BRANCH.ORIGINAL.LITERAL LITERAL)))
+	    (T (COND ((and (not (sat=literal.is.marked local.cursor)) 
+			   (member (da-term.symbol var) (da-gterm.variables literal)))
+		      (cond (sat*trace (format t "~%inserting into literal (~a): ~a" local.cursor literal)))
+		      (SETQ LITERAL (SAT=EVALUATE.LITERAL (sat=insert.bindings.gterm LITERAL)))
+		      (sat=push.data local.cursor)
+		      (SAT=PUT.ACTUAL.LITERAL LOCAL.CURSOR LITERAL)
+		      (COND ((SAT=LITERAL.IS.UNSOLVABLE LITERAL)
+			     (COND (SAT*TRACE (FORMAT T "~%Fallback because of literal ~a: ~a"
+						      LOCAL.CURSOR LITERAL)))
+			     (SETQ LOCAL.CURSOR -1)
+			     (SETQ CONTRA LITERAL)))))
+	       (DECF LOCAL.CURSOR))))
+    (COND (CONTRA 'CONTRA)
+	  (T 'SOLVED))))
+
+
+;;; =========================
+;;; Selection of alternatives 
+;;; =========================
+
+(DEFUN SAT=DELETE.CONTRADICTIONS (OR.TREE)
+
+  ;; Input:  a list of alternatives
+  ;; Effect: solved literals and unsolvable alternatives are deleted
+  ;; Value:  reduced list of alternatives
+  
+    (COND ((EQ OR.TREE 'CONTRA) NIL)
+	  ((EQ OR.TREE 'SOLVED) 'SOLVED)
+	  (T (DELETE-IF #'(LAMBDA (ALT)
+			    (FIND-IF #'SAT=LITERAL.IS.UNSOLVABLE ALT))
+			(MAPCAR #'(LAMBDA (ALT) 
+				    (DELETE-IF #'SAT=LITERAL.IS.SOLVED ALT))
+				OR.TREE)))))
+
+;             (COND ((AND OR.TREE1 (EVERY #'SAT=CHECK.ALTERNATIVE OR.TREE1))
+;                    (COND (SAT*TRACE
+;                           (FORMAT T "~%Cycle detected : not expanding !")
+;                           (format t "~%================================")))
+;                    (SETQ OR.TREE1 NIL)))
+
+
+(DEFUN SAT=INSERT.NEXT.ALTERNATIVE (OR.TREE)
+
+  ;; Input:  a list of alternatives or gterms or a single gterm
+  ;; Effect: one alternative is selected
+  ;; Value:  or.tree with selected alternative deleted
+
+  (LET (PROBLEM new.or.tree) 
+    (setq new.or.tree (cond ((and (da-gterm.is or.tree) (eq (da-gterm.symbol or.tree) 'or))
+			     (da-gterm.termlist or.tree))
+			    ((da-gterm.is or.tree) (list or.tree))
+			    (t or.tree)))
+    (COND ((CDR new.OR.TREE)
+	   ;; choose
+	   (COND (SAT*TRACE (FORMAT T "~%Alternatives: - * *  branch ~A  * * -" SAT*BRANCH.POINTER)))
+	   (SETQ PROBLEM (SAT=GET.NEXT.ALTERNATIVE new.OR.TREE))
+	   (COND (SAT*TRACE (SAT=STAR.PRINT PROBLEM new.OR.TREE)))
+	   ;; update
+	   (SETQ new.OR.TREE (DELETE PROBLEM new.OR.TREE :COUNT 1)))
+	  (T (SETQ PROBLEM (CAR new.OR.TREE)) 
+	     ;; nothing to choose from => only update
+	     (SETQ new.OR.TREE NIL)))
+    (cond (sat*trace (sat=print.open.problems)))
+    (COND (SAT*TRACE (FORMAT T "~% Inserting:")))
+    (mapc #'sat=insert.literal (cond ((consp problem) problem)
+				     (t (list problem))))
+    new.OR.TREE))
+a323 1
+(defun sat=insert.literal (literal)
+d325 1
+a325 293
+  ;; Input:  a LITERAL
+  ;; Effect: all bindings are inserted, literal is evaluated and pushed onto literal stack
+  ;; Value:  undefined
+  
+  (sat=push.literal (sat=evaluate.literal (sat=insert.bindings.gterm literal))))
+
+
+(DEFUN SAT=GET.NEXT.ALTERNATIVE (OR.TREE)
+
+  ;; Input:  an list of gterms
+  ;; Effect: see value
+  ;; Value:  selected alternative 
+
+  (cond ((FIND-IF #'(LAMBDA (ALT)
+		      (EVERY #'SAT=IS.SIMPLE.LITERAL ALT))
+		  OR.TREE))
+	(T (car or.tree))))
+
+
+;;; =====================
+;;; Selection of literals
+;;; =====================
+
+(DEFUN SAT=GET.NEXT.LITERAL (ACTUAL.CURSOR)
+
+  ;; Input:  pointer to SAT*LITERAL.STACK
+  ;; Effect: see value
+  ;; Value:  pointer to the next simple problem in SAT*LITERAL.STACK
+
+  (LET ((CURSOR ACTUAL.CURSOR) LITERAL EASY unsolvable)
+    (WHILE (and (> CURSOR 0) (not unsolvable))
+      (SETQ LITERAL (SAT=GET.ACTUAL.LITERAL CURSOR))
+      (COND ((NUMBERP LITERAL)
+	     (SETQ CURSOR (SAT=BRANCH.ORIGINAL.LITERAL LITERAL)))
+	    ((SAT=LITERAL.IS.MARKED CURSOR)
+	     (DECF CURSOR))
+	    ((sat=literal.is.unsolvable literal)
+	     (setq unsolvable cursor)
+	     (setq cursor -1))
+	    ((SAT=LITERAL.IS.SOLVED LITERAL)
+	     (SAT=MARK.LITERAL.SOLVED CURSOR)
+	     (DECF CURSOR))
+	    ((and (not easy) (SAT=IS.SIMPLE.LITERAL LITERAL))
+	     (SETQ EASY CURSOR)
+	     (decf cursor))
+	    (T (DECF CURSOR))))
+    (COND (unsolvable)
+	  (EASY)
+	  (T ACTUAL.CURSOR))))
+
+
+(DEFUN SAT=IS.SIMPLE.LITERAL (LITERAL)
+
+  ;; Input:  a LITERAL
+  ;; Effect: see value
+  ;; Value:  t, iff one term is a variable or both terms start with the same constructor, etc.
+
+  (cond ((da-literal.is literal)
+	 (LET ((LEFT (CAR (DA-LITERAL.TERMLIST LITERAL)))
+	       (RIGHT (SECOND (DA-LITERAL.TERMLIST LITERAL))))
+	   (COND ((NEQ (DA-LITERAL.SYMBOL LITERAL) (DA-PREDICATE.EQUALITY)) NIL)
+		 ((EQ (DA-LITERAL.SIGN LITERAL) '-)
+		  (AND (EQUAL (DA-TERM.SYMBOL LEFT) (DA-TERM.SYMBOL RIGHT))
+		       (SAT=SYMBOL.IS.CONSTRUCTOR left)
+		       (EQ (DA-FUNCTION.ARITY (DA-TERM.SYMBOL LEFT)) 1)))
+		 ((SAT=VARIABLE.IS LEFT) (OR (NOT (SAT=OCCUR.CHECK LEFT RIGHT))
+					     (SAT=SYMBOL.IS.CONSTRUCTOR RIGHT)))
+		 ((SAT=VARIABLE.IS RIGHT) (OR (NOT (SAT=OCCUR.CHECK RIGHT LEFT))
+					      (SAT=SYMBOL.IS.CONSTRUCTOR LEFT)))
+		 ((EQUAL (DA-TERM.SYMBOL LEFT) (DA-TERM.SYMBOL RIGHT))
+		  (SAT=SYMBOL.IS.CONSTRUCTOR left)))))))
+
+
+;;; ====================================
+;;; Insertion and evaluation of bindings
+;;; ====================================
+
+(DEFUN SAT=insert.bindings.GTERM (TERM) 
+  
+  ;;; Input   : a gterm with variables
+  ;;; Effect  : see value.
+  ;;; Value   : a multiple value: TERM, with all variable bindings inserted, 
+  ;;;           and a flag, which is true, iff at least one binding is inserted.
+
+  (COND ((null term))
+	((da-literal.is TERM)
+	 (mapc #'sat=insert.bindings.gterm (da-gterm.termlist term)))
+	((da-term.termlist TERM)
+	 (mapc #'sat=insert.bindings.gterm (da-gterm.termlist term)))
+	((AND (DA-VARIABLE.IS (da-term.symbol TERM))
+	      (DA-VARIABLE.BINDING (da-term.symbol TERM)))   ;;; Don't insert binding, if it's NIL !!
+	 (let (new.term)
+	   (setq new.term (sat=insert.bindings.gterm
+			   (da-term.copy (DA-VARIABLE.BINDING (da-term.symbol TERM)))))
+	   ;; variable.binding must remain unchanged. No way to undo changes !!
+	   (setf (da-term.symbol term) (da-term.symbol new.term))
+	   (setf (da-term.termlist term) (da-term.termlist new.term)))))
+  term)
+
+
+(DEFUN SAT=EVALUATE.LITERAL (LITERAL)
+
+  ;; Input:  a LITERAL with all bindings inserted
+  ;; Effect: see value
+  ;; Value:  evaluated LITERAL
+
+  ;; pruefen: ist LIT nicht immer richtig ???
+  
+  (LET ((LIT (EG-EVAL literal))) 
+    (COND ((DA-LITERAL.IS LIT) LIT)
+	  (T (SETF (DA-LITERAL.TERMLIST LITERAL)
+		   (MAPCAR #'SAT=EVALUATE.TERM (DA-LITERAL.TERMLIST LITERAL)))
+	     LITERAL))))
+	  
+
+(DEFUN SAT=EVALUATE.TERM (TERM)
+
+  ;; Input:  a TERM with all bindings inserted
+  ;; Effect: see value
+  ;; Value:  evaluated TERM
+
+  (COND ((EG-EVAL TERM))
+	(T TERM)))
+
+
+(DEFUN SAT=BIND.FORMAL.PARAMETERS (FORMAL.PARS ACTUAL.PARS)
+  
+  ;; Input:  list of FORMAL.PARS and list of ACTUAL.PARS
+  ;; Effect: actual parameters are inserted for formal parameters
+  ;; Value:  undefined
+
+  (sat=check.bindings formal.pars)
+  (MAPC #'(LAMBDA (FORMAL.PAR ACTUAL.PAR)
+	    (PUSH FORMAL.PAR SAT*RESET.BINDINGS)
+	    (SETF (DA-VARIABLE.BINDING formal.par) ACTUAL.PAR))
+	FORMAL.PARS ACTUAL.PARS))
+
+
+(DEFUN SAT=RESET.BINDINGS (bindings)
+
+  ;; Input:  a list of variables
+  ;; Effect: bindings of all variables in BINDINGS are reset
+  ;; Value:  undefined
+
+  (MAPC #'(LAMBDA(BINDING)
+		(SETF (DA-VARIABLE.BINDING BINDING) NIL))
+	bindings))
+
+
+(defun sat=check.bindings (variables &optional action)
+  (mapc #'(lambda (var)
+	    (cond ((da-variable.binding var)
+		   (sat=error "Variable still bound: ~a" (list var))))
+	    (cond (action (setf (da-variable.binding var) NIL))))
+	variables))
+
+
+(DEFMACRO SAT=SET.BINDING (VAR TERM)
+  `(progn (SETF (da-variable.binding (da-term.symbol ,VAR)) ,term)
+    (push (da-term.symbol ,var) sat*reset.bindings)))
+
+
+;;; =================================
+;;; Cycletest (currently not enabled)
+;;; =================================
+
+(DEFUN SAT=CHECK.ALTERNATIVE (ALT)
+
+  ;; Input:  list of literals
+  ;; Effect: see value 
+  ;; Value:  returns T, iff cycle detected 
+
+  (FIND-IF #'SAT=CHECK.CYCLES ALT))
+
+(DEFUN SAT=CHECK.CYCLES (LITERAL) 
+
+  ;; Input:  a LITERAL
+  ;; Effect: see value
+  ;; Value:  returns T, iff LITERAL is a subproblem of a literal similar to LITERAL
+
+  (LET ((POINTER SAT*LITERAL.POINTER))
+    (COND ((NOT (CONSP (CAR (DA-LITERAL.TERMLIST LITERAL)))) (SETQ POINTER 0))
+	  ((SAT=CHECK.CYCLES.1 LITERAL (SAT=GET.LITERAL SAT*LITERAL.POINTER))
+	   (SETQ POINTER -1)))
+;    (WHILE (> POINTER 0)			
+;      (COND ((NOT (NUMBERP (SAT=GET.LITERAL POINTER))) (DECF POINTER))
+;	    (T (SETQ LITERAL2 (SAT=BRANCH.ORIGINAL.INSTANCE (SAT=GET.LITERAL POINTER)))
+;	       (SETQ POINTER (1- (SAT=BRANCH.ORIGINAL.LITERAL (SAT=GET.LITERAL POINTER))))
+;	       (COND ((SAT=CHECK.CYCLES.1 LITERAL LITERAL2)
+;		      (SETQ POINTER -1)
+;		      (COND (SAT*TRACE (FORMAT t "~%Cycletest: ~a ~a" LITERAL LITERAL2))))))))
+    (COND ((EQ POINTER -1)
+	   (INCF SAT*CYCLES.DETECTED)
+	   T))))
+
+
+(DEFUN SAT=CHECK.CYCLES.1 (LITERAL LITERAL2)
+
+  ;; Input:  
+  ;; Effect:
+  ;; Value:  
+
+  (COND ((NUMBERP LITERAL2) NIL)
+	((EQ LITERAL2 'ROOT) NIL)
+	((NEQ (DA-LITERAL.SIGN LITERAL) (DA-LITERAL.SIGN LITERAL2)) NIL)
+	((NEQ (DA-LITERAL.SYMBOL LITERAL) (DA-LITERAL.SYMBOL LITERAL2)) NIL)
+	((NOT (CONSP (CAR (DA-LITERAL.TERMLIST LITERAL2))))NIL)
+	((SAT=SAME.LITERAL (DA-LITERAL.TERMLIST LITERAL) (DA-LITERAL.TERMLIST LITERAL2)) T)
+	((SAT=SAME.LITERAL (REVERSE (DA-LITERAL.TERMLIST LITERAL)) (DA-LITERAL.TERMLIST LITERAL2)) T)))
+
+
+(DEFUN SAT=SAME.LITERAL (PR1 PR2)
+
+  ;; Input:  two literals 
+  ;; Effect: see value 
+  ;; Value:  returns T, if same literal
+
+  (COND ((AND (CONSP PR1) (CONSP PR2))
+	 (EVERY #'(LAMBDA (X Y) (SAT=SAME.LITERAL X Y)) PR1 PR2))
+	((AND (SAT=VARIABLE.IS PR1)
+	      (SAT=VARIABLE.IS PR2)))
+	((uni-term.are.EQUAL PR1 PR2))))
+
+
+(DEFUN SAT=TEST.SYMBOL (SYMBOL)
+
+  ;; Input:  a SYMBOL
+  ;; Effect: prevents the expansion of symbol, iff not desired
+  ;; Value:  NIL, iff symbol has been expanded too often
+
+  (COND ((AND (or (DA-PREDICATE.IS SYMBOL) (da-function.is symbol))
+	      (NOT (DA-PREDICATE.definition SYMBOL))
+	      (neq (da-predicate.arity symbol) 0))
+	 (PUSH 'NO.DEFINITION SAT*CUT.REASONS) NIL)
+	((>= (COUNT SYMBOL SAT*EXPANDED.SYMBOLS) SAT*EXPANSIONS)
+	 (COND (SAT*TRACE
+		(FORMAT T "~%Symbol ~a not expanded (too deep) ~%=================================" SYMBOL)))
+	 (PUSH (LIST 'RECURSION SYMBOL) SAT*CUT.REASONS)
+	 NIL)
+	((AND (DA-FUNCTION.IS SYMBOL) (DA-FUNCTION.SKOLEM SYMBOL))
+	 (COND (SAT*TRACE
+		(FORMAT T "~%Symbol ~a is a skolem-function ~%==============================" SYMBOL)))
+	 (PUSH 'SKOLEM SAT*CUT.REASONS)
+	 NIL)
+	(T (PUSH SYMBOL SAT*EXPANDED.SYMBOLS)
+	   (SAT=PUSH.DATA 'EXPANDED.SYMBOL))))
+
+;;; =======================================
+;;; Finish
+;;; =======================================
+
+
+(DEFUN SAT=PRINT.SOLUTION (solution FORMULA cuts comment)
+
+  ;; Input:  a flag, gterm under consideration, list of cut subtrees and a comment flag
+  ;; Effect: writes solution to terminal
+  ;; Value:  a list of dotted pairs var -> binding
+  
+  (let (binding)
+    (setq binding
+	  (mapcar #'(lambda (var)
+		      (cons var (sat=insert.bindings.gterm (da-variable.binding var))))
+		  ;; Note: Bindings are modified. No way to undo these changes !
+		  (da-gterm.variables formula)))
+    (COND ((null comment))
+	  (solution
+	   (case comment
+	     (falsify (FORMAT T "~%~%This formula is not valid since with:  "))
+	     (satisfy (FORMAT T "~%~%This formula is satisfiable since with:  ")))
+	   (MAPC #'(LAMBDA (pair)
+		     (FORMAT T "~A -> ~A   " (car pair) (cond ((cdr pair))
+							      (T "any"))))
+		 binding)
+	   (case comment
+	     (falsify (FORMAT T "~%~%~{~6,2T~A~%~}~%is false.~%~%"
+			      (PR-PRINT.FORMULA (da-formula.negate formula))))
+	     (satisfy (FORMAT T "~%~%~{~6,2T~A~%~}~%is true.~%~%" (PR-PRINT.FORMULA formula)))))
+	  ((NULL cuts)
+	   (case comment
+	     (falsify
+	      (FORMAT T "~%There is no counterexample for this formula, thus the formula is valid.~%~%"))
+	     (satisfy
+	      (FORMAT T "~%There is no binding for this formula, ")
+	      (format t "thus the formula is not satisfiable.~%~%"))))
+	  (t (case comment
+	       (falsify (FORMAT T "~%No counterexample found, search stopped. "))
+	       (satisfy (FORMAT T "~%No binding found, search stopped. ")))
+	     (cond (sat*trace (format t"Reason: ~a" cuts)))))
+    (cond (solution binding)
+	  (t nil))))
+
+;;; ===============
+;;; Trace functions
+a327 21
+(DEFUN SAT=STAR.PRINT (PROBLEM OR.TREE)
+
+  ;; Input:  PROBLEM and OR.TREE
+  ;; Effect: all alternatives of OR.TREE are written to terminal with PROBLEM marked
+  ;; Value:  undefined
+
+  (MAPC #'(LAMBDA (P)
+	    (COND ((EQUAL PROBLEM P) (FORMAT T "~% * ~A" P))
+		  (T (FORMAT T "~%   ~A" P))))
+	OR.TREE))
+
+
+(defun sat=print.open.problems ()
+  (LET ((CURSOR SAT*LITERAL.POINTER) literal)
+    (format t "~%Open problems: ")
+    (WHILE (> CURSOR 0)
+      (SETQ LITERAL (SAT=GET.ACTUAL.LITERAL CURSOR))
+      (COND ((NUMBERP LITERAL)			; and - subtree is solved !
+	     (SETQ CURSOR (SAT=BRANCH.ORIGINAL.LITERAL LITERAL)))
+	    ((not (sat=literal.is.marked cursor)) (format t "~a " cursor) (decf cursor))
+	    (t (decf cursor))))))
+d330 1
+a330 18
+(DEFUN SAT=ERROR (STRING &OPTIONAL ARGLIST)
+
+  ;; Input:  an error-message
+  ;; Effect: error-message is written to terminal, ao-mechanizm is aborted
+  ;; Value:  undefined
+
+  (FORMAT T "~%~%Warning from Satisfier: Consistency violated !!")
+  (format t "~%===============================================")
+  (format t "~%Please report to your local dealer (mp) !!~%------------------------------------------")
+  (FORMAT T "~%~?~%" STRING ARGLIST)
+  (break)
+  (THROW 'SAT*ABNORMAL.EXIT (VALUES NIL 'abnormal.exit)))
+
+
+;;; Misc. functions
+;;; ===============
+
+(DEFUN SAT=CREATE.FUNCTION.WITH.NEW.VARS (SYMBOL)
+d336 2
+a337 2
+  (COND ((DA-FUNCTION.IS SYMBOL)
+	 (da-term.create symbol (MAPCAR #'(LAMBDA (SORT)
+d339 2
+a340 27
+					(DA-FUNCTION.DOMAIN.SORTS SYMBOL))))
+ 	(T SYMBOL)))
+
+
+(DEFUN SAT=ORIENTATE.LITERAL (LITERAL)
+  
+  ;; Input:  a LITERAL
+  ;; Effect: termlist is reverted when necessary, i.e. to assure the ordering var < sel < cons < def
+  ;;         on the symbols of left and right
+  ;; Value:  the canged LITERAL
+  
+  (cond ((not (da-predicate.is.equality (da-literal.symbol literal))) literal)
+	(T (LET ((LEFT (CAR (DA-LITERAL.TERMLIST LITERAL)))
+		 (RIGHT (CADR (DA-LITERAL.TERMLIST LITERAL))))
+	     (cond ((not (sat=sort.is.constructive (da-term.sort left)))
+		    (sat=error "inconstructive sort"))
+		   ((not (sat=sort.is.constructive (da-term.sort right)))
+		    (sat=error "inconstructive sort"))
+		   ((or (AND (da-VARIABLE.IS (da-term.symbol RIGHT))
+			     (NOT (da-VARIABLE.IS (da-term.symbol LEFT))))
+			(AND (SAT=SYMBOL.IS.SELECTOR RIGHT)
+			     (NOT (da-VARIABLE.IS (da-term.symbol LEFT)))
+			     (NOT (SAT=SYMBOL.IS.SELECTOR LEFT)))
+			(AND (SAT=SYMBOL.IS.DEFINED RIGHT)
+			     (SAT=SYMBOL.IS.CONSTRUCTOR LEFT)))
+		    (SETF (DA-LITERAL.TERMLIST LITERAL) (REVERSE (DA-LITERAL.TERMLIST LITERAL))))))
+	   literal)))
+a346 2
+(DEFUN SAT=OCCUR.CHECK (var term)
+  ;;; INSIDE ???
+d348 1
+a348 3
+  ;; Input:  an ITEM and a TERMLIST
+  ;; Effect: see value
+  ;; Value:  returns t, if item occurs as a subterm of termlist.
+d350 15
+a364 5
+  (COND ((da-term.termlist term)
+	 (SOME #'(LAMBDA (subTERM)
+		    (SAT=OCCUR.CHECK var subTERM))
+ 		(da-term.TERMLIST term)))
+	((uni-term.are.equal var term))))
+d367 1
+a367 1
+(DEFUN SAT=TERM.OCCURS.IN.TERM (TERM1 TERM2)
+d369 3
+a371 2
+  ;;; Input:   two terms
+  ;;; Value:   T iff TERM1 is a strict subterm of TERM2, NIL else.
+a372 2
+  (COND ((uni-term.are.EQUAL TERM1 TERM2) NIL)
+	(T (SAT=TERM.OCCURS.IN.TERM.1 TERM1 TERM2))))
+d374 1
+d376 1
+a376 6
+(DEFUN SAT=TERM.OCCURS.IN.TERM.1 (TERM1 TERM2)
+  (COND ((uni-term.are.equal TERM1 TERM2) T)
+	((AND (CONSP TERM2) (SAT=SYMBOL.IS.CONSTRUCTOR TERM2))
+	 (SOME #'(LAMBDA (SUBTERM)
+		   (SAT=TERM.OCCURS.IN.TERM.1 TERM1 SUBTERM))
+	       (DA-TERM.TERMLIST TERM2)))))
+a378 2
+(DEFMACRO SAT=VARIABLE.IS (TERM)
+  `(da-variable.is (da-term.symbol ,term)))
+d380 1
+d382 4
+a385 2
+(DEfmacro SAT=SYMBOL.IS.CONSTRUCTOR (term)
+  `(DA-SYMBOL.IS.STRUCTURE (da-term.symbol ,term)))
+a387 1
+(DEFmacro SAT=SYMBOL.IS.DEFINED (TERM)
+d389 1
+a389 8
+  ;; Input:  a TERM
+  ;; Effect: see value 
+  ;; Value:  T, iff leading symbol is defined or skolem function
+  
+  `(AND (da-term.termlist ,TERM)
+        (DA-FUNCTION.IS (DA-TERM.SYMBOL ,TERM))
+        (OR (DA-SYMBOL.HAS.ATTRIBUTE (DA-TERM.SYMBOL ,TERM) 'DEFINED)
+            (DA-FUNCTION.SKOLEM (DA-TERM.SYMBOL ,TERM)))))
+d391 3
+a394 3
+(DEFmacro SAT=SYMBOL.IS.SELECTOR (term)
+  `(AND (DA-FUNCTION.IS (da-term.symbol ,term))
+        (DA-SYMBOL.HAS.ATTRIBUTE (da-term.symbol ,term) 'SEL.STRUCTURE)))
+d396 1
+d398 5
+a402 2
+(DEFmacro SAT=SYMBOL.IS.REFLEXIVE (term)
+  `(DA-SYMBOL.HAS.ATTRIBUTE (da-term.SYMBOL ,term) 'SORT.REFLEXIVE))
+a404 1
+(DEFUN SAT=TERM.IS.CONSTRUCTOR.TERM (TERM)
+d406 4
+a409 3
+  ;; Input:  a TERM 
+  ;; Effect: see value
+  ;; Value:  T, iff TERM contains no defined symbols
+d411 13
+a423 5
+  (COND ((CONSP TERM)
+	 (AND (DA-SYMBOL.IS.STRUCTURE (DA-TERM.SYMBOL TERM))
+	      (EVERY #'SAT=TERM.IS.CONSTRUCTOR.TERM (DA-TERM.TERMLIST TERM))))
+	((DA-SYMBOL.IS.STRUCTURE TERM))
+	((SAT=VARIABLE.IS TERM))))
+a425 2
+(defmacro sat=sort.is.constructive (sort)
+  `(member 'structure (da-sort.attributes ,sort)))
+d427 1
+d429 5
+a433 3
+;;; ----------------------------
+;;; datastructures
+;;; ----------------------------
+d435 11
+a445 1
+;; Typedeclaration and access-functions for SAT*LITERAL.STACK
+a446 8
+(DEFUN SAT=PUSH.LITERAL (LITERAL)
+  (SETF (AREF SAT*LITERAL.STACK (INCF SAT*LITERAL.POINTER) 0) LITERAL)
+  (SETF (AREF SAT*LITERAL.STACK SAT*LITERAL.POINTER 1)
+	(cond ((da-literal.is literal) (DA-literal.COPY LITERAL))
+	      (t literal)))
+  (SETF (AREF SAT*LITERAL.STACK SAT*LITERAL.POINTER 2) NIL)
+  (COND ((AND (NOT (NUMBERP LITERAL)) SAT*TRACE)
+	 (FORMAT T "~%~a: " SAT*LITERAL.POINTER) (da=LITERAL.print literal t t))))
+d448 1
+a448 2
+(DEFMACRO SAT=POP.LITERALS (POSITION)
+  `(SETF SAT*LITERAL.POINTER ,POSITION))
+d450 5
+a454 2
+(DEFMACRO SAT=GET.LITERAL (POSITION)
+  `(AREF SAT*LITERAL.STACK ,POSITION 0))
+d456 6
+a461 2
+(DEFMACRO SAT=GET.ACTUAL.LITERAL (POSITION)
+  `(AREF SAT*LITERAL.STACK ,POSITION 1))
+a462 2
+(DEFMACRO SAT=PUT.ACTUAL.LITERAL (POSITION LITERAL)
+  `(SETF (AREF SAT*LITERAL.STACK ,POSITION 1) ,LITERAL))
+a463 3
+(DEFMACRO SAT=MARK.LITERAL.SOLVED (REFERENCE)
+  `(progn (cond (sat*trace (format t "~%Marking ~a solved" ,reference)))
+    (SETF (AREF SAT*LITERAL.STACK ,REFERENCE 2) T)))
+a464 3
+(DEFMACRO SAT=UNMARK.LITERAL.SOLVED (REFERENCE)
+  `(progn (cond (sat*trace (format t "~%Unmarking ~a" ,reference)))
+    (SETF (AREF SAT*LITERAL.STACK ,REFERENCE 2) NIL)))
+d466 1
+a466 2
+(DEFMACRO SAT=LITERAL.IS.MARKED (REFERENCE)
+  `(AREF SAT*LITERAL.STACK ,REFERENCE 2))
+d468 7
+a474 104
+
+;; Typedeclaration and access-functions for SAT*BRANCH.STACK
+
+(DEFMACRO SAT=BRANCH.OR.TREE (POS) `(AREF SAT*BRANCH.STACK ,POS 0))
+
+(DEFMACRO SAT=BRANCH.ORIGINAL.LITERAL (POS) `(AREF SAT*BRANCH.STACK ,POS 1))  ;; return adress!!
+
+(DEFMACRO SAT=BRANCH.DATA.POINTER (POS) `(AREF SAT*BRANCH.STACK ,POS 2))
+
+(DEFMACRO SAT=BRANCH.LAST.LITERAL (POS) `(AREF SAT*BRANCH.STACK ,POS 3))
+
+(DEFMACRO SAT=BRANCH.ORIGINAL.INSTANCE (POS) `(AREF SAT*BRANCH.STACK ,POS 4))
+
+(DEFMACRO SAT=BRANCH.CYCLE.STATE (POS) `(AREF SAT*BRANCH.STACK ,POS 5))
+
+
+(DEFMACRO SAT=PUT.OR.TREE (POS OR.TREE)
+  `(SETF (AREF SAT*BRANCH.STACK ,POS 0) ,OR.TREE))
+
+
+(DEFUN SAT=INSERT.BRANCH.STEP (CURSOR OR.TREE DATA.POINTER INSTANCE)
+  
+  ;; Value  : NIL, if SAT*BRANCH.DEPTH is exceeded, non-NIL else.
+  
+  (COND ((< (INCF SAT*BRANCH.POINTER) SAT*BRANCH.DEPTH)
+	 (SETQ SAT*MAX.BRANCH.POINTER (MAX SAT*BRANCH.POINTER SAT*MAX.BRANCH.POINTER))
+	 (SETF (AREF SAT*BRANCH.STACK SAT*BRANCH.POINTER 0) OR.TREE)
+	 (SETF (AREF SAT*BRANCH.STACK SAT*BRANCH.POINTER 1) CURSOR)
+	 (SETF (AREF SAT*BRANCH.STACK SAT*BRANCH.POINTER 2) DATA.POINTER)
+	 (SETF (AREF SAT*BRANCH.STACK SAT*BRANCH.POINTER 3) SAT*LITERAL.POINTER)
+	 (SETF (AREF SAT*BRANCH.STACK SAT*BRANCH.POINTER 4) (da-gterm.copy INSTANCE)))
+	(T (DECF SAT*BRANCH.POINTER)
+	   (COND (SAT*TRACE (FORMAT T "~%SAT*BRANCH DEPTH exceeded ~%=========================")))
+	   (PUSH 'TOO.DEEP SAT*CUT.REASONS)
+	   NIL)))
+
+
+;; Typedeclaration and access-functions for SAT*DATA.STACK
+
+(DEFUN SAT=POP.DATASTACK (POSITION)
+  (let ((pos position))
+    (WHILE (< POS SAT*DATA.POINTER)
+      (incf pos)
+      (SAT=POP.DATA (AREF SAT*DATA.STACK pos)))
+    (setq sat*data.pointer position)))
+
+
+(DEFUN SAT=POP.DATA (DATA)
+  (COND ((NUMBERP DATA)     ;; literal has to be restored
+	 (SAT=PUT.ACTUAL.LITERAL data (SAT=EVALUATE.LITERAL (sat=insert.bindings.gterm
+							     (da-literal.copy (SAT=GET.LITERAL data)))))
+	 (COND ((SAT=LITERAL.IS.SOLVED (SAT=GET.ACTUAL.LITERAL data))
+		(SAT=MARK.LITERAL.SOLVED data))
+	       (T (SAT=UNMARK.LITERAL.SOLVED data))))
+	((EQ DATA 'EXPANDED.SYMBOL) (POP SAT*EXPANDED.SYMBOLS))
+	((da-variable.is (da-term.symbol data)) (setf (da-variable.binding (da-term.symbol data)) nil))
+	(T (SAT=ERROR "~%ERROR: unidentified object ~a appearing on user-stack" (list data)))))
+
+
+(DEFUN SAT=PUSH.DATA (DATA)
+  (cond ((or (numberp data)
+	     (eq data 'expanded.symbol))
+	 (INCF SAT*DATA.POINTER)
+	 (SETF (AREF SAT*DATA.STACK SAT*DATA.POINTER) data))
+	((da-variable.is (da-term.symbol DATA))
+	 (INCF SAT*DATA.POINTER)
+	 (SETF (AREF SAT*DATA.STACK SAT*DATA.POINTER) (da-term.copy data)))
+	(T (SAT=ERROR "~%ERROR: unidentified object ~a pushed on user-stack" (list data)))))
+
+
+;; Currently not in use
+;; --------------------
+
+(defun sat=gterm.copy (gterm)
+  (let (variables)
+    (mapc #'(lambda(var)
+	      (setq variables (acons var (da-variable.create (da-variable.sort var)) variables)))
+	  (da-gterm.variables gterm))
+    (sat=gterm.copy.1 gterm variables)))
+
+
+(defun sat=gterm.copy.1 (gterm &optional variables)
+  (cond ((or (equal (da-gterm.symbol gterm) 'and)
+	     (equal (da-gterm.symbol gterm) 'or))
+	 (da-gterm.create (da-gterm.symbol gterm)
+			  (mapcar #'(lambda (subterm)
+				      (sat=gterm.copy.1 subterm variables))
+				  (da-gterm.termlist gterm))
+			  (da-gterm.colours gterm)
+			  (da-gterm.attributes gterm)))
+	((da-literal.is gterm)
+	 (da-literal.create (da-literal.sign gterm)
+			    (da-literal.symbol gterm)
+			    (mapcar #'(lambda(term)
+					(sat=gterm.copy.1 term variables))
+				    (da-literal.termlist gterm))
+			    (da-literal.attributes gterm)))
+	(T            ;; now it's a term
+	 (da-term.create (cond ((da-variable.is (da-term.symbol gterm))
+				(cdr (assoc (da-term.symbol gterm) variables)))
+			       (T (da-term.symbol gterm)))
+			 (mapcar #'(lambda(term)
+				     (sat=gterm.copy.1 term variables))
+				 (da-term.termlist gterm))))))
+d477 1
+d479 10
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d103 2
+a104 2
+	 (EVERY #'SAT=SORT.IS.FREE (MAPCAR #'DA-TERM.SORT (DA-LITERAL.TERMLIST GTERM))))
+	(T (EVERY #'SAT=GTERM.IS.APLICABLE (DA-GTERM.TERMLIST GTERM)))))
+@

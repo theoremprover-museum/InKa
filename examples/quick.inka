@@ -1,0 +1,85 @@
+structure nil, cons(car:nat, cdr:list):list;
+
+predicate le(x, y:nat) =
+if x = 0 then true
+if x = s(p(x)) and y = 0 then false
+otherwise le(p(x), p(y));
+
+function gtlist(x:nat, y:list):list =
+if y = nil then nil
+if y = cons(car(y), cdr(y)) and le(x, car(y)) 
+    then cons(car(y), gtlist(x, cdr(y)))
+if y = cons(car(y), cdr(y)) and not le(x, car(y))
+    then gtlist(x, cdr(y));
+
+function lelist(x:nat, y:list):list =
+if y = nil then nil
+if y = cons(car(y), cdr(y)) and le(x, car(y))
+    then lelist(x, cdr(y))
+if y = cons(car(y), cdr(y)) and not le(x, car(y))
+    then cons(car(y), lelist(x, cdr(y)));
+
+function app(x, y:list):list =
+if x = nil then y
+otherwise cons(car(x), app(cdr(x), y));
+
+function quick(x:list):list =
+if x = nil then nil
+otherwise app(quick(lelist(car(x), cdr(x))),  
+              cons(car(x), quick(gtlist(car(x), cdr(x)))));
+
+predicate leall(x:nat, y:list) =
+if y = nil then true
+otherwise le(x, car(y)) and leall(x, cdr(y));
+
+predicate ordered(x:list) =
+if x = nil then true
+otherwise leall(car(x), cdr(x)) and ordered(cdr(x));
+
+predicate geall(x:nat, y:list) =
+if y = nil then true
+otherwise not le(x, car(y)) and geall(x, cdr(y));
+
+
+all x:nat le(x, x);
+
+all x,y:nat le(x, y) or le(y, x);
+
+all x,y:nat not le(x, y) or not le(y, x) or x = y;
+
+all x:list all n:nat leall(n, gtlist(n, x));
+
+all x:list all n:nat geall(n, lelist(n, x));
+
+all x:list all n,m:nat not geall(n, x) impl 
+      (not geall(n, gtlist(m, x)) or not geall(n, lelist(m, x)));
+
+all x,y:list all n,m:nat geall(m, app(x, cons(n, y))) impl 
+           (geall(m, x) and not le(m, n) and geall(m, y));
+
+
+all x:list all n:nat not geall(n, cdr(x)) impl
+     (not geall(n, gtlist(car(x), cdr(x))) or 
+      not geall(n, lelist(car(x), cdr(x))));
+
+all x:list all n:nat not geall(n, x) impl not geall(n, quick(x));
+
+all x,y:list all n,m:nat leall(n, x) and leall(n, y) and le(n, m)
+                    impl leall(n, app(x, cons(m, y)));
+
+all x,y,z:nat not le(y, x) and le(z, x) impl le(z, y);
+
+all x:list all n,m:nat leall(n, x) and not leall(m, x) impl le(n, m);
+
+all x,y:list all n:nat geall(n, x) and leall(n, y) 
+                       and ordered(x) and ordered(y)
+                  impl ordered(app(x, cons(n, y)));
+
+
+all x:list ordered(quick(x));
+
+
+
+
+
+

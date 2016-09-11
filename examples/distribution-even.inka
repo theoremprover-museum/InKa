@@ -1,0 +1,21 @@
+ -INSERT
+STRUCTURE 0 succ (pred:number):number
+ |
+ -INSERT
+STRUCTURE empty add (head:number tail:list):list
+ |
+ -INSERT
+FUNCTION distribute.odd (l1:list):list =
+IF l1 = empty THEN empty
+IF l1 = add (head (l1) tail (l1)) AND tail (l1) = empty THEN l1
+IF l1 = add (head (l1) tail (l1)) AND NOT tail (l1) = empty
+   THEN add (head (l1) distribute.odd (tail (tail (l1))))
+ |
+ -INSERT
+FUNCTION distribute.even (l1:list):list =
+IF l1 = empty THEN empty
+IF l1 = add (head (l1) tail (l1)) AND tail (l1) = empty THEN empty
+IF l1 = add (head (l1) tail (l1)) AND NOT tail (l1) = empty
+   THEN distribute.odd (tail (l1))
+ |
+ OK
